@@ -1,42 +1,44 @@
-<h1>Rust is FP?</h1>
+# Rust is FP?
 
 
-I often see people claim that Rust is basically "fast FP" (in the cases where FP
-is actually more expressive than imperative). This is a short article comparing
-the FP expressiveness of various languages. I'll use quicksort for this.
+I often see people claim that Rust is basically "fast FP" (in the cases
+where FP is actually more expressive than imperative). This is a short
+article comparing the FP expressiveness of various languages. I'll use
+quicksort for this.
 
-<h2>Haskell</h2>
+## Haskell
 
-Pretty hard to beat haskell here. First class support for filters is nice, so we
-can do something like this...
+Pretty hard to beat haskell here. First class support for filters is
+nice, so we can do something like this...
 
-<pre>
+```
 quicksort [] = []
 quicksort (x : xs) =
   quicksort [y | y <- xs, y < x]
   ++ [x]
   ++ quicksort [y | y <- xs, y >= x]
-</pre>
+```
 
 That being said, I actually prefer this
 
-<pre>
+```
 quicksort [] = []
 quicksort (x : xs) = f (< x) ++ [x] ++ f (x <=)
   where f p = quicksort (filter p xs)
-</pre>
+```
 
 It's just so clear how the algorithm works just by looking at that line.
-<code>f (x >) ++ [x] ++ f (x <=)</code>. "The stuff smaller than x, then x, then
+`f (x >) ++ [x] ++ f (x <=)`. "The stuff smaller than x, then x, then
 the stuff bigger than x". So clean.
 
-<h2>Python</h2>
+## Python
 
-Python's got some new features since 3.10 that make this a lot easier. It's 
-pretty clean (if, in the normal python fashion a little spread out). We have to
-flip the match statement around here for type inference.
+Python's got some new features since 3.10 that make this a lot easier.
+It's pretty clean (if, in the normal python fashion a little spread
+out). We have to flip the match statement around here for type
+inference.
 
-<pre>
+```
 def quicksort(xs):
     match xs:
         case [y, *ys]:
@@ -44,38 +46,39 @@ def quicksort(xs):
             return f(lambda x: x < y) + [y] + f(lambda x: x >= y)
         case _:
             return []
-</pre>
+```
 
-<h2>JavaScript</h2>
+## JavaScript
 
-JavaScript is surprisingly clean here. You can get away with not using any 
-braces at all, becuase it's so relaxed with... well, everything. This makes it a
-little trickier though... I overlooked the potential of the first element being
-falsey, so we have to do this proper equality check... 
+JavaScript is surprisingly clean here. You can get away with not using
+any braces at all, becuase it's so relaxed with... well, everything.
+This makes it a little trickier though... I overlooked the potential of
+the first element being falsey, so we have to do this proper equality
+check...
 
-<pre>
+```
 const quicksort = ([x, ...xs]) => x !== undefined
     ? [...quicksort(xs.filter(y => y < x)), x, ...quicksort(xs.filter(y => y >= x))]
     : []
-</pre>
+```
 
-The drawback here is that a list with <code>undefined</code> in it doesn't sort 
-properly. If we want that to work, we have to do this. It's an easy fix, but 
-sadly the original elegance is lost slightly.
+The drawback here is that a list with `undefined` in it doesn't sort
+properly. If we want that to work, we have to do this. It's an easy fix,
+but sadly the original elegance is lost slightly.
 
-<pre>
+```
 const quicksort = ns => {
     if (ns.length == 0) return [];
     const [x, ...xs] = ns;
     return [...quicksort(xs.filter(y => y < x)), x, ...quicksort(xs.filter(y => y >= x))];
 }    
-</pre>
+```
 
-<h2>Rust</h2>
+## Rust
 
 Ok, so let's try Rust. 
 
-<pre>
+```
 fn quicksort&lt;T: PartialOrd + Clone&gt;(xs: &[T]) -&gt; Vec&lt;T&gt; {
     fn qs&lt;'a, T: PartialOrd&gt;(xs: &[&'a T]) -&gt; Vec&lt;&'a T&gt; {
         match *xs {
@@ -95,10 +98,10 @@ fn quicksort&lt;T: PartialOrd + Clone&gt;(xs: &[T]) -&gt; Vec&lt;T&gt; {
     }
     qs(&Vec::from_iter(xs)).into_iter().cloned().collect()
 }
-</pre>
+```
 
-Oh... my goodness. We've had to do a bunch of terrible things here. Firstly, 
-<code>T</code> might be a deep type... in which case we don't want to clone more
-than once, so we have to convert into a <code>&[&T]</code>. Also, to make this
-shorter, we have to use <code>dyn</code> eugh!. I mean, this probably does 
-<i>less</i> than the Haskell version.
+Oh... my goodness. We've had to do a bunch of terrible things here.
+Firstly, `T` might be a deep type... in which case we don't want to
+clone more than once, so we have to convert into a `&[&T]`. Also, to
+make this shorter, we have to use `dyn` eugh!. I mean, this probably
+does _less_ than the Haskell version.

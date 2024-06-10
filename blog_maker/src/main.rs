@@ -38,13 +38,7 @@ fn all_files_with_ext(dir: impl AsRef<Path>, ext: &str) -> Vec<NamedFile> {
 
 fn convert_to_html(md: &str) -> (String, String) {
     let lines = md.split('\n').collect::<Vec<_>>();
-    let heading = String::from(
-        lines
-            .first()
-            .expect("md contains a header")
-            .trim_matches('#')
-            .trim(),
-    );
+    let heading = markdown::to_html(lines.first().expect("md contains a header"));
     let mut md = String::new();
     for line in &lines[1..] {
         md.push_str(line);
