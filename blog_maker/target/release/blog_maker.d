@@ -1,1 +1,0 @@
-/home/oli/Documents/Coding/HTML/PersonalWebsite/blog_maker/target/release/blog_maker: /home/oli/Documents/Coding/HTML/PersonalWebsite/blog_maker/src/main.rs /home/oli/Documents/Coding/HTML/PersonalWebsite/blog_maker/src/template.html
