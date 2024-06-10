@@ -1,12 +1,7 @@
 //! I am pretty much using Rust as a scripting language here -- so don't think
 //! that this is some example of high-quality, robust Rust code.
 
-use markdown::{self, mdast};
-use std::{
-    fs::{self, DirEntry},
-    io::Write,
-    path::Path,
-};
+use std::{fs, io::Write, path::Path};
 
 const TEMPLATE: &str = include_str!("template.html");
 
