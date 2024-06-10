@@ -79,21 +79,21 @@ const quicksort = ns => {
 Ok, so let's try Rust. 
 
 ```
-fn quicksort&lt;T: PartialOrd + Clone&gt;(xs: &[T]) -&gt; Vec&lt;T&gt; {
-    fn qs&lt;'a, T: PartialOrd&gt;(xs: &[&'a T]) -&gt; Vec&lt;&'a T&gt; {
+fn quicksort<T: PartialOrd + Clone>(xs: &[T]) -> Vec<T> {
+    fn qs<'a, T: PartialOrd>(xs: &[&'a T]) -> Vec<&'a T> {
         match *xs {
-            [x, ref xs @ ..] =&gt; {
-                let filterxs = |p: &dyn Fn(&&T) -&gt; bool| {
-                    qs(&xs.iter().copied().filter(p).collect::&lt;Vec&lt;&T&gt;&gt;())
+            [x, ref xs @ ..] => {
+                let filterxs = |p: &dyn Fn(&&T) -> bool| {
+                    qs(&xs.iter().copied().filter(p).collect::<Vec<&T>>())
                 };
                 Vec::from_iter(
-                    filterxs(&move |&y| y &lt; x)
+                    filterxs(&move |&y| y < x)
                         .into_iter()
                         .chain([x])
-                        .chain(filterxs(&move |&y| y &gt;= x)),
+                        .chain(filterxs(&move |&y| y >= x)),
                 )
             }
-            [] =&gt; vec![],
+            [] => vec![],
         }
     }
     qs(&Vec::from_iter(xs)).into_iter().cloned().collect()
