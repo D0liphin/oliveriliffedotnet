@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-    
+
 <head>
     <title>Oliver Iliffe's Website</title>
     <meta charset="UTF-8">
@@ -10,7 +10,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --almost-black: rgb(30, 30, 30);
@@ -28,11 +30,14 @@
             color: var(--primary-color);
         }
 
-        h1, h2, h3, h4 {
+        h1,
+        h2,
+        h3,
+        h4 {
             font-family: "Open Sans", sans-serif;
             font-weight: 800;
         }
-        
+
         a:hover {
             color: var(--primary-color);
         }
@@ -46,6 +51,43 @@
             background-color: var(--secondary-color);
         }
 
+        .everything-container {
+            padding: 20px;
+        }
+
+        @media (max-width: 500px) {
+            .everything-container {
+                padding: 0px;
+            }
+        }
+
+        .name-and-face {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0px 20px 0px 20px;
+        }
+
+        .name-and-face>img {
+            border-radius: 50%;
+            max-height: 140px;
+            z-index: 100;
+        }
+
+        @media (max-width: 500px) {
+            .name-and-face>img {
+                max-height: 100px;
+            }
+
+            .name-and-face p {
+                font-size: 12px;
+            }
+
+            .name-and-face {
+                margin-bottom: 10px;
+            }
+        }
+
         .img-with-border {
             border: 5px solid var(--primary-color);
         }
@@ -57,6 +99,26 @@
         .inverse * a:hover {
             color: var(--secondary-color);
         }
+
+        .content-container {
+            border-radius: 5px;
+            background-color: var(--primary-color);
+            padding: 20px;
+            bottom: 30px;
+            position: relative;
+        }
+
+        @media (max-width: 500px) {
+            .content-container {
+                border-radius: 0px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .ferris-the-crab {
+                visibility: hidden;
+            }
+        }
     </style>
 </head>
 
@@ -67,47 +129,50 @@
 </style>
 
 <div style="max-width: 800px; margin-left: auto; margin-right: auto;">
-    <div style="padding: 20px;">
-        <div style="display: flex; align-items: center; justify-content: space-between; padding: 0px 20px 0px 20px;">
+    <div class="everything-container">
+        <div class="name-and-face">
             <div>
                 <h1>OLIVER ILIFFE</h1>
                 <p style="position: relative; bottom: 20px;">Computer Science Student @ Imperial</p>
             </div>
-            <img src="img/me.jpeg" class="img-with-border" style="border-radius: 50%; max-height: 140px; z-index: 100;" alt="Me, on a boat!"/>
+            <img src="img/me.jpeg" class="img-with-border" alt="Me, on a boat!" />
         </div>
-    
-        <div class="inverse" style="border-radius: 5px; background-color: var(--primary-color); padding: 20px; bottom: 30px; position: relative;">
-            <img 
-                src="img/ferris.png" 
-                alt="Ferris the crab, the Rust mascot" 
-                style="
+
+        <div class="content-container inverse">
+            <img src="img/ferris.png" alt="Ferris the crab, the Rust mascot" style="
                     position: absolute; 
                     transform: rotate(-10deg);
                     left: -15px;
                     top: -20px;
                     height: 40px;
                     z-index: 1000;
-                "
-            />
+                " class="ferris-the-crab" />
             <p>
-                I am currently a student at <a href="https://www.imperial.ac.uk/">Imperial College London</a> completing an 
-                <a href="https://www.imperial.ac.uk/computing/prospective-students/courses/pg/mac/">MSc in "Advanced Computer Science"</a>.
-                Previously, I graduated from <a href="https://www.kcl.ac.uk/">King's College London</a> with a 
-                <a href="https://www.kcl.ac.uk/study/undergraduate/courses/computer-science-bsc">BSc in Computer Science</a>. 
+                I am currently a student at <a href="https://www.imperial.ac.uk/">Imperial College London</a> completing
+                an
+                <a href="https://www.imperial.ac.uk/computing/prospective-students/courses/pg/mac/">MSc in "Advanced
+                    Computer Science"</a>.
+                Previously, I graduated from <a href="https://www.kcl.ac.uk/">King's College London</a> with a
+                <a href="https://www.kcl.ac.uk/study/undergraduate/courses/computer-science-bsc">BSc in Computer
+                    Science</a>.
             </p>
             <p>
-                I am particularly interested in the tools we use to build systems that are resilient, secure and fast. Roughly, this is the union 
-                of some subset of programming languages and some subset of systems. I am interested in type systems and language features that 
-                aid performance or safety, as well as efforts to formally define the operational semantics of unsafe, high-level languages.
+                I am particularly interested in the tools we use to build systems that are resilient, secure and fast.
+                Roughly, this is the union
+                of some subset of programming languages and some subset of systems. I am interested in type systems and
+                language features that
+                aid performance or safety, as well as efforts to formally define the operational semantics of unsafe,
+                high-level languages.
             </p>
             <p>
-                If you want a more comprehensive list of skills + experience, consult <a href="OliverIliffeCv.pdf">my CV</a>.
+                If you want a more comprehensive list of skills + experience, consult <a href="OliverIliffeCv.pdf">my
+                    CV</a>.
             </p>
-    
+
             <h2>BLOG</h2>
             <p>
-                Not necessarily a serious blog, just whatever comes to mind. 
-            </p>        
+                Not necessarily a serious blog, just whatever comes to mind.
+            </p>
             <ul>
                 <li>
                     <a href="">Another Hashtable Implementation</a>
@@ -119,7 +184,7 @@
                     <a href="blog/item-scoped-unsafe-code.html">Item-scoped Unsafe Code</a>
                 </li>
             </ul>
-        
+
             <h2>CONTACT</h2>
             <table>
                 <tr>
@@ -134,4 +199,5 @@
         </div>
     </div>
 </div>
+
 </html>
