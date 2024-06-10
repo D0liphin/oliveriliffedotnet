@@ -193,7 +193,6 @@ What's exciting is I made the whole thing generic over a chunk size and
 an underlying generic SIMD vector type... Incoming comparison of
 different vector sizes. My hardware supports AVX-512, so that should be
 fun.</p>
-<h3><code>movemask_eq</code></h3>
 <p>The only SIMD instruction we need to understand is
 <code>simd&lt;vector_t&gt;::movemask_eq</code>.</p>
 <pre><code class="language-cpp">template &lt;typename T&gt; struct simd
@@ -226,6 +225,37 @@ vector <code>u</code>.</li>
 <code>0x00ff00ff</code> for the above example.</li>
 <li>Squish this to a bitmask.</li>
 </ol>
+<p>Lookup, conceptually, is very simple then. Once we have the insertion
+index (<code>hash % size</code>), we find the chunk that's a part of. Then we
+produce a few masks:</p>
+<pre><code class="language-cpp">ctrlmask_t keep_mask = std::numeric_limits&lt;ctrlmask_t&gt;::max() &lt;&lt; ctrlbyte_offset;
+ctrlmask_t hit_mask = movemask_eq(ctrlchunk.as_simd(), h7(h)) &amp; keep_mask;
+ctrlmask_t empty_mask =
+    movemask_eq(ctrlchunk.as_simd(), CtrlChunk::CTRL_EMPTY) &amp; keep_mask;
+</code></pre>
+<p>First, to clear any confusion, bit indices start at the
+<em>least</em>-significant bit. The <code>keep_mask</code> is telling us to ignore the
+first few bits. Index <code>18</code> for example would require us to skip bits
+<code>0..=1</code>, since there is no point probing those.</p>
+<p>We use <code>__builtin_ctz()</code> to find the next offset to probe at. This
+compiles to a <code>rep bsf</code> string instruction... Since we're actually
+trying to produce a mask equal to the final high-bit, there are other
+bit-manipulation ways we can do this, and we spam <code>__builtin_ctz()</code>
+<em>a lot</em>. More to come on benchmarks with this.</p>
+<p>So, as you can imagine, we're essentially getting these chunk masks in
+order and consuming either the next empty entry or the next h7 hit and
+updating the masks as we go. Whenever we get an h7 hit, we go into the
+main <code>Entry[]</code> buffer and test full equality on the key. A type trait is
+added for how key equality should be computed, either first test the
+hash then the full key, or just test the keys right away. For a
+<code>std::string</code>, you could be better off testing the hash first, but
+again, I'd need to do some benchmarks to find out.</p>
+<h2>So how fast is it?</h2>
+<p>Not very. Right now, we quadruple in size whenever our load reaches
+87.5%. The chunks are <code>__m128i</code>s. On my machine, 100,000,000 insertions
+on a <code>HashTbl&lt;size_t, size_t&gt;</code> takes just over 3 seconds, and is 12%
+<em>slower</em> than <code>std::unordered_map</code>!. Terrible. I think we can get this
+much, much faster. The next article will hopefully detail how I do that.</p>
 
         </div>
     </div>
