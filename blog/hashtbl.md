@@ -6,7 +6,7 @@ things will get a lot faster over time.
 
 The hashtable is being built as part of a hashtable drag-race. The
 participants are `std::unordered_map`, FFHT (by 
-[this guy](www.rubensystems.com)) and me. Mine is just called `HashTbl`.
+[this guy](https://www.rubensystems.com)) and me. Mine is just called `HashTbl`.
 
 ## High-level Design
 

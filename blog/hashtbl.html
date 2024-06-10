@@ -142,7 +142,7 @@ First, I will detail my high-level logic and version 0.1.0. Hopefully
 things will get a lot faster over time.</p>
 <p>The hashtable is being built as part of a hashtable drag-race. The
 participants are <code>std::unordered_map</code>, FFHT (by
-<a href="www.rubensystems.com">this guy</a>) and me. Mine is just called <code>HashTbl</code>.</p>
+<a href="https://www.rubensystems.com">this guy</a>) and me. Mine is just called <code>HashTbl</code>.</p>
 <h2>High-level Design</h2>
 <p>My table is a probing table, 0.1.0 currently does linear probing.
 Entries are stored as <code>(key, value)</code> pairs in a big pool, with only one
