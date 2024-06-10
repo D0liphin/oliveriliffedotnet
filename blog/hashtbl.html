@@ -53,6 +53,7 @@
         body {
             margin: 0px;
             background-color: var(--secondary-color);
+            overflow-x: hidden;
         }
 
         .everything-container {
@@ -114,9 +115,19 @@
         code {
             font-family: "Roboto Mono", monospace;
             font-weight: bold;
-            color: rgb(0, 116, 87);
-            font-size: 14px;
+            font-size: 14px !important;
             line-height: 12px;
+        }
+        
+        pre {
+            overflow-x: auto;
+            background-color: var(--almost-black);
+            padding: 10px;
+            border-radius: 6px;
+        }
+        
+        pre>code {
+            color: rgb(78, 233, 194) !important;
         }
     </style>
 </head>
