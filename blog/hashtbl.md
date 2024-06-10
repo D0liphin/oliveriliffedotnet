@@ -105,10 +105,50 @@ would map (remember, little-endian)
 simd<i8x4>::movemask_eq(0xab12ab34, 0xab) -> 0b0101
 ```
 
-For SSE, this is done as follows:
+For SSE, this is three instructions and is done as follows:
 
-1. Splat `b` 
+1. Splat (broadcast) `b` to every byte in the vector, to create a new
+   vector `u`.
+2. Do a bytewise equality comparison with `u` and `v`. This gets you
+  `0x00ff00ff` for the above example.
+3. Squish this to a bitmask.
 
+Lookup, conceptually, is very simple then. Once we have the insertion 
+index (`hash % size`), we find the chunk that's a part of. Then we 
+produce a few masks:
+
+```cpp
+ctrlmask_t keep_mask = std::numeric_limits<ctrlmask_t>::max() << ctrlbyte_offset;
+ctrlmask_t hit_mask = movemask_eq(ctrlchunk.as_simd(), h7(h)) & keep_mask;
+ctrlmask_t empty_mask =
+    movemask_eq(ctrlchunk.as_simd(), CtrlChunk::CTRL_EMPTY) & keep_mask;
 ```
 
-```
+First, to clear any confusion, bit indices start at the 
+_least_-significant bit. The `keep_mask` is telling us to ignore the 
+first few bits. Index `18` for example would require us to skip bits 
+`0..=1`, since there is no point probing those.
+
+We use `__builtin_ctz()` to find the next offset to probe at. This 
+compiles to a `rep bsf` string instruction... Since we're actually
+trying to produce a mask equal to the final high-bit, there are other
+bit-manipulation ways we can do this, and we spam `__builtin_ctz()`
+_a lot_. More to come on benchmarks with this.
+
+So, as you can imagine, we're essentially getting these chunk masks in
+order and consuming either the next empty entry or the next h7 hit and
+updating the masks as we go. Whenever we get an h7 hit, we go into the
+main `Entry[]` buffer and test full equality on the key. A type trait is
+added for how key equality should be computed, either first test the
+hash then the full key, or just test the keys right away. For a
+`std::string`, you could be better off testing the hash first, but
+again, I'd need to do some benchmarks to find out.
+
+## So how fast is it?
+
+Not very. Right now, we quadruple in size whenever our load reaches 
+87.5%. The chunks are `__m128i`s. On my machine, 100,000,000 insertions
+on a `HashTbl<size_t, size_t>` takes just over 3 seconds, and is 12% 
+_slower_ than `std::unordered_map`!. Terrible. I think we can get this 
+much, much faster. The next article will hopefully detail how I do that.
+

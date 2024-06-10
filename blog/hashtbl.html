@@ -13,6 +13,10 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
         rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --almost-black: rgb(30, 30, 30);
@@ -105,8 +109,14 @@
             }
         }
 
-        pre {
-            font-family: monospace;
+        pre *,
+        code *,
+        code {
+            font-family: "Roboto Mono", monospace;
+            font-weight: bold;
+            color: rgb(0, 116, 87);
+            font-size: 14px;
+            line-height: 12px;
         }
     </style>
 </head>
@@ -183,6 +193,7 @@ What's exciting is I made the whole thing generic over a chunk size and
 an underlying generic SIMD vector type... Incoming comparison of
 different vector sizes. My hardware supports AVX-512, so that should be
 fun.</p>
+<h3><code>movemask_eq</code></h3>
 <p>The only SIMD instruction we need to understand is
 <code>simd&lt;vector_t&gt;::movemask_eq</code>.</p>
 <pre><code class="language-cpp">template &lt;typename T&gt; struct simd
@@ -207,14 +218,17 @@ iff the byte at index <code>v[i]</code> is equal to <code>b</code>. E.g. a <code
 would map (remember, little-endian)</p>
 <pre><code class="language-plaintext">simd&lt;i8x4&gt;::movemask_eq(0xab12ab34, 0xab) -&gt; 0b0101
 </code></pre>
-<p>For SSE, this is done as follows:</p>
+<p>For SSE, this is three instructions and is done as follows:</p>
 <ol>
-<li>Splat <code>b</code></li>
+<li>Splat (broadcast) <code>b</code> to every byte in the vector, to create a new
+vector <code>u</code>.</li>
+<li>Do a bytewise equality comparison with <code>u</code> and <code>v</code>. This gets you
+<code>0x00ff00ff</code> for the above example.</li>
+<li>Squish this to a bitmask.</li>
 </ol>
-<pre><code>
-</code></pre>
 
         </div>
     </div>
 </div>
+
 </html>
