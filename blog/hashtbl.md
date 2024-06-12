@@ -146,9 +146,37 @@ again, I'd need to do some benchmarks to find out.
 
 ## So how fast is it?
 
-Not very. Right now, we quadruple in size whenever our load reaches 
-87.5%. The chunks are `__m128i`s. On my machine, 100,000,000 insertions
-on a `HashTbl<size_t, size_t>` takes just over 3 seconds, and is 12% 
-_slower_ than `std::unordered_map`!. Terrible. I think we can get this 
-much, much faster. The next article will hopefully detail how I do that.
+Not very. But, I think we can get this much, much faster. The next
+article will hopefully detail how I do that.
 
+![Graph of benchmarks](./hashtbl-v0.0.1-bms.png)
+
+The graph shows a variety of different benchmarks (could do an 
+interactive one, but I want to keep my website simple HTML). The Y-axis
+shows the number of operations we do for every 1 operation 
+`std::unordered_map` does in the same benchmark.
+
+Each benchmarks has a name, parameterized by some value `N`.
+
+- `insert_in_order`: Insert `0..N` in order.
+- `insert_randoms`:  Insert `N` random ints in order.
+- `insert_2update_randoms`: Insert `N` random ints in order, then update
+  them all, then update them all again.
+- `insert_in_order_xl_vals`: `insert_in_order`, but with `512`-byte
+  types for the `Val` type.
+- `insert_randoms_xl_vals`: `insert_randoms`, but with `512`-byte types
+  for the `Val` type.
+
+The benchmark I will be most focusing on is `insert_2update_randoms`, 
+since it provides a pretty holistic judgement about the table. Right
+now, I get -13% to +17% performance vs `std::unordered_map`, which is
+fine, I guess. I'm not too worried about the XL vals benchmark, 
+because you can always just put pointers to a buffer in your map 
+instead. Across non-XL benchmarks we have an average speed buff of +37%
+over `std::unordered_map`, which I'm pretty happy about.
+
+The map is also tested against an oracle on a series of a billion 
+random operations. I also did that thing where you change values across
+the code by 1 in a bunch of spots and see if the oracle fails and it 
+does everywhere I tried, so I'm confident these results aren't bogus 
+no-ops (not that they're good enough to suggest that).

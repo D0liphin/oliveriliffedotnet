@@ -151,30 +151,38 @@
             </a>
         </div>
         <div class="content-container inverse">
-            <p>Small string optimisation for Rust. This works with both the new <code>allocator_api</code> and the old
-<code>GlobalAlloc</code> style allocation. If you want to use the new <code>allocator_api</code> set the <code>nightly</code> feature
-to be active.</p>
-<p><strong>Note that this does not mean, <code>SsoString</code> is generic over a global allocator yet, sadly.</strong></p>
-<p>Small string optimisation is done only for strings of length 23 or less. The goal is for this to
-be a drop in replacement for <code>std::string::String</code>.</p>
+            <p>Small string optimisation for Rust. This works with both the new
+<code>allocator_api</code> and the old <code>GlobalAlloc</code> style allocation. If you want
+to use the new <code>allocator_api</code> set the <code>nightly</code> feature to be active.</p>
+<p><strong>Note that this does not mean, <code>SsoString</code> is generic over a global
+allocator yet, sadly.</strong></p>
+<p>Small string optimisation is done only for strings of length 23 or less.
+The goal is for this to be a drop in replacement for
+<code>std::string::String</code>.</p>
 <p>Small string optimisation is only available on
-<code>#[cfg(all(target_endian = &quot;little&quot;, target_pointer_width = &quot;64&quot;))]</code>. Otherwise, <code>sso::String</code> is
-just an alias for <code>std::string::String</code>.</p>
-<p>I am in the process of implementing every <code>std::string::String</code> method for <code>sso::SsoString</code>, there
-are declarations for every method, but most of them are just <code>todo_impl!()</code>s. One method,
-<code>as_mut_vec</code> is impossible... but who uses that anyway?</p>
+<code>#[cfg(all(target_endian = &quot;little&quot;, target_pointer_width = &quot;64&quot;))]</code>.
+Otherwise, <code>sso::String</code> is just an alias for <code>std::string::String</code>.</p>
+<p>I am in the process of implementing every <code>std::string::String</code> method
+for <code>sso::SsoString</code>, there are declarations for every method, but most
+of them are just <code>todo_impl!()</code>s. One method, <code>as_mut_vec</code> is
+impossible... but who uses that anyway?</p>
 <p>All the methods I think are useful are implemented.</p>
 <h2>SAFETY WARNING</h2>
-<p>I think due to use of <code>ptr::copy_non_overlapping</code> on <code>SsoString::clone</code>, we actually don't mark
-the region as initalised, causing UB on some internal methods? I'm really not sure though. It only
-happens in <code>long.as_mut_str().mask_ascii_lowercase()</code>... I'll have to investigate this more.</p>
+<p>I think due to use of <code>ptr::copy_non_overlapping</code> on <code>SsoString::clone</code>,
+we actually don't mark the region as initalised, causing UB on some
+internal methods? I'm really not sure though. It only happens in
+<code>long.as_mut_str().mask_ascii_lowercase()</code>... I'll have to investigate
+this more.</p>
 <h1>Can I use this?</h1>
-<p>This is an imaginary conversation I am having with a person who will never exist, but I would
-recommend strongly that you do not use this, unless perhaps you can guarantee that the exported type
-is actually <code>std::string::String</code> hehe.</p>
-<p>But seriously, although tested a little, it's not rigorously safe yet. Once I add debug assertions
-about unsafe preconditions, I'll be more confident that it is safe to use.</p>
-<p>For now, everything <em>appears</em> to be safe, but nothing is as it seems in the land of <code>unsafe</code>!</p>
+<p>This is an imaginary conversation I am having with a person who will
+never exist, but I would recommend strongly that you do not use this,
+unless perhaps you can guarantee that the exported type is actually
+<code>std::string::String</code> hehe.</p>
+<p>But seriously, although tested a little, it's not rigorously safe yet.
+Once I add debug assertions about unsafe preconditions, I'll be more
+confident that it is safe to use.</p>
+<p>For now, everything <em>appears</em> to be safe, but nothing is as it seems in
+the land of <code>unsafe</code>!</p>
 <h2>Usage</h2>
 <h4>Basic String Operations</h4>
 <pre><code class="language-rust">use sso::String;
@@ -199,13 +207,14 @@ assert!(s.is_long());
 assert!(!s.is_short());
 assert_eq!(&amp;s, &quot;Hello, world! My name is Gregory :)&quot;);
 </code></pre>
-<p>Use of <code>is_short()</code> and <code>is_long()</code> functions should be prefaced with the following conditionl
-compilation options:</p>
+<p>Use of <code>is_short()</code> and <code>is_long()</code> functions should be prefaced with
+the following conditionl compilation options:</p>
 <pre><code class="language-rust">#[cfg(all(target_endian = &quot;little&quot;, target_pointer_width = &quot;64&quot;))]
 </code></pre>
 <h4>Matching Internals</h4>
-<p><code>sso::String</code> is best for code that doesn't do a lot of mutating. If you have a lot of mutations
-and don't want to branch, you can match the internal string. For example</p>
+<p><code>sso::String</code> is best for code that doesn't do a lot of mutating. If you
+have a lot of mutations and don't want to branch, you can match the
+internal string. For example</p>
 <pre><code class="language-rust">use sso::String;
 
 let s = String::new();
@@ -227,21 +236,23 @@ s.reserve(100);
 #[cfg(not(all(target_endian = &quot;little&quot;, target_pointer_width = &quot;64&quot;)))]
 { unimplemented!() }
 </code></pre>
-<p>This is a bad idea though. The API is unstable and it's no long replaceable by <code>std::string::String</code>
-on non-optimized architectures.</p>
+<p>This is a bad idea though. The API is unstable and it's no long
+replaceable by <code>std::string::String</code> on non-optimized architectures.</p>
 <h2>Why is your code weird?</h2>
-<p>A longer explanation to come. The idea is to uphold the invariants of the struct <strong>at all times</strong>,
-instead of just when they might actually cause UB. Basically, trying to make <code>unsafe</code> code really,
-really simple to prove safety.</p>
-<p>That's why all my code has <code># Safety</code> contracts and <code>SAFETY:</code> contract clearances at every <code>unsafe</code>
-call-site (I think).</p>
-<p>It's also why I use <code>len: UnsafeWrite&lt;usize, 0&gt;</code>. So that I cannot accidentally set the length to an
-invalid value without using <code>unsafe</code>, which reminds me to clear the safety contract i might be
-violating.</p>
-<p>And why I can't <code>impl Drop</code>, because otherwise a semantically simultaneous write (not realy true,
-but it's good enough) is impossible for <code>capacity</code> and <code>buf</code>. E.g. this code would become impossible
-(I need to write both <code>capacity</code> and <code>buf</code> 'at the same time', so that <code>LongString</code> is never
-invalid.</p>
+<p>A longer explanation to come. The idea is to uphold the invariants of
+the struct <strong>at all times</strong>, instead of just when they might actually
+cause UB. Basically, trying to make <code>unsafe</code> code really, really simple
+to prove safety.</p>
+<p>That's why all my code has <code># Safety</code> contracts and <code>SAFETY:</code> contract
+clearances at every <code>unsafe</code> call-site (I think).</p>
+<p>It's also why I use <code>len: UnsafeWrite&lt;usize, 0&gt;</code>. So that I cannot
+accidentally set the length to an invalid value without using <code>unsafe</code>,
+which reminds me to clear the safety contract i might be violating.</p>
+<p>And why I can't <code>impl Drop</code>, because otherwise a semantically
+simultaneous write (not realy true, but it's good enough) is impossible
+for <code>capacity</code> and <code>buf</code>. E.g. this code would become impossible (I need
+to write both <code>capacity</code> and <code>buf</code> 'at the same time', so that
+<code>LongString</code> is never invalid.</p>
 <pre><code class="language-rust">/// free the buffer of this string, setting the `len` and `capacity` to `0`
 pub fn free(&amp;mut self) {
     let capacity = self.capacity();
@@ -264,8 +275,8 @@ pub fn free(&amp;mut self) {
 }
 </code></pre>
 <h1>Item-scoped Unsafe Code</h1>
-<p>This document is a first? draft. Things might not be worded as accurately as I would like, but I am
-trying my best!</p>
+<p>This document is a first? draft. Things might not be worded as
+accurately as I would like, but I am trying my best!</p>
 <h2>Axiomatically Unsafe Operations</h2>
 <p>Rust defines &quot;the only things that you can do in unsafe code&quot; as (reordered):</p>
 <ul>
@@ -275,11 +286,13 @@ trying my best!</p>
 <li>Call an unsafe function or method</li>
 <li>Implement an unsafe trait</li>
 </ul>
-<p>This definition is accurate, but it's more from a code semantics perspective, as opposed to a
-soundness perspective. When I say that something is &quot;axiomatically unsafe&quot;, that means that it can
-<em>never</em> be a safe operation without first checking preconditions.</p>
-<p>For examlpe &quot;calling an unsafe function or method&quot; is not axiomatically unsafe, since you can prove
-soundness without checking any preconditions.</p>
+<p>This definition is accurate, but it's more from a code semantics
+perspective, as opposed to a soundness perspective. When I say that
+something is &quot;axiomatically unsafe&quot;, that means that it can <em>never</em> be a
+safe operation without first checking preconditions.</p>
+<p>For examlpe &quot;calling an unsafe function or method&quot; is not axiomatically
+unsafe, since you can prove soundness without checking any
+preconditions.</p>
 <pre><code class="language-rust">/// # Safety
 /// always safe
 unsafe fn puts(s: &amp;str) {
@@ -291,14 +304,16 @@ unsafe {
     puts(&quot;Hello, world!&quot;);
 }
 </code></pre>
-<p>I can prove this program is sound, without checking any preconditions. It is always sound to call
-<code>puts</code>, in any form. Therefore although it is &quot;unsafe&quot; to call <code>puts</code>, it is <em>never unsound</em>. That
-is to say: there is no way I can invoke undefined behaviour with a call to <code>puts</code> in an otherwise
-safe environment.</p>
-<p>This is not the case for what I would call &quot;axiomatically unsafe operations&quot;. For example,
-dereferencing a raw pointer always has a safety contract. We couuld define this as a function
-(though it's not really) with a safety contract, but we could not define it as a function <em>without</em>
-a safety contract, without that being unsound.</p>
+<p>I can prove this program is sound, without checking any preconditions.
+It is always sound to call <code>puts</code>, in any form. Therefore although it is
+&quot;unsafe&quot; to call <code>puts</code>, it is <em>never unsound</em>. That is to say: there is
+no way I can invoke undefined behaviour with a call to <code>puts</code> in an
+otherwise safe environment.</p>
+<p>This is not the case for what I would call &quot;axiomatically unsafe
+operations&quot;. For example, dereferencing a raw pointer always has a
+safety contract. We couuld define this as a function (though it's not
+really) with a safety contract, but we could not define it as a function
+<em>without</em> a safety contract, without that being unsound.</p>
 <pre><code class="language-rust">/// # Safety
 /// - pointer is non-null
 /// - pointer must be within the bounds of the allocated object
@@ -307,12 +322,13 @@ a safety contract, without that being unsound.</p>
 /// -
 unsafe fn deref&lt;T&gt;(*const T) -&gt; T;
 </code></pre>
-<p>There are ways we could restrict <code>T</code>, such that this operation would be valid, but that would be a
-different operation.</p>
-<p>Basically all compiler intrinsic unsafe functions are &quot;axiomatically unsafe&quot;. For example,
-<code>std::intrinsics::offset&lt;Ptr, Delta&gt;(Ptr, Delta)</code> as on operation cannot be defined without a safety
-contract. However the safety contract that rust defines for this operation, is slightly different in
-its scope.</p>
+<p>There are ways we could restrict <code>T</code>, such that this operation would be
+valid, but that would be a different operation.</p>
+<p>Basically all compiler intrinsic unsafe functions are &quot;axiomatically
+unsafe&quot;. For example, <code>std::intrinsics::offset&lt;Ptr, Delta&gt;(Ptr, Delta)</code>
+as on operation cannot be defined without a safety contract. However the
+safety contract that rust defines for this operation, is slightly
+different in its scope.</p>
 <pre><code class="language-rust">/// Note: in reality, the type of `Ptr` is enforced by the compiler when we use stabilized 
 /// methods. So we ignore this. 
 /// 
@@ -325,18 +341,21 @@ its scope.</p>
 ///  - `Ptr + Delta` must not overflow unsafe fn
 fn offset&lt;Ptr, Delta&gt;(Ptr, Delta) -&gt; Ptr;
 </code></pre>
-<p><strong>Important-ish note:</strong> I'm actually very much unsure what these docs mean. The actual notes in
-<code>core</code> are</p>
+<p><strong>Important-ish note:</strong> I'm actually very much unsure what these docs
+mean. The actual notes in <code>core</code> are</p>
 <blockquote>
 <p>any further use of the returned value will result in undefined behavior</p>
 </blockquote>
-<p>So is <code>offset(ptr, usize::MAX)</code> safe? It shouldn't produce a pointer that is out of the allocated
-object if overflow is allowed, but I don't see why they wouldn't enforce the same rules as
-<code>unchecked_add</code> here. For the purposes of this theoretical point, I will assume that overflow works
-as you would expect.</p>
-<p>So, we can read this as &quot;it's not undefined behavior, but using the value afterwards <em>is</em>&quot;. This
-makes it considerably different from the previous safety contract. Here, I can prove a call to this
-function is sound, but I might not be able to prove that my whole program is sound after this:</p>
+<p>So is <code>offset(ptr, usize::MAX)</code> safe? It shouldn't produce a pointer
+that is out of the allocated object if overflow is allowed, but I don't
+see why they wouldn't enforce the same rules as <code>unchecked_add</code> here.
+For the purposes of this theoretical point, I will assume that overflow
+works as you would expect.</p>
+<p>So, we can read this as &quot;it's not undefined behavior, but using the
+value afterwards <em>is</em>&quot;. This makes it considerably different from the
+previous safety contract. Here, I can prove a call to this function is
+sound, but I might not be able to prove that my whole program is sound
+after this:</p>
 <pre><code class="language-rs">let n: *const i32 = alloc::&lt;i32&gt;();
 if random::&lt;bool&gt;() {
     // assignment is (probably) unsound actually...
@@ -348,11 +367,12 @@ if random::&lt;bool&gt;() {
 // unsound. Maybe UB, who knows?
 println!({n:?});
 </code></pre>
-<p>We could structure the code differently and check if we invalidated the pointer every single time we
-want to 'use' it. However, the point of this document is to prove that this kind of safety contract
-is <em>never</em> (well, almost never) required. We can do everything at what I call &quot;item-scope&quot; (with the
-addition of <code>unsafe</code> fields, or the the allowance of a few exceptions to the rule, that we can
-provide in a library).</p>
+<p>We could structure the code differently and check if we invalidated the
+pointer every single time we want to 'use' it. However, the point of
+this document is to prove that this kind of safety contract is <em>never</em>
+(well, almost never) required. We can do everything at what I call
+&quot;item-scope&quot; (with the addition of <code>unsafe</code> fields, or the the allowance
+of a few exceptions to the rule, that we can provide in a library).</p>
 <h2>What is Item-scope?</h2>
 <p>not written this bit yet.</p>
 

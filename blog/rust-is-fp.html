@@ -206,21 +206,21 @@ but sadly the original elegance is lost slightly.</p>
 </code></pre>
 <h2>Rust</h2>
 <p>Ok, so let's try Rust.</p>
-<pre><code>fn quicksort&amp;lt;T: PartialOrd + Clone&amp;gt;(xs: &amp;[T]) -&amp;gt; Vec&amp;lt;T&amp;gt; {
-    fn qs&amp;lt;'a, T: PartialOrd&amp;gt;(xs: &amp;[&amp;'a T]) -&amp;gt; Vec&amp;lt;&amp;'a T&amp;gt; {
+<pre><code>fn quicksort&lt;T: PartialOrd + Clone&gt;(xs: &amp;[T]) -&gt; Vec&lt;T&gt; {
+    fn qs&lt;'a, T: PartialOrd&gt;(xs: &amp;[&amp;'a T]) -&gt; Vec&lt;&amp;'a T&gt; {
         match *xs {
-            [x, ref xs @ ..] =&amp;gt; {
-                let filterxs = |p: &amp;dyn Fn(&amp;&amp;T) -&amp;gt; bool| {
-                    qs(&amp;xs.iter().copied().filter(p).collect::&amp;lt;Vec&amp;lt;&amp;T&amp;gt;&amp;gt;())
+            [x, ref xs @ ..] =&gt; {
+                let filterxs = |p: &amp;dyn Fn(&amp;&amp;T) -&gt; bool| {
+                    qs(&amp;xs.iter().copied().filter(p).collect::&lt;Vec&lt;&amp;T&gt;&gt;())
                 };
                 Vec::from_iter(
-                    filterxs(&amp;move |&amp;y| y &amp;lt; x)
+                    filterxs(&amp;move |&amp;y| y &lt; x)
                         .into_iter()
                         .chain([x])
-                        .chain(filterxs(&amp;move |&amp;y| y &amp;gt;= x)),
+                        .chain(filterxs(&amp;move |&amp;y| y &gt;= x)),
                 )
             }
-            [] =&amp;gt; vec![],
+            [] =&gt; vec![],
         }
     }
     qs(&amp;Vec::from_iter(xs)).into_iter().cloned().collect()
