@@ -265,12 +265,37 @@ hash then the full key, or just test the keys right away. For a
 <code>std::string</code>, you could be better off testing the hash first, but
 again, I'd need to do some benchmarks to find out.</p>
 <h2>So how fast is it?</h2>
-<p>Not very. Right now, we quadruple in size whenever our load reaches
-87.5%. The chunks are <code>__m128i</code>s. On my machine, 100,000,000 insertions
-on a <code>HashTbl&lt;size_t, size_t&gt;</code> takes just over 3 seconds, and is 12%
-<em>slower</em> than <code>std::unordered_map</code>!. Terrible. I think we can get this
-much, much faster. The next article will hopefully detail how I do that.</p>
-<iframe width="901" height="712" seamless frameborder="0" scrolling="no" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vSquqNcJca_-U9M5mGzIHfCAGYIvqEbVDhu2Yg7PQ0KP6p355iPsMhi8oVgr6ThlOVfoxu2MPG62_De/pubchart?oid=226821002&amp;format=interactive"></iframe>
+<p>Not very. But, I think we can get this much, much faster. The next
+article will hopefully detail how I do that.</p>
+<p><img src="./hashtbl-v0.0.1-bms.png" alt="Graph of benchmarks" /></p>
+<p>The graph shows a variety of different benchmarks (could do an
+interactive one, but I want to keep my website simple HTML). The Y-axis
+shows the number of operations we do for every 1 operation
+<code>std::unordered_map</code> does in the same benchmark.</p>
+<p>Each benchmarks has a name, parameterized by some value <code>N</code>.</p>
+<ul>
+<li><code>insert_in_order</code>: Insert <code>0..N</code> in order.</li>
+<li><code>insert_randoms</code>:  Insert <code>N</code> random ints in order.</li>
+<li><code>insert_2update_randoms</code>: Insert <code>N</code> random ints in order, then update
+them all, then update them all again.</li>
+<li><code>insert_in_order_xl_vals</code>: <code>insert_in_order</code>, but with <code>512</code>-byte
+types for the <code>Val</code> type.</li>
+<li><code>insert_randoms_xl_vals</code>: <code>insert_randoms</code>, but with <code>512</code>-byte types
+for the <code>Val</code> type.</li>
+</ul>
+<p>The benchmark I will be most focusing on is <code>insert_2update_randoms</code>,
+since it provides a pretty holistic judgement about the table. Right
+now, I get -13% to +17% performance vs <code>std::unordered_map</code>, which is
+fine, I guess. I'm not too worried about the XL vals benchmark,
+because you can always just put pointers to a buffer in your map
+instead. Across non-XL benchmarks we have an average speed buff of +37%
+over <code>std::unordered_map</code>, which I'm pretty happy about.</p>
+<p>The map is also tested against an oracle on a series of a billion
+random operations. I also did that thing where you change values across
+the code by 1 in a bunch of spots and see if the oracle fails and it
+does everywhere I tried, so I'm confident these results aren't bogus
+no-ops (not that they're good enough to suggest that).</p>
+
         </div>
     </div>
 </div>
