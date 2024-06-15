@@ -29,6 +29,13 @@ struct entry *table_get_slot(table *tbl, key_t k)
 }
 ```
 
+![A graph showing that it's just wayyy faster](<Operations per second vs std__unordered_map.png>)
+
+The graph above is in operations performed for every equivalent 
+`std::unordered_map` operation. The tests are the same as last time.
+Again, `insert_2update_randoms` performs the worst, but yo ucan see how
+much better the C version is overall!
+
 This got me thinking about why this version might be so much faster. I
 think it's because my version does the following:
 
@@ -53,7 +60,12 @@ we may as well use a `uint8x4` instead of a `uint8x16`!
 
 I've always wanted to do this math. So I finally sat down and worked it
 all out. It could be all wrong, but I looked it up and I got the right
-answer. Email me if it's wrong! There are two questions to ask here:
+answer. Email me if it's wrong! Disclaimer, I wrote this really late at
+night and I'm pretty sure I made a mistake about halfway through and 
+just got lucky. You can skip to the last section if you just want the 
+results of it all.
+
+There are two questions to ask here:
 
 1. What is the average number of collisions when our hashtable is `l` 
    full?

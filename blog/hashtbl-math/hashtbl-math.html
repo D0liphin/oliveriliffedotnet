@@ -180,6 +180,11 @@ be found <a href="https://github.com/D0liphin/HashTable/blob/master/include/tabl
         }
 }
 </code></pre>
+<p><img src="Operations%20per%20second%20vs%20std__unordered_map.png" alt="A graph showing that it's just wayyy faster" /></p>
+<p>The graph above is in operations performed for every equivalent
+<code>std::unordered_map</code> operation. The tests are the same as last time.
+Again, <code>insert_2update_randoms</code> performs the worst, but yo ucan see how
+much better the C version is overall!</p>
 <p>This got me thinking about why this version might be so much faster. I
 think it's because my version does the following:</p>
 <ol>
@@ -202,7 +207,11 @@ we may as well use a <code>uint8x4</code> instead of a <code>uint8x16</code>!</p
 <h2>Working out the average number of hashtable collisions</h2>
 <p>I've always wanted to do this math. So I finally sat down and worked it
 all out. It could be all wrong, but I looked it up and I got the right
-answer. Email me if it's wrong! There are two questions to ask here:</p>
+answer. Email me if it's wrong! Disclaimer, I wrote this really late at
+night and I'm pretty sure I made a mistake about halfway through and
+just got lucky. You can skip to the last section if you just want the
+results of it all.</p>
+<p>There are two questions to ask here:</p>
 <ol>
 <li>What is the average number of collisions when our hashtable is <code>l</code>
 full?</li>
