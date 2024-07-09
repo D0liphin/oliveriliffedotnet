@@ -217,14 +217,15 @@ case class Rep(r: Reg)           extends Reg
 </code></pre>
 <p>For trees of depth 3, we get the following counts for trees starting
 with different nodes</p>
-<p>| tree root  | # trees with this root |
+<pre><code class="language-plaintext">| tree root  | # trees with this root |
 |:----------:|:----------------------:|
-|   <code>Eps</code>    |           1            |
-| <code>Sym('a')</code> |           1            |
-| <code>Sym('b')</code> |           1            |
-|   <code>Rep</code>    |           24           |
-|   <code>Alt</code>    |          576           |
-|   <code>Seq</code>    |          576           |</p>
+|   `Eps`    |           1            |
+| `Sym('a')` |           1            |
+| `Sym('b')` |           1            |
+|   `Rep`    |           24           |
+|   `Alt`    |          576           |
+|   `Seq`    |          576           |
+</code></pre>
 <p>Let's say we want tree <code>0</code>. We could say this is <code>Eps</code>. Tree <code>1</code> could
 be <code>Sym('a')</code>. Tree <code>13</code> would be something starting with <code>Rep</code>. Tree
 <code>700</code> would be something starting with <code>Seq</code> etc. Let's take tree <code>750</code>

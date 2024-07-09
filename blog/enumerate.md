@@ -84,6 +84,7 @@ case class Rep(r: Reg)           extends Reg
 For trees of depth 3, we get the following counts for trees starting 
 with different nodes
 
+```plaintext
 | tree root  | # trees with this root |
 |:----------:|:----------------------:|
 |   `Eps`    |           1            |
@@ -92,6 +93,7 @@ with different nodes
 |   `Rep`    |           24           |
 |   `Alt`    |          576           |
 |   `Seq`    |          576           |
+```
 
 Let's say we want tree `0`. We could say this is `Eps`. Tree `1` could
 be `Sym('a')`. Tree `13` would be something starting with `Rep`. Tree
