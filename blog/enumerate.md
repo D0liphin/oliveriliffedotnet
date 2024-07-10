@@ -1,130 +1,182 @@
 # How Enumerate Works
 
-I have recently been tasked with enumerating every single possible tree
-for arbitrary branch types. I produced some rather elegant Scala in the
-end and wanted to write a little article about it. Back to the 
-hashtables soon, hopefully.*
+I was recently tasked with enumerating all possible trees. The trees can
+be of any type -- regexes, binary trees etc. Specifically, I need to
+be able to associate every integer with a unique tree. Here is the 
+entire code for this
+
+```hs
+rdigits b 0 = [0, 0 ..]
+rdigits b n = n `mod` b : rdigits b (n `div` b)
+
+perms ns 0 = 0
+perms ns d = sum $ nodePerms ns d
+
+nodePerms ns d = (perms ns (d - 1) ^) . fst <$> ns
+
+perm ns d i = n children
+  where
+    l = reverse $ zip (scanl (+) 0 (nodePerms ns d)) ns
+    (g, (_, n)) = head $ dropWhile ((i <) . fst) l
+    children = perm ns (d - 1) <$> rdigits (perms ns (d - 1)) (i - g)
+```
+
+`perm ns d i` takes some node constructors `ns`, a maximum depth `d` 
+and an integer `i` and produces the same tree every time. It is 
+guaranteed that for all `i`, the tree is different or does not exist.
 
 ## Digits
 
-First, we define a function `digits(base)(n)` that converts the number
-`n` into a list of digits of the specified base. For example, 
-`digits(10)(167)` would produce `[1, 6, 7]`. We also specify a `minLen`
-parameter, that pads the front of the list with `0`s, should we need.
-This is useful in the case of `digits(_)(0)` which produces the empty
-list. 
+This is understood best by example. Take `549` that we wish to convert
+to base-10 digits. `549 % 10` is `9` and `549 / 10` is `54`. It is
+clear, we can define a recursive function based on the update rule
+`digits(n / base) :+ n % base`.
 
 ```hs
-digits base minLen n = (reverse $ f n 0, base) where
-  f 0 len = replicate ((minLen - len) `max` 0) 0
-  f n len = (n `mod` base) : f (n `div` base) (len + 1)
+rdigits b 0 = [0, 0 ..]
+rdigits b n = n `mod` b : rdigits b (n `div` b)
 ```
 
-This is not super interesting. It is understood best by example. Take
-`549` that we wish to convert to base-10 digits. `549 % 10` is `9` and
-`549 / 10` is `54`. It doesn't take a genius to see that we can define
-a recursive function based on `digits(n / base) :+ n % base`.
+This function returns the reversed digits, since we later do not care
+about the order the digits are in. It is also quite convenient that the
+digits are ordered least-significant to most significant, because it
+allows us to concatenate an infinite list of `0`s onto the end.
 
-## Number of Permutations for a Tree
+## Perms 
 
-First, we define the types of nodes that exist in the tree. A node is 
-defined by the number of children it takes. Leaves take `0`. This is 
-important for our calculations.
+All parameters `ns` contain a list of "node constructors". A node 
+constructor is a tuple `(childCount, constructor)`. `childCount` 
+naturally describes how many children the node has. `constructor` 
+is a function that takes a list of child nodes and constructs a node 
+with these as children.
 
-The number of permutations up to depth `d` is the sum of the number of
-permutations for every parent node.
+The function `perms` takes a list of node constructors and a maximum 
+depth and returns the number of possible permutations up to this depth.
 
-```scala
-case class INodeBundle[T](val nodes: Vector[INode[T]] = Vector()) {
-  def perms(d: Int): BigInt = nodePerms(d).sum
-}
+```hs
+perms :: [(Int, [a] -> a)] -> Int -> Int
 ```
 
-The number of permutations, assuming a parent node is `0` if the tree is
-of depth `0`.
+To compute it, we consider the number of permutations for a tree rooted
+at node `p`, `∀p ∈ ns`. The sum of all these is the result. Of course,
+there are no trees of depth `0`.
 
-The number of permutations, for depth `d` is dependent on the number of
-children for that node. Each child has `perms(d - 1)` permutations. The
-parent therefore, has `perms(d - 1) ** childCount` permutations. In the
-below code `n._1` is the number of children for the node `n`.
-
-```scala
-def nodePerms(d: Int): Vector[BigInt] = d match {
-  case 0 => Vector()
-  case d => nodes.map(n => perms(d - 1).pow(n._1))
-}
+```hs
+perms ns 0 = 0
+perms ns d = sum $ nodePerms ns d
 ```
 
-In the case where `d = 1`, `perms(d - 1) = 0`. `0^n` is `0` for all `n`
-except for `0`. Leaves have `0` children, so we are effectively counting
-the number of leaves. Neat.
+The helper function `nodePerms` maps each node constructor `p` to the 
+number of permutations of trees rooted at `p`. Each child can have 
+`perms ns (d - 1)` children, so the total permutations is 
+`perms ns (d - 1) ^ p.childCount`. Recall that the child count is the 
+`fst` element of the tuple.
 
-We can also think of this algorithm as creating a tree and at each 
-branch, we either terminate it with a leaf or we choose a branch and 
-continue.
-
-## Specific Permutation
-
-We are given a number `i` and we wish to return the `i`th permutation of
-our tree up to depth `d`. We can do this by considering how many 
-permutations exist for each node. For example, we are creating trees for
-regular expressions. Below is the definition for all the nodes we need 
-for regular expressions. Consider an alphabet `{a, b}`. Our leaf nodes
-are therefore `Eps`, `Sym('a')` and `Sym('b')`.
-
-```scala
-sealed trait Reg
-case object Eps                  extends Reg
-case class Sym(c: Char)          extends Reg
-case class Seq(r1: Reg, r2: Reg) extends Reg
-case class Alt(r1: Reg, r2: Reg) extends Reg
-case class Rep(r: Reg)           extends Reg
+```hs
+nodePerms ns d = (perms ns (d - 1) ^) . fst <$> ns
 ```
 
-For trees of depth 3, we get the following counts for trees starting 
-with different nodes
+A fun property here is that for `d = 1`, we are effectively counting 
+the number of nodes with 0 children, or all the leaf nodes. A previous
+implementation considered leaf and branch nodes differently, but this 
+property of exponents comes in very handy here!
+
+## Perm
+
+Recall the original task of ordering all possible tree permutations
+and accessing the `i`ᵗʰ one. Well, what should be the `i`ᵗʰ permutation?
+This is best understood by example. Consider the nodes used in regular
+expressions. You do not need to know what they do, but comments are 
+provided.
+
+```hs
+data Reg 
+    = Eps         -- the empty string ε
+    | Sym Char    -- a single character
+    | Seq Reg Reg -- a sequence of two regular expressions
+    | Alt Reg Reg -- either of two regular expressions
+    | Rep Reg     -- a regular expression, repeated at least 0 times
+```
+
+Consider the alphabet `{'a', 'b'}`. For trees up to depth 3, we can 
+generate the number of permutations for trees rooted at each of these 
+nodes. For `Eps`, this is obviously just `1`, but the others can grow 
+double-exponentially.
 
 ```plaintext
-| tree root  | # trees with this root |
-|:----------:|:----------------------:|
-|   `Eps`    |           1            |
-| `Sym('a')` |           1            |
-| `Sym('b')` |           1            |
-|   `Rep`    |           24           |
-|   `Alt`    |          576           |
-|   `Seq`    |          576           |
+| tree root | # trees with this root |
+|:---------:|:----------------------:|
+|    Eps    |           1            |
+|  Sym 'a'  |           1            |
+|  Sym 'b'  |           1            |
+|    Rep    |           24           |
+|    Alt    |          576           |
+|    Seq    |          576           |
 ```
 
-Let's say we want tree `0`. We could say this is `Eps`. Tree `1` could
-be `Sym('a')`. Tree `13` would be something starting with `Rep`. Tree
-`700` would be something starting with `Seq` etc. Let's take tree `750`
-as an example. This is tree `147` of `Seq`. 
+We could say that tree `0` starts with `Eps`, tree `1` starts with 
+`Sym 'a'`, tree `10` starts with `Rep`, tree `700` starts with `Seq`
+etc. etc. One can see this is related to the prefix sum. In Haskell,
+this is
 
-We can describe the 147th tree of `Seq` by converting `147` to a number
-with `Seq.childCount` digits, base `perms(d - 1)`. This counts up the 
-trees on the rhs of `Seq` first, then carries over to the lhs and 
-continues to count up the right some more. 
-
-Here's the full code for this
-
-```scala
-def perm(d: Int, i: BigInt): T = {
-  // Select the node where `i` would be 
-  val groups = nodePerms(d).scanLeft(BigInt(0))(_ + _)
-  val nodeIndex = groups.indexWhere(i < _) - 1
-  val node = nodes(nodeIndex)
-  // Compute which index _within_ `node` `i` would be
-  val j = i - groups(nodeIndex)
-  // Split up `j` into digits
-  val children = digits(perms(d - 1), node.childCount)(j)
-    // ...and choose the permutation corresponding to the digit
-    .map(perm(d - 1, _))
-  // Construct the node and return it
-  node.construct(children)
-}
+```hs
+scanl (+) 0 (nodePerms ns d)
 ```
 
-All done! 
+The prefix sum for the above case is `[0,1,2,3,27,603,1179]` Consider we
+take the `300`ᵗʰ term. This is the `300 - 27`ᵗʰ term of `Alt`. We
+acquire the node constructor `n` and the previous group start index `g`
+like this
+
+```hs
+l = reverse $ scanl (+) 0 (nodePerms ns d) `zip` ns
+(g, (_, n)) = head $ dropWhile ((i <) . fst) l
+```
+
+We go in reverse, selecting the first one that is greater than or 
+equal to `i`. The associated node is zipped with a sheer of one to the
+left, so we also have the correct node constructor. For the above 
+example, `l` is 
+
+```
+[(0, Eps), (1, Sym 'a'), (2, Sym 'b'), (3, Rep), (27, Alt), (603, Seq)]
+```
+
+So, we want the `i - g`ᵗʰ child of `Alt`. We can get this by considering
+each child of `Alt` as a digit in a base-`perms ns (d - 1)`
+representation of `i - g`. The intuition for this is that each child has
+`perms ns (d - 1)` permutations. We use our function from earlier,
+`rdigits`. This gives an index for the tree of each child, which we can
+map to a concrete permutation.
+
+```hs
+children = perm ns (d - 1) <$> rdigits (perms ns (d - 1)) (i - g)
+```
+
+Finally, we construct the node with the node constructor acquired 
+earlier, `n`.
+
+```hs
+perm ns d i = n children
+```
+
+To actually use the code, we have to define our node constructors and 
+whatnot...
+
+```hs 
+data Tree
+  = L1
+  | L2
+  | B1 Tree Tree
+  | B2 Tree Tree
+  deriving (Show)
+
+ns =
+  [ (0, const L1),
+    (2, \(l : r : _) -> B1 l r),
+    (2, \(l : r : _) -> B2 l r)
+  ]
+```
 
 ## Issues
 
@@ -134,6 +186,3 @@ worse than exponential time (but not double-exponential) with respect to
 the tree depth. I only managed to compute the values for trees of depth
 12 before I got too bored to wait. There's no a lot to do about this,
 since the task requires compactly assigning an integer to every tree.
-
-*This whole article uses Scala at the moment, but I wouldn't mind 
-updating everything to Haskell when I get a chance.
