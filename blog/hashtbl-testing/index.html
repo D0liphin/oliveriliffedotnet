@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Oliver Iliffe's Website</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="Oliver Iliffe's personal website and blog and stuff">
+    <meta name="keywords" content="Oliver, Iliffe, Personal, Website, oliver, iliffe">
+    <meta name="author" content="Oliver Iliffe">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --almost-black: rgb(30, 30, 30);
+            --almost-white: rgb(240, 240, 240);
+        }
+
+        :root {
+            --primary-color: var(--almost-white);
+            --secondary-color: var(--almost-black);
+        }
+
+        * {
+            font-family: "Open Sans", sans-serif;
+            box-sizing: border-box;
+            color: var(--primary-color);
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: "Open Sans", sans-serif;
+            font-weight: 800;
+        }
+
+        a:hover {
+            color: var(--primary-color);
+        }
+
+        html {
+            margin: 0px;
+        }
+
+        body {
+            margin: 0px;
+            background-color: var(--secondary-color);
+            overflow-x: hidden;
+        }
+
+        .everything-container {
+            padding: 20px;
+        }
+
+        @media (max-width: 500px) {
+            .everything-container {
+                padding: 0px;
+            }
+        }
+
+        .heading-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0px 20px 0px 20px;
+        }
+
+        @media (max-width: 500px) {
+            .heading-container {
+                margin-bottom: 10px;
+            }
+        }
+
+        .img-with-border {
+            border: 5px solid var(--primary-color);
+        }
+
+        .inverse * {
+            color: var(--secondary-color);
+        }
+
+        .inverse * a:hover {
+            color: var(--secondary-color);
+        }
+
+        .content-container {
+            border-radius: 6px;
+            background-color: var(--primary-color);
+            padding: 20px 30px 30px 30px;
+            position: relative;
+        }
+
+        .content-container *>img {
+            max-width: 100%;
+        }
+
+        @media (max-width: 500px) {
+            .content-container {
+                border-radius: 0px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .ferris-the-crab {
+                visibility: hidden;
+            }
+        }
+
+        pre *,
+        code *,
+        code {
+            font-family: "Roboto Mono", monospace;
+            font-weight: bold;
+            font-size: 14px;
+            line-height: 12px;
+        }
+
+        h1 *,
+        h2 *,
+        h3 *,
+        h4 * {
+            font-size: inherit;
+        }
+
+        pre {
+            overflow-x: auto;
+            background-color: var(--almost-black);
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        pre>code {
+            color: rgb(78, 233, 194) !important;
+        }
+    </style>
+</head>
+
+<div style="max-width: 800px; margin-left: auto; margin-right: auto;">
+    <div class="everything-container">
+        <div class="heading-container">
+            <div>
+                <h1>A New Idea For Reducing Probe-lengths...</h1>
+            </div>
+            <a href="/">
+                <img src="/img/go-back.svg" alt="A navigation arrow to send you back to the site homepage"
+                    style="filter: invert(1); height: 30px;" />
+            </a>
+        </div>
+        <div class="content-container inverse">
+            <p>Recently, I've upgraded the hashtable project significantly. Firstly, I
+am now referring to them as &quot;associative arrays&quot;, which sounds far more
+fancy and academic. But more importantly, I have created a proper
+framework that we can use to program our hashtables against. It includes
+a basic benchmark suite and an extensive suite of tests which can
+generate counter examples. I used all these tools to program a new
+table, which isn't very good (but failed research is still useful).</p>
+<p><a href="https://github.com/D0liphin/AssociativeArrays">Here is a link</a> to the
+repository.</p>
+<h2>Testing</h2>
+<p>The whole framework is built around one vtable struct, called
+<code>astv_array_vtable</code>. It contains five function pointers, <code>init()</code> and
+<code>deinit()</code> then <code>insert(k, v)</code>, <code>remove(k)</code> and <code>lookup(k)</code>. Sort of
+exactly what you would expect. Some other operations that I didn't
+bother including are <code>clear()</code>, <code>clone()</code> and some kind of iterator. It
+could be nice to include something that tests iteration speed, but for
+now, I'm leaving this for another day. Also, the hashtables all operate
+on <code>(keyint_t, valint_t)</code> entries. These are currently <code>intptr_t</code>s.</p>
+<p>Okay, so testing hashtables is pretty easy actually. The first thing I
+did was make this exact replica of C++'s <code>std::unordered_map</code>...</p>
+<pre><code class="language-c">typedef struct {
+        intptr_t _[7];
+} cpp_std_unordered_map;
+</code></pre>
+<p>Perfect! Just kidding. We just use this as a dummy to write the actual
+<code>std::unordered_map&lt;keyint_t, valint_t&gt;</code> to. We can also wrap all the
+operations of <code>std::unordered_map</code> in C functions so that we can use
+them, something like this:</p>
+<pre><code class="language-cpp">void cpp_std_unordered_map_insert(void *tbl, keyint_t k, valint_t v) 
+{
+    (*(std::unordered_map&lt;keyint_t, valint_t&gt; *)tbl)[k] = v;
+}
+</code></pre>
+<p>Next up, we can just run random operations on both our implementation
+and this at the same time and wait for it to fail. Let's call this
+method <code>test_against_oracle_huge_randoms</code>. This approach is great,
+because it gives us pretty high confidence that our table works. The
+issue with it is that when it fails, tracing exactly why it failed is
+really <em>really</em> hard. As a result, I did a couple extra things.</p>
+<p>First, generate every single possible ordering of <code>remove()</code>/<code>insert()</code>.
+We do this for up to <code>k = 8</code> and for sequences up to length <code>7</code>. Values
+only need to be binary (<code>1</code> or <code>0</code>). Using more values is basically
+pointless because for any case where the value happens to be the same,
+there is another combination where it isn't. After executing each
+sequence on the oracle and the test table, we check that looking up
+all keys up to <code>k = 8</code> produces identical results.</p>
+<p>This lets us generate <em>readable</em> counter examples as code. Here's an
+example output from the test suite.</p>
+<pre><code class="language-c">// Failed to match oracle output on below test case
+int main()
+{
+        jtable tbl;
+        struct astv_array_vtable vtbl = jtable_vtable();
+        vtbl.init(&amp;tbl);
+        vtbl.insert(&amp;tbl, 6, 0);
+        vtbl.insert(&amp;tbl, 0, 1);
+        valint_t *v = vtbl.lookup(&amp;tbl, 0);
+        assert(v != NULL);
+        assert(*v == 1);
+        vtbl.deinit(&amp;tbl);
+        return 0;
+}
+</code></pre>
+<p>Indeed, I found <strong>seven</strong> <em>different</em> bugs this way! However, my code
+was still not working on <code>test_against_oracle_huge_randoms</code>. A new
+test case was needed! This time, I generate about 100-million random
+counter examples for different sequence lengths and with much larger
+possible keys (up to <code>32</code>). This approach generated another seven
+counter examples. The last one only came up after 300-million tests!</p>
+<p>Finally, I was confident that my table was working. At the same time
+though, I am now totally convinced that I have almost never written
+correct software before this.</p>
+<h2>Benchmarking</h2>
+<p>Benchmarking is done with Google's benchmark library and then I plot
+things with <code>plotly</code>. Exactly what kind of benchmarks one should use for
+this sort of thing is a little tricky. In the end, I decided on four
+options that are supposed to give you some kind of 'holistic' idea
+of usage</p>
+<ul>
+<li><code>insert_2update_randoms</code>
+<ul>
+<li>insert <code>N</code> randoms in range <code>[0, N)</code>.</li>
+<li>update each key twice</li>
+</ul>
+</li>
+<li><code>insert_remove_all_randoms</code>
+<ul>
+<li>insert <code>N</code> randoms in range <code>[0, N)</code></li>
+<li>remove all entries in reverse order</li>
+</ul>
+</li>
+<li><code>insert_remove_lookup</code>
+<ul>
+<li>insert <code>N</code> randoms in range <code>[0, N)</code></li>
+<li>remove <code>N / 2</code> randoms in range <code>[0, N)</code></li>
+<li>lookup <code>N / 2</code> randoms in range <code>[0, N)</code></li>
+</ul>
+</li>
+<li><code>insert_remove_alt</code>
+<ul>
+<li>insert <code>N / 2</code> randoms in range <code>[0, N)</code></li>
+<li>remove <code>N / 2</code> randoms in range <code>[0, N)</code></li>
+<li>repeat 8 times</li>
+</ul>
+</li>
+</ul>
+<h2><code>jtable</code></h2>
+<p><code>jtable</code> is a table that aims to benefit from some level of
+cache-locality that is provided by linear-probing lookup, but with
+the consistency of a chaining approach. It's a failed idea, at least
+in its current form. Failed research is stil research though, especially
+if you learn <em>why</em> it failed. The next article should be about trying
+to make this approach work better, this one just describes it.</p>
+<p><code>jtable</code> uses a flat buffer to store everything. Let's start by
+inserting <code>a</code>, <code>b</code>, <code>c</code> and <code>d</code>. We ignore values here.</p>
+<p><img src="image.png" alt="A flat buffer with snugly-placed entries" /></p>
+<p>Let's say that <code>hash(e) == hash(a)</code>. In this case, we want to place <code>e</code>
+in the same bucket.</p>
+<p><img src="image-1.png" alt="e overlaps with bucket containing a" /></p>
+<p>Since we can't do this, we probe for an empty slot and insert <code>e</code>.</p>
+<p><img src="image-3.png" alt="e is placed in an empty slot a few spaces to the right of a" /></p>
+<p>We maintain a pointer from the bucket containing <code>a</code> to the bucket
+containing <code>e</code>. This represents a chain.</p>
+<p><img src="image-4.png" alt="an arrow is added to the previous image, from a to e" /></p>
+<p>Intuitively, <code>e</code> will be close to <code>a</code>. The pointers should let us
+skip any unnecessary comparisons though.</p>
+<p>Further items might be added to the chain. For example consider the case
+where <code>hash(f) == hash(e) == hash(a)</code>:</p>
+<p><img src="image-5.png" alt="the chain continues from e to f, which is placed in the first free slot to the right of e" /></p>
+<p>Okay, but we have a problem now. What if <code>hash(g) == idxof(e)</code>?</p>
+<p><img src="image-6.png" alt="g hovers over the bucket that e is in" /></p>
+<p>Again, we probe and insert <code>g</code> in the slot we find.</p>
+<p><img src="image-7.png" alt="g is inserted in a new free slot" /></p>
+<p>We need to maintain another pointer from the bucket that <code>e</code> is in to
+<code>g</code> now.</p>
+<p><img src="image-8.png" alt="an arrow without a dash is drawn from e to g" /></p>
+<p>This way, if we need to lookup <code>g</code>, we first check if the bucket is
+occupied with a non-head value (here marked in blue) and if it is, find
+the true head in one jump. Notice also that we can do any kind of
+probing we want here. One great idea would be to do double-hashing.</p>
+<p>Remember back when I did <a href="https://www.oliveriliffe.net/blog/hashtbl-math/hashtbl-math.html">that article about hashtable math</a>?
+I'm sure as an avid reader you do remember <code>;)</code>. Anyway, here I made
+the assumption that given that slot <code>i</code> is not occupied, the chance that
+slot <code>i + 1</code> is not occupied is still just the load of the table.</p>
+<blockquote>
+<p>Recall, the 'load' (lowercase <code>l</code>) of the table is the percentage of
+the table that is occupied. The 'load-factor' (uppercase <code>L</code>) is the
+percentage of the table that needs to be occupied for us to reallocate
+and rehash everything.</p>
+</blockquote>
+<p>However, this is just not true! Let's say I have 8 slots in my buffer.
+They all start off empty, so whichever one I fill (considering a totally
+random hash function) is random. So let's go ahead and fill in slot <code>2</code>.</p>
+<p><img src="image-9.png" alt="a flat buffer with the 3rd slot occupied" /></p>
+<p>A subsequent insert will select an index in the range <code>[0, 8)</code> at
+random. However, slot <code>2</code> is occupied now. And if we choose slot <code>2</code>,
+we deterministically end up filling slot <code>3</code>. So slot <code>3</code> is <em>twice</em>
+as likely to be filled. This actually <em>snowballs</em> really fast!</p>
+
+        </div>
+    </div>
+</div>
+
+</html>
