@@ -52,6 +52,7 @@ fn convert_all() {
     // TODO: recursive search
     files.extend(all_files_with_ext("../blog/hashtbl-math", "md"));
     files.extend(all_files_with_ext("../blog/hashtbl-testing", "md"));
+    files.extend(all_files_with_ext("../blog/olis-little-guide-to-cxl", "md"));
     for file in files.iter_mut() {
         while let Some(ch) = file.name.chars().last() {
             file.name.pop();

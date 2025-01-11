@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Oliver Iliffe's Website</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="Oliver Iliffe's personal website and blog and stuff">
+    <meta name="keywords" content="Oliver, Iliffe, Personal, Website, oliver, iliffe">
+    <meta name="author" content="Oliver Iliffe">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --almost-black: rgb(30, 30, 30);
+            --almost-white: rgb(240, 240, 240);
+        }
+
+        :root {
+            --primary-color: var(--almost-white);
+            --secondary-color: var(--almost-black);
+        }
+
+        * {
+            font-family: "Open Sans", sans-serif;
+            box-sizing: border-box;
+            color: var(--primary-color);
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: "Open Sans", sans-serif;
+            font-weight: 800;
+        }
+
+        a:hover {
+            color: var(--primary-color);
+        }
+
+        html {
+            margin: 0px;
+        }
+
+        body {
+            margin: 0px;
+            background-color: var(--secondary-color);
+            overflow-x: hidden;
+        }
+
+        .everything-container {
+            padding: 20px;
+        }
+
+        @media (max-width: 500px) {
+            .everything-container {
+                padding: 0px;
+            }
+        }
+
+        .heading-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0px 20px 0px 20px;
+        }
+
+        @media (max-width: 500px) {
+            .heading-container {
+                margin-bottom: 10px;
+            }
+        }
+
+        .img-with-border {
+            border: 5px solid var(--primary-color);
+        }
+
+        .inverse * {
+            color: var(--secondary-color);
+        }
+
+        .inverse * a:hover {
+            color: var(--secondary-color);
+        }
+
+        .content-container {
+            border-radius: 6px;
+            background-color: var(--primary-color);
+            padding: 20px 30px 30px 30px;
+            position: relative;
+        }
+
+        .content-container *>img {
+            max-width: 100%;
+        }
+
+        @media (max-width: 500px) {
+            .content-container {
+                border-radius: 0px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .ferris-the-crab {
+                visibility: hidden;
+            }
+        }
+
+        pre *,
+        code *,
+        code {
+            font-family: "Roboto Mono", monospace;
+            font-weight: bold;
+            font-size: 14px;
+            line-height: 12px;
+        }
+
+        h1 *,
+        h2 *,
+        h3 *,
+        h4 * {
+            font-size: inherit;
+        }
+
+        pre {
+            overflow-x: auto;
+            background-color: var(--almost-black);
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        pre>code {
+            color: rgb(78, 233, 194) !important;
+        }
+    </style>
+</head>
+
+<div style="max-width: 800px; margin-left: auto; margin-right: auto;">
+    <div class="everything-container">
+        <div class="heading-container">
+            <div>
+                <h1>Oli's Little Guide to CXL</h1>
+            </div>
+            <a href="/">
+                <img src="/img/go-back.svg" alt="A navigation arrow to send you back to the site homepage"
+                    style="filter: invert(1); height: 30px;" />
+            </a>
+        </div>
+        <div class="content-container inverse">
+            <p>I'm working on a research project about <a href="https://en.wikipedia.org/wiki/Compute_Express_Link">CXL (Compute Express Link)</a>
+and distributed memory, so I am adding a new little guide about what CXL
+actually is. Hopefully in a way that you can read this in 20 minutes
+and understand the motivation behind it. Then, you can look up the
+different parts in more detail.</p>
+<p>I'm a computer scientist. This means that I don't know anything about
+mathematics and I don't know anything about electrical engineering.
+Some would call this useless. But it is what I am and I will explain it
+in a way that makes sense to me.</p>
+<h2>What is CXL?</h2>
+<p>CXL is just an open standard interconnect (created by Intel). It must be
+implemented at the hardware level. There are three protocols as part of
+this standard. (1) CXL.io (2) CXL.cache (3) CXL.mem.</p>
+<h2>CXL.io</h2>
+<p>This is <em>functionally</em> the same as PCIe. We use it for</p>
+<ul>
+<li>Device discovery</li>
+<li>Status reporting</li>
+<li>Virtual to physical address translation TODO</li>
+<li>Direct memory access (DMA)</li>
+</ul>
+<h3>What is PCIe?</h3>
+<p>PCIe transfers data fast.</p>
+<blockquote>
+<p>A root complex is the interface between the system CPU and memory and
+the rest of the PCIe structure. The root complex is either integrated
+into the CPU directly or is external to the CPU as a discrete
+component.</p>
+</blockquote>
+<p>I quoted that bit so I don't get it wrong. The root complex has some
+control components to set up a PCIe link. It also has some timing parts.
+There's a pretty complicated setup process in PCIe where you have to
+negotiate how the connection will work, that's not really important.</p>
+<p>TODO: ATS<br />
+TODO: PCIe vs DDR</p>
+<h2>Devices and Hosts</h2>
+<p>In CXL we have 'CXL hosts' (or 'CPU hosts' or 'host CPUs' etc.) and
+'CXL devices'. CXL lets us attach new devices to our host CPU. The
+devices communicate with our CPU and we communicate with the devices
+through CXL.</p>
+<h2>CXL Protocols</h2>
+<p><strong>CXL.io</strong> is functionally identical to PCIe.</p>
+<p><strong>CXL.cache</strong> allows CXL devices to access and cache (locally) memory
+from the CPU host.</p>
+<p><strong>CXL.mem</strong> allows the host CPU to access device-attached memory. This
+is referred to as &quot;Host managed Device Memory&quot; (HDM).</p>
+<p>The latter two are special because they allow these memory operations
+to happen in a 'cache coherent' way.</p>
+<h2>It's All About Memory</h2>
+<p>CXL is about accessing device memory from your host CPU and vice versa.
+CXL is <em>all about memory</em> Don't get any ideas that CXL is for something
+else.</p>
+<h2>What is Cache Coherence?</h2>
+<p>Imagine we have lots of CPUs all accessing some shared memory. Accessing
+shared memory is slow, so they <em>each</em> have their own cache that they put
+blocks (cache lines) of memory in so that they can read/write to that
+memory really fast. This cache is much smaller than main memory so it
+can only hold a small subset of what's available in memory. A diagram
+of such an architecture would look like this:</p>
+<p><img src="image-1.png" alt="CPUs and Caches Block Diagram. There are two CPUs each with a cache
+connected to a shared main memory." /></p>
+<p>Consider the case where CPU 1 writes some value. Upon write, the cache
+line is moved from main memory into its cache, then it is updated. If,
+before we write-through to main memory (if that is the policy of the
+CPU), CPU 2 decides to read the same cache line, it must know that the
+CPU 1 has updated it. Otherwise, there will be some inconsistency
+between the two caches.</p>
+<p>This is the whole problem of cache coherence and we need a way to manage
+it. CXL works in a cache coherent way, whereas regular PCIe memory
+accesses do not. Wikipedia says this means:</p>
+<blockquote>
+<p>In a cache coherent system, if multiple clients have a cached copy of
+the same region of a shared memory resource, all copies are the same.</p>
+</blockquote>
+<p>I'm not a huge fan of this definition. Really, it should say that we
+have some mechanism to wait for those copies to be the same or
+something. Let's look at a use case of CXL that takes advantage of this.</p>
+<h2>Use Cases</h2>
+<p>The CXL consortium outline loaddsss of use cases. Here's an example:</p>
+<p>We have some kind of accelerator (processor that does a certain job
+better than our CPU) e.g. a GPU. If a GPU wants memory at the moment,
+it does so with a non-coherent DMA over PCIe.</p>
+<ol>
+<li>Allocate buffer in host memory</li>
+<li>GPU makes request to the RC</li>
+<li>Vaddr is translated</li>
+<li>Memory controller responds to RC</li>
+<li>RC responds to GPU</li>
+<li>GPU puts memory in the right spot etc.</li>
+</ol>
+<p>It would be much easier and more useful if we could just have a cache
+on the accelerator and do access of host memory through normal reads
+and writes.</p>
+<p><img src="image.png" alt="Block diagram. There is an accelarator NIC with a cache connected to a
+CPU via CXL. The CPU has two blocks of memory connected to it over
+DDR" /></p>
+<p>In the case where the cache is never invalidated (which is the assumed
+case in the 'old way') there shouldn't be any speed decrease. But we
+probably want to access parts of the same data structure from the host
+or the devices. More formally (from the CXL consortium):</p>
+<blockquote>
+<p>This poses a barrier for new usage models such as Artificial
+Intelligence (AI), Machine Learning (ML), and smart network interface
+cards (NICs) where devices seek to access parts of the same data
+structures simultaneously with the CPU using device-local caches
+without moving entire data structures back and forth.</p>
+</blockquote>
+<h2>Implementation</h2>
+<p>This section talks about how CXL actually does this.</p>
+<h3>MESI Protocol</h3>
+<p>Time for a lesson in cache coherency protocols. This is the hardware
+protocol that enforces that our caches are 'coherent'. A pretty common
+protocol is 'MESI' and it is also the one that CXL uses. Each of these
+four letters represents a different state that a cache line can be in.
+Specifically they encode two things: (1) is the cache line the same as
+in main memory? (if it is, we call it 'clean', otherwise it's called
+'dirty') (2) Do any other caches have a copy of this?.</p>
+<p>| Clean | Exclusive |     Name      |
+|:-----:|:---------:|:-------------:|
+|   ⛔   |     ⛔     | Doesn't exist |
+|   ⛔   |     ✅     | Modified (M)  |
+|   ✅   |     ⛔     |  Shared (S)   |
+|   ✅   |     ✅     | Exclusive (E) |</p>
+<p>The final state 'I' is really just a marker to say a cache line is
+free. It stands for 'Invalid'.</p>
+<p>Whenever we do a read to some cache, we broadcast on some bus &quot;hey
+everyone, I want to read this thing&quot;. If some other cache has that cache
+line in state M, it broadcasts back &quot;wait, I already have that&quot;. Then,
+we can read the value from it and set both states to S. Other states
+result in different resolution methods. For example, if some cache wants
+to update the state of some data from S to M (because it writes to it),
+we need to invalidate all other copies.</p>
+<p>This is just one of many possible 'snooping' designs. A snooping
+coherence protocol is one that works by caches broadcasting updates and
+other caches making sure that they snoop in on these broadcasts and make
+sure they update their state accordingly. The specifics don't really
+matter, you just need to understand that this can be achieved like this.</p>
+<p>Our previous diagram needs to be updated to look something like this:</p>
+<p><img src="image-2.png" alt="Shows three caches all connected hierarchically to a shared memory.
+Each cache is also connected to a shared red wire labelled 'common
+broadcasting bus'." /></p>
+<h3>CXL's Coherency Protocol</h3>
+<p>The CXL developers want the complexity to be at the hosts.</p>
+<p><a href="https://youtu.be/OK7_89zm2io?t=1224">20:00</a>
+https://dl.acm.org/doi/10.1145/3669900</p>
+<p>Home Agent is the agent on the Host that is responsible for resolving system wide coherency for a given address.</p>
+&lt;!-- CXL over ethernet --&gt;
+&lt;!-- https://www.rambus.com/blogs/compute-express-link/#respond --&gt;
+<p>marios what do you think about eie</p>
+<p>PIM (processing in memory)</p>
+&lt;!-- https://ieeexplore.ieee.org/abstract/document/8579261 --&gt;
+&lt;!-- https://dl.acm.org/doi/10.1145/3669900 --&gt;
+<ul>
+<li>
+<p>A key reason for this mismatch in scaling is the pin-inefficiency of the parallel DDR interface. Scaling up by adding DDR channels significantly adds to platform cost and introduces signal integrity challenges. In principle, PCIe pins would be a great alternative due to their superior memory bandwidth per pin, even with the added latency of serialization/ deserialization, as discussed later. For example, a x16 Gen5 PCIe port at 32 GT/s offers 256 GB/s with 64 signal pins. DDR5-6400 offers 50 GB/s with ∼200 signal-pins.</p>
+</li>
+<li>
+<p>PCIe also supports longer reach with retimers,1 which would allow moving memory farther away from CPUs and using more than 15 W of power per DIMM, resulting in superior performance. Unfortunately, PCIe does not support coherency, and device-attached memory cannot be mapped to the coherent memory space. Thus, PCIe has not been able to replace DDR.</p>
+</li>
+<li>
+<p>I should talk about what CXL is originally made for and then explain
+how that is <em>not</em> DSM, but there are som DSM adjacent things that
+mean maybe DSM can work.</p>
+</li>
+</ul>
+<h2>2 CXL Background and Design Choices</h2>
+<p>Cache-coherent interconnects (QPI, Bluelink, NVLink) have historically
+been symmetric. Each processor has its own cache that acts as a bridge
+between the processor and main memory. This is exceedingly complicated
+to deploy, especially in-light of many processors using different
+coherency protocols.</p>
+<p>CXL is <em>asymmetric</em>.</p>
+<p>CXL aims to be backwards compatible and present new features as needed
+with new versions.</p>
+<p>Direct peer-to-peer access from a PCIe/CXL device to the coherent HDM memory hosted by a Type 2/Type 3 device without involving the host processor if no conflict arises. This results in low latency, less congestion, and high bandwidth efficiency, which is critical for large systems. For example, in Figure 12, the NIC to memory is 8 hops away using direct P2P vs. going through a CPU is 16 hops away round-trip.</p>
+<p>???</p>
+<blockquote>
+<p>memory access latency from a CXL device would be similar to memory access from a DDR bus in a remote socket. While this is higher than memory access from a DDR bus in a local socket [79], in a 2-socket symmetric multi-processing system, it is acceptable due to NUMA (non-uniform memory access) optimization and the higher bandwidth resulting in lower latency in non-idle systems [8, 9, 10].</p>
+</blockquote>
+<p>TODO: probably not useful but how exactly do the snoops work. I think
+it's sufficient to know that the snoops are host managed for CXL.cache</p>
+
+        </div>
+    </div>
+</div>
+
+</html>
