@@ -147,12 +147,14 @@ Specifically they encode two things: (1) is the cache line the same as
 in main memory? (if it is, we call it 'clean', otherwise it's called
 'dirty') (2) Do any other caches have a copy of this?.
 
-| Clean | Exclusive |     Name      |
-|:-----:|:---------:|:-------------:|
-|   ⛔   |     ⛔     | Doesn't exist |
-|   ⛔   |     ✅     | Modified (M)  |
-|   ✅   |     ⛔     |  Shared (S)   |
-|   ✅   |     ✅     | Exclusive (E) |
+```
+| Clean/Dirty | Exclusive/Shared |     Name      |
+|:-----------:|:----------------:|:-------------:|
+|    Dirty    |      Shared      | Doesn't exist |
+|    Dirty    |    Exclusive     | Modified (M)  |
+|    Clean    |      Shared      |  Shared (S)   |
+|    Clean    |    Exclusive     | Exclusive (E) |
+```
 
 The final state 'I' is really just a marker to say a cache line is 
 free. It stands for 'Invalid'. 
@@ -177,9 +179,52 @@ Our previous diagram needs to be updated to look something like this:
   Each cache is also connected to a shared red wire labelled 'common 
   broadcasting bus'.](image-2.png)
 
-### CXL's Coherency Protocol
+### CXL.cache
 
-The CXL developers want the complexity to be at the hosts. 
+At a high-level CXL.cache implements the MESI protocol. There are
+different message types that the device can send to the host and vice
+versa.
+
+The device has various kinds of commands it can send. Most obvious are
+`Read` and `Write`. `Read` allows a device to request coherence state
+and data _for_ a cache line. `Write` is used for the device to evict
+data from the device cache. For both, the host tells the device what is
+globally observed (GO) by the system. Devices can also write directly to
+the host, or read only cache line state.
+
+The host can also send 'snoop's to the device to update its cache, or
+to read the current cache state from the device. Notice how the 
+responsibility for the whole cache management is on the host -- this is
+by design. Let's look at an example:
+
+![Read Flow time/agents graph. Time flows downwards and the graph shows
+  how messages are pinged between the CXL device, Peer cache and home](image-3.png)
+
+Here, the CXL device wants to read something and have it be in state
+S, so they do `RdShared`. The host first snoops on a peer cache. The 
+peer cache is responsible for downgrading its cache line state and 
+sending back a message to the host telling it that it has done so.
+Finally, the host reports that the cache line is globally observed as
+S and sends the data. Notice how simultaneously, data is also read.
+This is where we get the data from. This can be any kind of memory 
+controller.
+
+These requests are (dubious source) propagated by the IMC (integrated
+memory controller) on the processor of the CXL device. It's supposed to
+be clever enough to figure out that it needs to translate say a `mov`
+into a RdShared or something. From the perspective of the CXL device,
+this is just a memory read with maybe a bit more latency than normal,
+but all the regular pipelining mechanisms should still work. Note that 
+if the data is already cached, we don't need to send a `RdShared` and 
+no such request is sent. Our request never even hits the IMC of the 
+device, it just goes straight to device cache!
+
+How clever. We send off our read/write, the host updates all peer caches
+and sends us back our data. If it's already in cache, we just read/write
+straight away. 
+
+### CXL.mem
+
 
 [20:00](https://youtu.be/OK7_89zm2io?t=1224)
 https://dl.acm.org/doi/10.1145/3669900
