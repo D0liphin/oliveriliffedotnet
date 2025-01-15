@@ -6,44 +6,11 @@ actually is. Hopefully in a way that you can read this in 20 minutes
 and understand the motivation behind it. Then, you can look up the 
 different parts in more detail.
 
-I'm a computer scientist. This means that I don't know anything about 
-mathematics and I don't know anything about electrical engineering.
-Some would call this useless. But it is what I am and I will explain it
-in a way that makes sense to me.
-
 ## What is CXL?
 
 CXL is just an open standard interconnect (created by Intel). It must be
 implemented at the hardware level. There are three protocols as part of
 this standard. (1) CXL.io (2) CXL.cache (3) CXL.mem. 
-
-## CXL.io
-
-This is _functionally_ the same as PCIe. We use it for
-
-- Device discovery
-- Status reporting
-- Virtual to physical address translation TODO
-- Direct memory access (DMA)
-
-### What is PCIe?
-
-PCIe transfers data fast.
-
-> A root complex is the interface between the system CPU and memory and
-> the rest of the PCIe structure. The root complex is either integrated
-> into the CPU directly or is external to the CPU as a discrete
-> component.
-
-I quoted that bit so I don't get it wrong. The root complex has some
-control components to set up a PCIe link. It also has some timing parts.
-There's a pretty complicated setup process in PCIe where you have to
-negotiate how the connection will work, that's not really important.
-
-TODO: ATS  
-TODO: PCIe vs DDR
-
-## Devices and Hosts
 
 In CXL we have 'CXL hosts' (or 'CPU hosts' or 'host CPUs' etc.) and 
 'CXL devices'. CXL lets us attach new devices to our host CPU. The
@@ -52,7 +19,8 @@ through CXL.
 
 ## CXL Protocols
 
-**CXL.io** is functionally identical to PCIe.
+**CXL.io** is functionally identical to PCIe. It allows for a variety
+of control tasks, as well as non-coherent direct memory access (DMA).
 
 **CXL.cache** allows CXL devices to access and cache (locally) memory
 from the CPU host.
@@ -71,12 +39,8 @@ else.
 
 ## What is Cache Coherence?
 
-Imagine we have lots of CPUs all accessing some shared memory. Accessing
-shared memory is slow, so they _each_ have their own cache that they put
-blocks (cache lines) of memory in so that they can read/write to that
-memory really fast. This cache is much smaller than main memory so it
-can only hold a small subset of what's available in memory. A diagram
-of such an architecture would look like this:
+Here is a typical [cache](https://en.wikipedia.org/wiki/CPU_cache) 
+diagram:
 
 ![CPUs and Caches Block Diagram. There are two CPUs each with a cache 
   connected to a shared main memory.](image-1.png)
@@ -97,21 +61,21 @@ accesses do not. Wikipedia says this means:
 
 I'm not a huge fan of this definition. Really, it should say that we 
 have some mechanism to wait for those copies to be the same or 
-something. Let's look at a use case of CXL that takes advantage of this.
+something. 
 
-## Use Cases
+Anyway, let's look at a use case of CXL that takes advantage of this.
 
-The CXL consortium outline loaddsss of use cases. Here's an example:
+## Use Case
 
 We have some kind of accelerator (processor that does a certain job
 better than our CPU) e.g. a GPU. If a GPU wants memory at the moment,
 it does so with a non-coherent DMA over PCIe.
 
 1. Allocate buffer in host memory
-2. GPU makes request to the RC 
+2. GPU makes request to the CPU
 3. Vaddr is translated
 4. Memory controller responds to RC
-5. RC responds to GPU
+5. CPU responds to GPU
 6. GPU puts memory in the right spot etc. 
 
 It would be much easier and more useful if we could just have a cache
@@ -135,7 +99,10 @@ or the devices. More formally (from the CXL consortium):
 
 ## Implementation
 
-This section talks about how CXL actually does this.
+This section discusses possible implementation details. Unless you are
+implementing CXL yourself, you do not need to understand exactly how it
+is implemented. Therefore, this section aims to demystify such a
+protocol, without delving too deep.
 
 ### MESI Protocol
 
@@ -188,17 +155,16 @@ versa.
 The device has various kinds of commands it can send. Most obvious are
 `Read` and `Write`. `Read` allows a device to request coherence state
 and data _for_ a cache line. `Write` is used for the device to evict
-data from the device cache. For both, the host tells the device what is
-globally observed (GO) by the system. Devices can also write directly to
-the host, or read only cache line state.
+data from the device cache. For both, the host tells the device what
+state is globally observed (GO) by the system.
 
 The host can also send 'snoop's to the device to update its cache, or
-to read the current cache state from the device. Notice how the 
-responsibility for the whole cache management is on the host -- this is
-by design. Let's look at an example:
+to read the current cache state from the device. Let's look at an 
+example.
 
 ![Read Flow time/agents graph. Time flows downwards and the graph shows
-  how messages are pinged between the CXL device, Peer cache and home](image-3.png)
+  how messages are pinged between the CXL device, Peer cache and home
+  agent](image-3.png)
 
 Here, the CXL device wants to read something and have it be in state
 S, so they do `RdShared`. The host first snoops on a peer cache. The 
@@ -225,53 +191,52 @@ straight away.
 
 ### CXL.mem
 
+CXL.mem uses "host-managed device memory" (HDM). The basic form of the 
+protocol does not allow the device to also cache the host memory. A
+more complicated version _does_, though.
 
-[20:00](https://youtu.be/OK7_89zm2io?t=1224)
-https://dl.acm.org/doi/10.1145/3669900
+Memory that is host-managed coherent is called HDM-H and memory that is
+device-managed coherent is called HDM-D. The way HDM-D is managed much
+in the same way as CXL.cache, in fact, certain parts of it actually do
+perform CXL.cache requests to the host. I don't think going through the
+specifics here provides much additional benefit. (Perhaps if I find a
+use for some of the specifics here, I will add something to the article
+in the future).
 
-Home Agent is the agent on the Host that is responsible for resolving system wide coherency for a given address.
+HDM-H exposes an additional 2-bits for each cache-line, which would have
+been used by the device to store cache state before. Who knows what 
+you can do with this, but maybe something clever.
 
+### The Whole Thing
 
-<!-- CXL over ethernet -->
+This image shows how we can use the protocols I've described earlier.
 
-<!-- https://www.rambus.com/blogs/compute-express-link/#respond -->
+![Diagram showing all the constituent parts of CXL connected. Important 
+  details are explained below in a way that is mindful of users who 
+  cannot see this image.](image-4.png)
 
-marios what do you think about eie 
+The diagram shows a multicore CPU in socket 0. It has 4 cores, each 
+core has a unique L1 cache, each pair of cores share L2 cache. All
+four cores share L3 cache (LLC). 
 
-PIM (processing in memory)
-<!-- https://ieeexplore.ieee.org/abstract/document/8579261 -->
+This CPU has decided to implement CXL.cache at the LLC. This is not the
+only possible design but makes good sense for a number of reasons. (1)
+CXL.cache defines host-to-device semantics, not core-to-device. (2) 
+Implementing at a higher level cache introduces significant complexity.
+L1/L2 coherence is already managed by a proprietary protocol which is
+not CXL, so multiplexing with this protocol would be challenging. (3)
+If L3 is inclusive, we have to write to it anyway, so this design may
+not degrade performance as much as we expect. I'm just guessing on that
+one though.
 
-<!-- https://dl.acm.org/doi/10.1145/3669900 -->
+The device connected through CXL.cache could also access host memory
+non-coherently over CXL.io. In this design, we pass through the same
+cache. Again this seems to make most sense if L3 is inclusive.
 
-- A key reason for this mismatch in scaling is the pin-inefficiency of the parallel DDR interface. Scaling up by adding DDR channels significantly adds to platform cost and introduces signal integrity challenges. In principle, PCIe pins would be a great alternative due to their superior memory bandwidth per pin, even with the added latency of serialization/ deserialization, as discussed later. For example, a x16 Gen5 PCIe port at 32 GT/s offers 256 GB/s with 64 signal pins. DDR5-6400 offers 50 GB/s with ∼200 signal-pins.
-
-- PCIe also supports longer reach with retimers,1 which would allow moving memory farther away from CPUs and using more than 15 W of power per DIMM, resulting in superior performance. Unfortunately, PCIe does not support coherency, and device-attached memory cannot be mapped to the coherent memory space. Thus, PCIe has not been able to replace DDR.
-
-- I should talk about what CXL is originally made for and then explain
-  how that is _not_ DSM, but there are som DSM adjacent things that 
-  mean maybe DSM can work.
-
-## 2 CXL Background and Design Choices
-
-Cache-coherent interconnects (QPI, Bluelink, NVLink) have historically
-been symmetric. Each processor has its own cache that acts as a bridge
-between the processor and main memory. This is exceedingly complicated
-to deploy, especially in-light of many processors using different
-coherency protocols.
-
-CXL is _asymmetric_.
-
-CXL aims to be backwards compatible and present new features as needed
-with new versions.
-
-
-
-Direct peer-to-peer access from a PCIe/CXL device to the coherent HDM memory hosted by a Type 2/Type 3 device without involving the host processor if no conflict arises. This results in low latency, less congestion, and high bandwidth efficiency, which is critical for large systems. For example, in Figure 12, the NIC to memory is 8 hops away using direct P2P vs. going through a CPU is 16 hops away round-trip.
-
-???
-
-> memory access latency from a CXL device would be similar to memory access from a DDR bus in a remote socket. While this is higher than memory access from a DDR bus in a local socket [79], in a 2-socket symmetric multi-processing system, it is acceptable due to NUMA (non-uniform memory access) optimization and the higher bandwidth resulting in lower latency in non-idle systems [8, 9, 10].
-
-
-TODO: probably not useful but how exactly do the snoops work. I think 
-it's sufficient to know that the snoops are host managed for CXL.cache
+CXL.mem devices are also attached to the CPU socket behind its home
+agent. The home agent is supposed to maintain coherence for a certain
+address space. Not only do requests by cache to main DDR-attached memory
+pass through the home agent, it is also responsible for attaching
+additional CPUs through a proprietary interconnect. It is natural in
+this design to put CXL.mem devices behind the home agent, as this is the
+same location DDR-attached memory would go.
