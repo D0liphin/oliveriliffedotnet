@@ -240,3 +240,35 @@ pass through the home agent, it is also responsible for attaching
 additional CPUs through a proprietary interconnect. It is natural in
 this design to put CXL.mem devices behind the home agent, as this is the
 same location DDR-attached memory would go.
+
+## CXL 2.0
+
+I bet you're excited for this. That was just CXL 1.0. 
+
+Multiple hosts may wish to use multiple devices, with some overlap.
+
+In order to achieve this, we use a CXL switch.
+
+A CXL switch fits into a PCIe slot (I'm guessing?).
+
+We physically connect both hosts to the CXL switch.
+
+However, while they are both physically just connected to the switch
+as normal, they see a virtual CXL switch instead, as configured inside
+the CXL switch.
+
+Each host has a complete view of the network defined by the CXL 
+switch. This view is called the virtual hierarchy (VH).
+
+Virtual CXL switches are configured by the fabric manager and do the
+routing.
+
+all output devices are connected to the same physical CXL switch. 
+
+The CXL switch determines which one to output to based on the active
+virtual bridges as managed by the virtual cxl switches.
+
+However, this virtualization is done by the CXL switch by tracking the
+address maps, which is expensive so we cannot scale more than a single
+layer in CXL 2.0.
+

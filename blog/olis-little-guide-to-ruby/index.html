@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Oliver Iliffe's Website</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="Oliver Iliffe's personal website and blog and stuff">
+    <meta name="keywords" content="Oliver, Iliffe, Personal, Website, oliver, iliffe">
+    <meta name="author" content="Oliver Iliffe">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --almost-black: rgb(30, 30, 30);
+            --almost-white: rgb(240, 240, 240);
+        }
+
+        :root {
+            --primary-color: var(--almost-white);
+            --secondary-color: var(--almost-black);
+        }
+
+        * {
+            font-family: "Open Sans", sans-serif;
+            box-sizing: border-box;
+            color: var(--primary-color);
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: "Open Sans", sans-serif;
+            font-weight: 800;
+        }
+
+        a:hover {
+            color: var(--primary-color);
+        }
+
+        html {
+            margin: 0px;
+        }
+
+        body {
+            margin: 0px;
+            background-color: var(--secondary-color);
+            overflow-x: hidden;
+        }
+
+        .everything-container {
+            padding: 20px;
+        }
+
+        @media (max-width: 500px) {
+            .everything-container {
+                padding: 0px;
+            }
+        }
+
+        .heading-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0px 20px 0px 20px;
+        }
+
+        @media (max-width: 500px) {
+            .heading-container {
+                margin-bottom: 10px;
+            }
+        }
+
+        .img-with-border {
+            border: 5px solid var(--primary-color);
+        }
+
+        .inverse * {
+            color: var(--secondary-color);
+        }
+
+        .inverse * a:hover {
+            color: var(--secondary-color);
+        }
+
+        .content-container {
+            border-radius: 6px;
+            background-color: var(--primary-color);
+            padding: 20px 30px 30px 30px;
+            position: relative;
+        }
+
+        .content-container *>img {
+            max-width: 100%;
+        }
+
+        @media (max-width: 500px) {
+            .content-container {
+                border-radius: 0px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .ferris-the-crab {
+                visibility: hidden;
+            }
+        }
+
+        pre *,
+        code *,
+        code {
+            font-family: "Roboto Mono", monospace;
+            font-weight: bold;
+            font-size: 14px;
+            line-height: 12px;
+        }
+
+        h1 *,
+        h2 *,
+        h3 *,
+        h4 * {
+            font-size: inherit;
+        }
+
+        pre {
+            overflow-x: auto;
+            background-color: var(--almost-black);
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        pre>code {
+            color: rgb(78, 233, 194) !important;
+        }
+    </style>
+</head>
+
+<div style="max-width: 800px; margin-left: auto; margin-right: auto;">
+    <div class="everything-container">
+        <div class="heading-container">
+            <div>
+                <h1>Oli's Little Guide to Ruby</h1>
+            </div>
+            <a href="/">
+                <img src="/img/go-back.svg" alt="A navigation arrow to send you back to the site homepage"
+                    style="filter: invert(1); height: 30px;" />
+            </a>
+        </div>
+        <div class="content-container inverse">
+            <p>This is about the 1986 HDL Ruby, made by <a href="https://www.cse.chalmers.se/~ms/">Mary Sheeran</a>.</p>
+<h2>Basic Relations</h2>
+<ul>
+<li>Ruby defines blocks with a domain and range.</li>
+<li>Domain variables are read bottom-to-top, left-to-right and are on the
+left or top of the block.</li>
+<li>Range variables are read left-to-right, bottom-to-top and are on the
+bottom or right of the block.</li>
+<li>Blocks might perform computation.</li>
+</ul>
+<p><img src="image.png" alt="A square labelled lowercase f has an incoming arrow from the left
+and outgoing arrow to the right." /></p>
+<p>In ruby we can describe this as follows:</p>
+<pre><code>f = VAR a . a $rel a.
+</code></pre>
+<p>If <code>f</code> performs a function <code>g</code> on its input, we can write:</p>
+<pre><code>f = VAR a . a $rel (`g` a).
+</code></pre>
+<p><code>f</code> can be used as a function. For example, it is valid to declare a
+new block <code>e == f == g</code>:</p>
+<pre><code>e = VAR a . a $rel (`f` a).
+</code></pre>
+<p>If we have multiple range/domain variables.</p>
+<p><img src="image-1.png" alt="As before, but now with two incoming/outgoing arrows on both sides of
+f" /></p>
+<pre><code>f = VAR a b . &lt;a, b&gt; $rel &lt;a, b&gt;.
+</code></pre>
+<p>Or, with computation:</p>
+<pre><code>f = VAR a b . &lt;a, b&gt; $rel &lt;(`inc` a), (`inc` b)&gt;.
+</code></pre>
+<p>Tuples/lists are defined with angle brackets.</p>
+<p>The left/right sides of <code>$rel</code> can be either inputs or outputs.</p>
+<pre><code>f = VAR a b . &lt;(`inc` a), b&gt; $rel &lt;a, (`inc` b)&gt;.
+</code></pre>
+<p><img src="image-2.png" alt="f has a left-incoming wire and a right-outgoing wire, but also two
+arrows flowing in the other direction, underneath the left-to-right
+arrows" /></p>
+<p>With <code>VAR</code> we declare the inputs, in this case <code>a</code> and <code>b</code>.</p>
+<h2>Running things</h2>
+<p>This is dependent on your compiler. You will pass your <code>.rby</code> file into
+a compiler and execute it with another program and some inputs. These
+are passed to the <code>current</code> block in your program. For me this looks
+like:</p>
+<pre><code>rc mycode.rby &amp;&amp; re &quot;a b&quot;
+</code></pre>
+<p>You can pass symbols for symbolic execution, or concrete values.</p>
+<h2>One input, lots of input wires</h2>
+<p><code>$wire</code> is a shorthand for <code>$rel</code> without explicit inputs.</p>
+<p>Consider</p>
+<pre><code>id = a $wire a.
+</code></pre>
+<p>Obviously, <code>`id` 5</code> is just <code>5</code>. But what about <code>`id` &lt;5, 5&gt;</code>?
+This is <code>&lt;5, 5&gt;</code>. Consider a more useful example.</p>
+<pre><code>fork = a $wire &lt;a, a&gt;.
+</code></pre>
+<p><code>`fork` a</code> is <code>&lt;a, a&gt;</code>, and <code>`fork` &lt;a, a&gt;</code> is
+<code>&lt;&lt;a, a&gt;, &lt;a, a&gt;&gt;</code>.</p>
+<h2>Defining Blocks Without <code>$rel</code></h2>
+<p>We can sequence (compose) blocks with <code>;</code>. E.g. <code>f ; g</code></p>
+<p><img src="image-3.png" alt="Two blocks labeled f and g are connected in sequence. g is positioned
+to the right of f. An incoming arrow from the left enters f. From the
+right of f, an outgoing arrow enters the left-side of g. g has a single
+outgoing arrow to the right." /></p>
+<p>We can define blocks in parallel with <code>[]</code>. E.g. <code>f = [id, inc]</code>.</p>
+<p><img src="image-4.png" alt="An outer block f with two inputs and two outputs surrounds the inc and
+id blocks from which it is composed" /></p>
+<p>A more complex example might be the following</p>
+<p><img src="image-5.png" alt="An adder and a multiplier are both supplied the same two inputs
+through forked wires. The entire system has two inputs and two outputs,
+one representing the output of the multiplier and one the
+adder." /></p>
+<p>The 4-input part after the forking is clearly</p>
+<pre><code>&lt;&lt;a, b&gt;, &lt;a, b&gt;&gt; ; [mult, add]
+</code></pre>
+<p><code>&lt;&lt;a, b&gt;, &lt;a, b&gt;&gt;</code> is equivalent to <code>fork &lt;a, b&gt;</code>. Thus the entire
+block is representable as</p>
+<pre><code>f = fork ; [mult, add].
+</code></pre>
+<p>Here's another example</p>
+<pre><code>add3 = [id, add] ; add.
+</code></pre>
+<h2>Higher-order Functions</h2>
+<p>You can pass arguments to your functions. Here's an example</p>
+<pre><code>fst R = [R, id].
+</code></pre>
+<p><code>R</code> is a block, so is <code>id</code>. Thus <code>fst R</code> is a 2-input, 2-output block.
+A flipped version, <code>snd</code> also exists. We could therefore define <code>add3</code>
+like so:</p>
+<pre><code>add3 = fst add ; add.
+</code></pre>
+<p>We could do <code>map</code> too. But we need to specify the input vector size.
+We'll learn how to write it ourselves later.</p>
+<pre><code>squared n = map n (fork ; mult).
+current = squared 3.
+</code></pre>
+<pre><code class="language-sh">$ re &quot;1 2 3&quot;
+    0 - &lt;1,2,3&gt; ~ &lt;1,4,9&gt;
+</code></pre>
+<h2>Inverse</h2>
+<p>The inverse of a component is defined in the prelude. We write the
+inverse of <code>R</code> as <code>R^~1</code>.</p>
+<p><img src="image-7.png" alt="A diagramatic representation of the inverse function" /></p>
+<pre><code>R^~1 = x $wire &lt;a, a, x&gt; ; [id, R, id] ; &lt;b, y, y&gt; $wire b.
+</code></pre>
+<p><code>pi1</code> and <code>pi2</code> are common selection operators.</p>
+<pre><code>pi1 = &lt;a, b&gt; $wire a.
+pi2 = &lt;a, b&gt; $wire b.
+</code></pre>
+<p>They are also frequently inverted.</p>
+<h2>Constants</h2>
+<p>Ruby has constant values. For example, if we wish to ignore the input
+to a block and output a constant instead.</p>
+<pre><code>fourtytwo = VAR x . x $rel 42.
+</code></pre>
+<p>A constant is also a component that has a an output on the range and the
+domain.</p>
+<p><img src="image-6.png" alt="A block with '42' inside has an outgoing arrow on both its left and
+right sides." /></p>
+<p>This component can be described as a function of a constant with the
+tools we have discussed. But a component with a single output and no
+input does not make sense in Ruby.</p>
+<pre><code>splitIgnore x = VAR a . &lt;a, x&gt; $rel x.
+const x = pi2^~1 ; splitIgnore x.
+</code></pre>
+<p>Diagrams just show what circuit things represent. In this case, the
+diagram is not a circuit you would ever build.</p>
+<p><img src="image-8.png" alt="A diagramatic representation of const 42, with internal
+components" /></p>
+
+        </div>
+    </div>
+</div>
+
+</html>
