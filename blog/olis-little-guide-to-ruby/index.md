@@ -97,12 +97,15 @@ fork = a $wire <a, a>.
 
 ## Defining Blocks Without `$rel`
 
-We can sequence (compose) blocks with `;`. E.g. `f ; g` 
+We can sequence (compose) blocks with `;`. E.g. `f ; g`. 
 
 ![Two blocks labeled f and g are connected in sequence. g is positioned
 to the right of f. An incoming arrow from the left enters f. From the
 right of f, an outgoing arrow enters the left-side of g. g has a single
 outgoing arrow to the right.](image-3.png)
+
+You can do this lots of times with the same block by raising it to the 
+power of `n`. E.g. `f^3` is `f ; f ; f`.
 
 We can define blocks in parallel with `[]`. E.g. `f = [id, inc]`.
 
@@ -135,6 +138,30 @@ Here's another example
 add3 = [id, add] ; add.
 ```
 
+## More Wiring Patterns
+
+`append m n` takes a pair of lists of size `m` and `n` respectively and
+concatenates them into a list of size `m+n`. E.g.
+
+```
+append 2 3 <<x0,x1>,<y0,y1,y2>>
+# <x0,x1,y0,y1,y2>
+```
+
+`apl n` takes a pair of singleton, n-length vector and flattens it.
+`apr n` is the same, but in the opposite order.
+
+```
+apl 3 <x,<y0,y1,y2>>
+# <x,y0,y1,y2>
+apr 4 <<x0,x1,x2,x3>,y> 
+# <x0,x1,x2,x3,y>
+```
+
+`zip n` is a regular zip function. `tran n m` extends this to a vector
+transpose. `zip n` is equivalent to `tran 2 n`. `zip` takes 2 n-length
+vectors.
+
 ## Higher-order Functions
 
 You can pass arguments to your functions. Here's an example
@@ -164,12 +191,12 @@ $ re "1 2 3"
     0 - <1,2,3> ~ <1,4,9>
 ```
 
-## Inverse
+## Converse
 
-The inverse of a component is defined in the prelude. We write the 
-inverse of `R` as `R^~1`. 
+The converse of a component is defined in the prelude. We write the 
+converse of `R` as `R^~1`. 
 
-![A diagramatic representation of the inverse function](image-7.png)
+![A diagramatic representation of the converse function](image-7.png)
 
 ```
 R^~1 = x $wire <a, a, x> ; [id, R, id] ; <b, y, y> $wire b.
@@ -183,6 +210,35 @@ pi2 = <a, b> $wire b.
 ```
 
 They are also frequently inverted. 
+
+### Conjugate
+
+A converse is not an inverse. It is just swapping the direction of the
+wires. This might mean that `R^~1` is an inverse function (as in the 
+case of `id`, or `fork`).
+
+`Q^~1 ; R ; Q` is a common enough pattern that we shorthand it with 
+`R \ Q`. This is called the conjugate. You might want to do this to 
+map between types and back again. 
+
+`P \ (Q ; R)` is `(P \ Q) \ R`.
+
+We can also now understand the definition of `map`.
+
+```
+map n R = IF (n $eq 0) THEN [] ELSE ( [R, map (n-1) R] \ (apl (n-1)) ).
+```
+
+Everything up to `apl` should make sense. Without `apl`, this produces
+a box with two inputs `[R1, [R2, [R3, [...]]]]`. Recall that  `apl n` 
+looks like this
+
+```
+<a,<x1,..,xn>> (apl n) <a,x1,..,xn>
+```
+
+So this nested map conjugated by `apl` will first translate the flat 
+vector input into a nested from, and then undo that translation.
 
 ## Constants 
 
@@ -214,3 +270,16 @@ diagram is not a circuit you would ever build.
 ![A diagramatic representation of const 42, with internal 
 components](image-8.png)
 
+## Types
+
+Ruby has `uint`s, `int` and `sreal`s. It also has tuples like 
+`<int, uint, <int, sreal>>` or `<int, int, int>` which is just `<int>₃`.
+It also has bits.
+
+Ruby is typechecked at runtime and compile time in the Rebecca 
+simulator.
+
+<!-- 
+btree 1 R = R 
+btree (n+1) R = half m ; [btree n R, btree n R] ; R, m = 2^n
+ -->

@@ -213,11 +213,13 @@ This is <code>&lt;5, 5&gt;</code>. Consider a more useful example.</p>
 <p><code>`fork` a</code> is <code>&lt;a, a&gt;</code>, and <code>`fork` &lt;a, a&gt;</code> is
 <code>&lt;&lt;a, a&gt;, &lt;a, a&gt;&gt;</code>.</p>
 <h2>Defining Blocks Without <code>$rel</code></h2>
-<p>We can sequence (compose) blocks with <code>;</code>. E.g. <code>f ; g</code></p>
+<p>We can sequence (compose) blocks with <code>;</code>. E.g. <code>f ; g</code>.</p>
 <p><img src="image-3.png" alt="Two blocks labeled f and g are connected in sequence. g is positioned
 to the right of f. An incoming arrow from the left enters f. From the
 right of f, an outgoing arrow enters the left-side of g. g has a single
 outgoing arrow to the right." /></p>
+<p>You can do this lots of times with the same block by raising it to the
+power of <code>n</code>. E.g. <code>f^3</code> is <code>f ; f ; f</code>.</p>
 <p>We can define blocks in parallel with <code>[]</code>. E.g. <code>f = [id, inc]</code>.</p>
 <p><img src="image-4.png" alt="An outer block f with two inputs and two outputs surrounds the inc and
 id blocks from which it is composed" /></p>
@@ -236,6 +238,22 @@ block is representable as</p>
 <p>Here's another example</p>
 <pre><code>add3 = [id, add] ; add.
 </code></pre>
+<h2>More Wiring Patterns</h2>
+<p><code>append m n</code> takes a pair of lists of size <code>m</code> and <code>n</code> respectively and
+concatenates them into a list of size <code>m+n</code>. E.g.</p>
+<pre><code>append 2 3 &lt;&lt;x0,x1&gt;,&lt;y0,y1,y2&gt;&gt;
+# &lt;x0,x1,y0,y1,y2&gt;
+</code></pre>
+<p><code>apl n</code> takes a pair of singleton, n-length vector and flattens it.
+<code>apr n</code> is the same, but in the opposite order.</p>
+<pre><code>apl 3 &lt;x,&lt;y0,y1,y2&gt;&gt;
+# &lt;x,y0,y1,y2&gt;
+apr 4 &lt;&lt;x0,x1,x2,x3&gt;,y&gt; 
+# &lt;x0,x1,x2,x3,y&gt;
+</code></pre>
+<p><code>zip n</code> is a regular zip function. <code>tran n m</code> extends this to a vector
+transpose. <code>zip n</code> is equivalent to <code>tran 2 n</code>. <code>zip</code> takes 2 n-length
+vectors.</p>
 <h2>Higher-order Functions</h2>
 <p>You can pass arguments to your functions. Here's an example</p>
 <pre><code>fst R = [R, id].
@@ -253,10 +271,10 @@ current = squared 3.
 <pre><code class="language-sh">$ re &quot;1 2 3&quot;
     0 - &lt;1,2,3&gt; ~ &lt;1,4,9&gt;
 </code></pre>
-<h2>Inverse</h2>
-<p>The inverse of a component is defined in the prelude. We write the
-inverse of <code>R</code> as <code>R^~1</code>.</p>
-<p><img src="image-7.png" alt="A diagramatic representation of the inverse function" /></p>
+<h2>Converse</h2>
+<p>The converse of a component is defined in the prelude. We write the
+converse of <code>R</code> as <code>R^~1</code>.</p>
+<p><img src="image-7.png" alt="A diagramatic representation of the converse function" /></p>
 <pre><code>R^~1 = x $wire &lt;a, a, x&gt; ; [id, R, id] ; &lt;b, y, y&gt; $wire b.
 </code></pre>
 <p><code>pi1</code> and <code>pi2</code> are common selection operators.</p>
@@ -264,6 +282,24 @@ inverse of <code>R</code> as <code>R^~1</code>.</p>
 pi2 = &lt;a, b&gt; $wire b.
 </code></pre>
 <p>They are also frequently inverted.</p>
+<h3>Conjugate</h3>
+<p>A converse is not an inverse. It is just swapping the direction of the
+wires. This might mean that <code>R^~1</code> is an inverse function (as in the
+case of <code>id</code>, or <code>fork</code>).</p>
+<p><code>Q^~1 ; R ; Q</code> is a common enough pattern that we shorthand it with
+<code>R \ Q</code>. This is called the conjugate. You might want to do this to
+map between types and back again.</p>
+<p><code>P \ (Q ; R)</code> is <code>(P \ Q) \ R</code>.</p>
+<p>We can also now understand the definition of <code>map</code>.</p>
+<pre><code>map n R = IF (n $eq 0) THEN [] ELSE ( [R, map (n-1) R] \ (apl (n-1)) ).
+</code></pre>
+<p>Everything up to <code>apl</code> should make sense. Without <code>apl</code>, this produces
+a box with two inputs <code>[R1, [R2, [R3, [...]]]]</code>. Recall that  <code>apl n</code>
+looks like this</p>
+<pre><code>&lt;a,&lt;x1,..,xn&gt;&gt; (apl n) &lt;a,x1,..,xn&gt;
+</code></pre>
+<p>So this nested map conjugated by <code>apl</code> will first translate the flat
+vector input into a nested from, and then undo that translation.</p>
 <h2>Constants</h2>
 <p>Ruby has constant values. For example, if we wish to ignore the input
 to a block and output a constant instead.</p>
@@ -283,6 +319,16 @@ const x = pi2^~1 ; splitIgnore x.
 diagram is not a circuit you would ever build.</p>
 <p><img src="image-8.png" alt="A diagramatic representation of const 42, with internal
 components" /></p>
+<h2>Types</h2>
+<p>Ruby has <code>uint</code>s, <code>int</code> and <code>sreal</code>s. It also has tuples like
+<code>&lt;int, uint, &lt;int, sreal&gt;&gt;</code> or <code>&lt;int, int, int&gt;</code> which is just <code>&lt;int&gt;₃</code>.
+It also has bits.</p>
+<p>Ruby is typechecked at runtime and compile time in the Rebecca
+simulator.</p>
+&lt;!-- 
+btree 1 R = R 
+btree (n+1) R = half m ; [btree n R, btree n R] ; R, m = 2^n
+ --&gt;
 
         </div>
     </div>
