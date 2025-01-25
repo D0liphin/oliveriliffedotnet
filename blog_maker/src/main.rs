@@ -54,6 +54,7 @@ fn convert_all() {
     files.extend(all_files_with_ext("../blog/hashtbl-testing", "md"));
     files.extend(all_files_with_ext("../blog/olis-little-guide-to-cxl", "md"));
     files.extend(all_files_with_ext("../blog/olis-little-guide-to-ruby", "md"));
+    files.extend(all_files_with_ext("../blog/compacting-decision-trees", "md"));
     for file in files.iter_mut() {
         while let Some(ch) = file.name.chars().last() {
             file.name.pop();
