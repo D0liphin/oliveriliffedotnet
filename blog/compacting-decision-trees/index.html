@@ -218,7 +218,23 @@ possible, while keeping <em>as much information as possible</em>. It's a form
 of <em>compression</em>, <strong><em>that's</em></strong> the intuition!</p>
 <p>Now, we take this function (which, btw is a binary search) and use it to
 convert each <code>mean_cr</code> into a value from 0 to 31. Then, we encode this
-5-bit number as 5 binary features. That's it... and it <em>works</em>!</p>
+5-bit number as 5 binary features. That's it... and it <em>works</em>! For
+example, we take a <code>mean_cr=202.45</code>.</p>
+<ol>
+<li>Find which bucket this is in. Let's say it's 19.</li>
+<li>Convert 19 to a 5-bit integer <code>0b10011</code></li>
+<li>The <code>float mean_cr</code> feature is now 5 binary features, so we assign
+the value to each of these.</li>
+</ol>
+<pre><code class="language-c">struct patient_data {
+    // ...other fields
+    uint1_t mean_cr_0 = 1; 
+    uint1_t mean_cr_1 = 1;
+    uint1_t mean_cr_2 = 0;
+    uint1_t mean_cr_3 = 0;
+    uint1_t mean_cr_4 = 1;
+}
+</code></pre>
 <h2>Why Does it Work?</h2>
 <p>Here's a graph when I first started adding features to this model. I
 think at this point I just use <code>{ sex, age, recent_cr, median_cr }</code>. I

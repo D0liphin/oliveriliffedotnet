@@ -78,8 +78,25 @@ possible, while keeping _as much information as possible_. It's a form
 of _compression_, **_that's_** the intuition!
 
 Now, we take this function (which, btw is a binary search) and use it to
-convert each `mean_cr` into a value from 0 to 31. Then, we encode this 
-5-bit number as 5 binary features. That's it... and it _works_!
+convert each `mean_cr` into a value from 0 to 31. Then, we encode this
+5-bit number as 5 binary features. That's it... and it _works_! For 
+example, we take a `mean_cr=202.45`. 
+
+1. Find which bucket this is in. Let's say it's 19.
+2. Convert 19 to a 5-bit integer `0b10011` 
+3. The `float mean_cr` feature is now 5 binary features, so we assign
+   the value to each of these.
+
+```c
+struct patient_data {
+    // ...other fields
+    uint1_t mean_cr_0 = 1; 
+    uint1_t mean_cr_1 = 1;
+    uint1_t mean_cr_2 = 0;
+    uint1_t mean_cr_3 = 0;
+    uint1_t mean_cr_4 = 1;
+}
+```
 
 ## Why Does it Work?
 
