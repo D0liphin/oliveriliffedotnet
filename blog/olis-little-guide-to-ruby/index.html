@@ -238,6 +238,35 @@ block is representable as</p>
 <p>Here's another example</p>
 <pre><code>add3 = [id, add] ; add.
 </code></pre>
+<h2><code>$rel</code> vs block composition</h2>
+<p>Think of $rel as a lambda (anonymous) function, but for relations.</p>
+<p>You can use a lambda everywhere where you can use a named function.</p>
+<pre><code>f = [VAR x. x $rel x, add].
+</code></pre>
+<p>You can also give a lambda a name, just as we have been doing all along, and
+then refer to it in other parts of the code.</p>
+<pre><code>id = VAR x. x $rel x.
+f = [id, add].
+</code></pre>
+<p>In fact, you can give new names to existing named functions (i.e. function
+aliasing):</p>
+<pre><code>f = [id, add].
+g = f.
+</code></pre>
+<p>How can we write f using <code>$rel</code> notation? Let's try to draw it, and
+use <code>$rel</code> to define the behaviour of the resulting block.</p>
+<p><img src="./image-9.svg" alt="Drawing of f being defined in terms of add and id" /></p>
+<p>We can see that <code>f</code> takes 3 inputs, adds the latter two (remember we count from
+the bottom up), and produces two outputs. So we can encode that directly as
+follows:</p>
+<pre><code>f = VAR x y z. &lt;x, &lt;y, z&gt;&gt; $rel &lt;(`id` x), (`add` &lt;y, z&gt;)&gt;.
+</code></pre>
+<p>We can see that <code>;</code> and <code>[]</code> are really just a nice syntactic sugar for
+composing blocks, without having to explicitly declare input/output variables.</p>
+<p>We can encode sequential composition with <code>$rel</code> using function application
+nesting:</p>
+<pre><code>fTwice = VAR x. x $rel (`f` (`f` x)).
+</code></pre>
 <h2>More Wiring Patterns</h2>
 <p><code>append m n</code> takes a pair of lists of size <code>m</code> and <code>n</code> respectively and
 concatenates them into a list of size <code>m+n</code>. E.g.</p>

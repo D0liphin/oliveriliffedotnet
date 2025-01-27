@@ -138,6 +138,55 @@ Here's another example
 add3 = [id, add] ; add.
 ```
 
+## `$rel` vs block composition
+
+Think of $rel as a lambda (anonymous) function, but for relations.
+
+You can use a lambda everywhere where you can use a named function.
+
+```
+f = [VAR x. x $rel x, add].
+```
+
+You can also give a lambda a name, just as we have been doing all along, and
+then refer to it in other parts of the code.
+
+```
+id = VAR x. x $rel x.
+f = [id, add].
+```
+
+In fact, you can give new names to existing named functions (i.e. function
+aliasing):
+
+```
+f = [id, add].
+g = f.
+```
+
+How can we write f using `$rel` notation? Let's try to draw it, and
+use `$rel` to define the behaviour of the resulting block.
+
+![Drawing of f being defined in terms of add and id](./image-9.svg)
+
+We can see that `f` takes 3 inputs, adds the latter two (remember we count from
+the bottom up), and produces two outputs. So we can encode that directly as
+follows:
+
+```
+f = VAR x y z. <x, <y, z>> $rel <(`id` x), (`add` <y, z>)>.
+```
+
+We can see that `;` and `[]` are really just a nice syntactic sugar for
+composing blocks, without having to explicitly declare input/output variables.
+
+We can encode sequential composition with `$rel` using function application
+nesting:
+
+```
+fTwice = VAR x. x $rel (`f` (`f` x)).
+```
+
 ## More Wiring Patterns
 
 `append m n` takes a pair of lists of size `m` and `n` respectively and
