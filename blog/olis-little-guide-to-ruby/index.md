@@ -328,7 +328,104 @@ It also has bits.
 Ruby is typechecked at runtime and compile time in the Rebecca 
 simulator.
 
+## Grid Components
+
+It can be useful to arrange components in a grid, like this:
+
+DIAGRAM
+
+For these kind of arrangements, all blocks have two inputs and two
+outputs, so they look like `<a, b> R <c, d>`.
+
+we have new combinators. `<->` (beside) connects things next to each
+other. Thus we have a type like `<a, <b, c>> (Q <-> R) <<p, q>, r>`.
+
+DIAGRAM
+
+`<|>` is 'below'. `(Q^~1 <-> R^~1)^~1` is equivalent to `Q <|> R`. 
+If you work through that equivalence you will see that it means 'place
+`Q` below `R`'. `row n` and `col n` are the repeated versions of these 
+combinators.
+
+It is common to convert a chain component into a grid component. We
+can do this with `pi1 ; R ; pi2~1`. This looks like this:
+
+DIAGRAM
+
+The transposed conjugate `\\` is a special conjugate operator for grid
+components. It is `R \\ [P, Q]`.
+
+```
+R \\ [S, T] = [T^~1, S^~1] ; R ; [S, T]
+```
+
+Essentially this has the conjugate flowing down on `S` and left-to-right
+on `T`.
+
+### Reduce
+
+`rdr n` is "reduce-right". Here is the definition. It is hard to 
+understand right away, so just keep reading and I'll get back to it
+later.
+
+```
+rdr n R = col n (R ; pi1^~1) ; pi1.
+```
+
+It is useful to recall what this operation means in a functional 
+language. A reduce (or fold) describes some code where we update `y`
+based on a sequence of input data `xs`.
+
+```py
+y = ...
+for x in xs:
+    y = f(x)
+```
+
+![TODO](image-9.png)
+
+You might remember that there are left-folds and right-folds and be 
+wondering if the "right" in "reduce-right" has anything to do with 
+that. If you're not, you can skip this bit. If you are, recall that:
+
+```hs
+foldr f y [x₁,x₂,x₃] = (f x₁ (f x₂ (f x₃ y)))
+foldl f y [x₁,x₂,x₃] = (f (f (f y x₁) x₂) x₃)
+```
+
+If you're clever, you might notice that _basically_ `foldr` is just
+`foldl` with the `xs` reversed. If you're really clever, you'll notice
+that in a lazy language, `foldr` can short circuit early and `foldl`
+can't. E.g. `foldr (||) False (True : repeat False)` actually evaluates,
+whereas the `foldl` version never terminates.
+
+Anyway, this doesn't really matter for our purposes. The "right" in
+"reduce-right" is about how the right hand side of this column has
+no wires coming out of it.
+
+Let's return to the definition of `rdr`. It's supposed to make something
+that looks like the diagram we made for a fold. It's useful to also 
+wonder a bit about how the definition expands, so that we can better
+understand some of the tricks used in making complex combinators.
+
+`R ; pi1^~1` turns a component `<a, b> R b` into a grid component. We'll
+call this `R'`. Then, we arrange these components in a column. Note that
+this column arrangement still has type
+`<X, Y> (col n (R ; pi1^~1)) <Y, Z>`. The `X` and `Z` here are tuples of
+size `n`. This component is the one with the dark grey background on
+the right circuit in the diagram below. 
+
+All the wires on the right are useless, so we ignore them with `pi1`. 
+
+![TODO](image-10.png)
+
+## Registers 
+
+
 <!-- 
 btree 1 R = R 
 btree (n+1) R = half m ; [btree n R, btree n R] ; R, m = 2^n
+
+
  -->
+’
