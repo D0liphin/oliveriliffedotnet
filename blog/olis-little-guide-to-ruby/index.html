@@ -354,10 +354,75 @@ components" /></p>
 It also has bits.</p>
 <p>Ruby is typechecked at runtime and compile time in the Rebecca
 simulator.</p>
+<h2>Grid Components</h2>
+<p>It can be useful to arrange components in a grid, like this:</p>
+<p>DIAGRAM</p>
+<p>For these kind of arrangements, all blocks have two inputs and two
+outputs, so they look like <code>&lt;a, b&gt; R &lt;c, d&gt;</code>.</p>
+<p>we have new combinators. <code>&lt;-&gt;</code> (beside) connects things next to each
+other. Thus we have a type like <code>&lt;a, &lt;b, c&gt;&gt; (Q &lt;-&gt; R) &lt;&lt;p, q&gt;, r&gt;</code>.</p>
+<p>DIAGRAM</p>
+<p><code>&lt;|&gt;</code> is 'below'. <code>(Q^~1 &lt;-&gt; R^~1)^~1</code> is equivalent to <code>Q &lt;|&gt; R</code>.
+If you work through that equivalence you will see that it means 'place
+<code>Q</code> below <code>R</code>'. <code>row n</code> and <code>col n</code> are the repeated versions of these
+combinators.</p>
+<p>It is common to convert a chain component into a grid component. We
+can do this with <code>pi1 ; R ; pi2~1</code>. This looks like this:</p>
+<p>DIAGRAM</p>
+<p>The transposed conjugate <code>\\</code> is a special conjugate operator for grid
+components. It is <code>R \\ [P, Q]</code>.</p>
+<pre><code>R \\ [S, T] = [T^~1, S^~1] ; R ; [S, T]
+</code></pre>
+<p>Essentially this has the conjugate flowing down on <code>S</code> and left-to-right
+on <code>T</code>.</p>
+<h3>Reduce</h3>
+<p><code>rdr n</code> is &quot;reduce-right&quot;. Here is the definition. It is hard to
+understand right away, so just keep reading and I'll get back to it
+later.</p>
+<pre><code>rdr n R = col n (R ; pi1^~1) ; pi1.
+</code></pre>
+<p>It is useful to recall what this operation means in a functional
+language. A reduce (or fold) describes some code where we update <code>y</code>
+based on a sequence of input data <code>xs</code>.</p>
+<pre><code class="language-py">y = ...
+for x in xs:
+    y = f(x)
+</code></pre>
+<p><img src="image-9.png" alt="TODO" /></p>
+<p>You might remember that there are left-folds and right-folds and be
+wondering if the &quot;right&quot; in &quot;reduce-right&quot; has anything to do with
+that. If you're not, you can skip this bit. If you are, recall that:</p>
+<pre><code class="language-hs">foldr f y [x₁,x₂,x₃] = (f x₁ (f x₂ (f x₃ y)))
+foldl f y [x₁,x₂,x₃] = (f (f (f y x₁) x₂) x₃)
+</code></pre>
+<p>If you're clever, you might notice that <em>basically</em> <code>foldr</code> is just
+<code>foldl</code> with the <code>xs</code> reversed. If you're really clever, you'll notice
+that in a lazy language, <code>foldr</code> can short circuit early and <code>foldl</code>
+can't. E.g. <code>foldr (||) False (True : repeat False)</code> actually evaluates,
+whereas the <code>foldl</code> version never terminates.</p>
+<p>Anyway, this doesn't really matter for our purposes. The &quot;right&quot; in
+&quot;reduce-right&quot; is about how the right hand side of this column has
+no wires coming out of it.</p>
+<p>Let's return to the definition of <code>rdr</code>. It's supposed to make something
+that looks like the diagram we made for a fold. It's useful to also
+wonder a bit about how the definition expands, so that we can better
+understand some of the tricks used in making complex combinators.</p>
+<p><code>R ; pi1^~1</code> turns a component <code>&lt;a, b&gt; R b</code> into a grid component. We'll
+call this <code>R'</code>. Then, we arrange these components in a column. Note that
+this column arrangement still has type
+<code>&lt;X, Y&gt; (col n (R ; pi1^~1)) &lt;Y, Z&gt;</code>. The <code>X</code> and <code>Z</code> here are tuples of
+size <code>n</code>. This component is the one with the dark grey background on
+the right circuit in the diagram below.</p>
+<p>All the wires on the right are useless, so we ignore them with <code>pi1</code>.</p>
+<p><img src="image-10.png" alt="TODO" /></p>
+<h2>Registers</h2>
 &lt;!-- 
 btree 1 R = R 
 btree (n+1) R = half m ; [btree n R, btree n R] ; R, m = 2^n
+
+
  --&gt;
+<p>’</p>
 
         </div>
     </div>
