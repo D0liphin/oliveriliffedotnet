@@ -177,19 +177,19 @@ through clever choice of course content, we can design a course that
 works for the first two groups, but not the third. KCL shows us that we
 can design a course that works for the third group, but not the first
 two. What we must do is take a strong stance against lazy students.
-Ibelieve that most of the students at KCL are bright, and have it in
+I believe that most of the students at KCL are bright, and have it in
 them to do well on a module similar to the Imperial's CP1 (maybe 70-80%
 the difficulty). 
 
 The first step is to change the assessment style to actual programming
 assessments. This should immediately show that PPA is too easy as the
 students find they cannot simply coast through the module with
-generative AI. The next step is to restructure the content so it's new
-to more people. BlueJ seems to be a mainstay and it is getting a Kotlin
-extension, so use that. Put a _pure_ functional language, or Rust, or C
-in first semester. Then, we can introduce the PPT system. Over a few 
-years of running this module, taking one of these steps each year, we
-can easily make it much better! 
+generative AI and are forced to actually learn to program. The next step
+is to restructure the content so it's new to more people. BlueJ seems to
+be a mainstay and it is getting a Kotlin extension, so use that. Put a
+_pure_ functional language, or Rust, or C in first semester. Then, we
+can introduce the PPT system. Over a few years of running this module,
+taking one of these steps each year, we can easily make it much better!
 
 ## Course Content and Structure
 
@@ -197,6 +197,9 @@ can easily make it much better!
 DON'T READ THIS BIT YET IT'S JUST NOTES
 
 taught by actually smart profs not ppl who do teaching
+
+duhh PPA is only one module, what about all the other important shit
+like DSTs and linalg and shit???
 
 it is easy to forget that we can expect a lot more of the students
 
@@ -233,3 +236,7 @@ tehre is a C test 12%
 some optional lectures about HTML javascript and css
 
 most exams are after easter 
+
+
+remove the bit about haskell being chosen for that reason
+remove javascript thing (not going to do that because i disagree)
