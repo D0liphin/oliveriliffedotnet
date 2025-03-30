@@ -21,6 +21,14 @@ data Config = Config
   }
   deriving (Show)
 
+instance Eq Config where
+  (==) :: Config -> Config -> Bool
+  (Config { date = d1 }) == (Config {date = d2}) = d1 == d2
+
+instance Ord Config where
+  (<=) :: Config -> Config -> Bool
+  (Config { date = d1 }) <= (Config {date = d2}) = d1 <= d2
+
 data Error
   = EToml String
   | EConfig String

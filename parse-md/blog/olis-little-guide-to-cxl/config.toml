@@ -1,0 +1,11 @@
+title = "Oli's Little Guide to CXL"
+
+description = """How CXL 1.0 and related concepts work."""
+
+date = 2025-02-10
+
+[meta]
+keywords = ["CXL", "cache"]
+
+[[author]]
+name = "Oliver Iliffe"

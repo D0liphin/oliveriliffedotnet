@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Oliver Iliffe's Website</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="DESCRIPTION">
+    <meta name="keywords" content="hashtable, math">
+    <meta name="author" content="Oliver Iliffe">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+        rel="stylesheet">
+    <!-- -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex/dist/contrib/auto-render.min.js" onload="renderMath()"></script>
+    <script>
+    const renderMath = () => {
+        document.querySelectorAll('.tex-math').forEach(el => {
+            renderMathInElement(el, {
+                delimiters: [
+                    { left: "\\(", right: "\\)", display: false },
+                    { left: "\\[", right: "\\]", display: true }
+                ]
+            });
+        });
+    };
+    </script>  
+    <!-- -->
+    <style>
+        :root {
+            --almost-black: rgb(30, 30, 30);
+            --almost-white: rgb(240, 240, 240);
+        }
+
+        :root {
+            --primary-color: var(--almost-white);
+            --secondary-color: var(--almost-black);
+        }
+
+        * {
+            box-sizing: border-box;
+            color: var(--primary-color);
+        }
+
+        .sans-serif {
+            font-family: "Open Sans", sans-serif;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: "Open Sans", sans-serif;
+            font-weight: 800;
+        }
+        
+        p {
+            font-family: "Open Sans", sans-serif;
+        }
+
+        a:hover {
+            color: var(--primary-color);
+        }
+
+        html {
+            margin: 0px;
+        }
+
+        body {
+            margin: 0px;
+            background-color: var(--secondary-color);
+            overflow-x: hidden;
+        }
+
+        .everything-container {
+            padding: 20px;
+        }
+
+        @media (max-width: 500px) {
+            .everything-container {
+                padding: 0px;
+            }
+        }
+
+        .heading-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0px 20px 0px 20px;
+        }
+
+        @media (max-width: 500px) {
+            .heading-container {
+                margin-bottom: 10px;
+            }
+        }
+
+        .img-with-border {
+            border: 5px solid var(--primary-color);
+        }
+
+        .inverse * {
+            color: var(--secondary-color);
+        }
+
+        .inverse * a:hover {
+            color: var(--secondary-color);
+        }
+
+        .content-container {
+            border-radius: 6px;
+            background-color: var(--primary-color);
+            padding: 20px 30px 30px 30px;
+            position: relative;
+        }
+
+        .content-container *>img {
+            max-width: 100%;
+        }
+
+        @media (max-width: 500px) {
+            .content-container {
+                border-radius: 0px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .ferris-the-crab {
+                visibility: hidden;
+            }
+        }
+
+        pre *,
+        code *,
+        code {
+            font-family: "Roboto Mono", monospace;
+            font-size: 14px;
+            line-height: 20px;
+        }
+
+        h1 *,
+        h2 *,
+        h3 *,
+        h4 * {
+            font-size: inherit;
+        }
+
+        pre {
+            overflow-x: auto;
+            background-color: var(--almost-black);
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        pre>code {
+            color: rgb(78, 233, 194) !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="max-width: 800px; margin-left: auto; margin-right: auto;">
+        <div class="everything-container">
+            <div class="heading-container">
+                <div style="display: flex; flex-direction: column;">
+                    <h1>Making a Hashtable: Hashtable Math</h1>
+                    <span style="position: relative; bottom: 10px; padding-left: 2px;" class="sans-serif">June 25, 2024</span>
+                </div>
+                <a href="/">
+                    <img src="/img/go-back.svg" alt="A navigation arrow to send you back to the site homepage"
+                        style="filter: invert(1); height: 30px;" />
+                </a>
+            </div>
+            <div class="content-container inverse">
+                <h1>Hashtable Math </h1><p>
+As is evident from the <a href="/blog/hashtbl.html">previous article</a>, I am
+currently building a hash table. I made my hash table rather fancy and 
+used lots of SIMD instructions. The thing is, this hashtable ended up
+not being very fast at all. In fact, I made an incredible simple C 
+implementation and it outperformed my facy C++ version in all tests.</p><p>The whole thing is about 100 lines, including whitespace and is very 
+simple. Below is the lookup code, which encapsulates pretty much all the
+hashtable-specific logic. The full source can be found The full code can
+be found <a href="https://github.com/D0liphin/HashTable/blob/master/include/table.h">here</a>.</p><pre lang="c"><code>struct entry *table_get_slot(table *tbl, key_t k)
+{
+        size_t h = hash(&k, sizeof(key_t));
+        for (size_t i = h % tbl->capacity; true; i = (i + 1) % tbl->capacity) {
+                tbl->nr_probes++;
+                struct entry *e = &tbl->buf[i];
+                if (e->meta == CTRL_EMPTY) {
+                        return e;
+                } else if (e->meta == CTRL_DEL) {
+                        continue;
+                } else if (e->key == k) {
+                        return e;
+                }
+        }
+}
+</code></pre><p>![A graph showing that it's just wayyy faster](<Operations per second vs std__unordered_map.png</p><blockquote><p>)
+</p></blockquote><p>
+The graph above is in operations performed for every equivalent 
+<code>std::unordered_map</code> operation. The tests are the same as last time.
+Again, <code>insert_2update_randoms</code> performs the worst, but yo ucan see how
+much better the C version is overall!</p><p>This got me thinking about why this version might be so much faster. I
+think it's because my version does the following:</p><p>1. Find the associated control chunk
+2. Do a bunch of vector instructions to generate a bitmask
+3. Consume the bitmask with <code>tzcnt</code> (3 cycles at a time)</p><p>The simple C version does the following:</p><p>1. Find the associated element
+2. Iterate over the elements in a predictable way with pointer offsets
+   (1 cycle).</p><p>There are all sorts of benefits for the latter. For example, we don't
+fill up the instruction buffer so OOO hardware can prefetch more clevery
+if it ever needs to. But I think more importantly than something like
+that, we just do _less compute_ than the original version since we
+hardly ever probe anyway. If we do less than 3 probes 99% of the time,
+we may as well use a <code>uint8x4</code> instead of a <code>uint8x16</code>!</p><h2>Working out the average number of hashtable collisions</h2><p>
+I've always wanted to do this math. So I finally sat down and worked it
+all out. It could be all wrong, but I looked it up and I got the right
+answer. Email me if it's wrong! Disclaimer, I wrote this really late at
+night and I'm pretty sure I made a mistake about halfway through and 
+just got lucky. You can skip to the last section if you just want the 
+results of it all.</p><p>There are two questions to ask here:</p><p>1. What is the average number of collisions when our hashtable is <code>l</code> 
+   full?
+2. What is the average number of collisions for a hashtable with load
+   factor <code>L</code>?</p><p>I'll try and use <code>l</code> and "load" for the proportion of our hashmap that 
+is _currently full right now_ and <code>L</code> and "load factor" for the maximum
+allowed <code>l</code> before we trigger a realloc. I'm using code snippets 
+because I generate these blogs from markdown. I'm using images for the 
+math. </p><p>So, we're looking for an empty cell to put our entry. Let's say we've 
+probed <code>i</code> entries already. What is the chance that the next entry is 
+empty?</p><p><div class="tex-math">\[ P(\text{empty} | i \text{ were occupied}) = \frac{(1 - di) - (l - di)}{1 - di} \]</div></p><p>I'm skipping a few steps here, but hopefully it's still intuitable.
+Normally, the chance of finding an element would be <span class="tex-math">\( (1 - l) / 1 \)</span>.
+Remember, the hashtable is <span class="tex-math">\( l \)</span> full, so we just take the empty part,
+which is <span class="tex-math">\( 1 - l \)</span> and divide it by the total size of the hashtable, which
+is just <span class="tex-math">\( 1 \)</span>. If we know that <span class="tex-math">\( i \)</span> are occupied, we remove <span class="tex-math">\( i \)</span> from the
+total capacity _and_ <span class="tex-math">\( l \)</span>. An example would be like if we had 10 elements
+in the table and 4 were full. If we've checked 2 and they're both full
+we know the next one has a chance of <span class="tex-math">\( (4 - 2) / (10 - 2) \)</span> of being
+empty. Since we're taking the capacity to be <span class="tex-math">\( 1 \)</span> though, we just say
+that there is some constant <span class="tex-math">\( d \)</span> that represents some portion of the
+capacity we've removed. For our example, we could say <span class="tex-math">\( d \)</span> is <span class="tex-math">\( 0.1 \)</span> and
+get the same values.</p><pre lang=""><code>(1 - 0.1 * 2) / (1 - 0.1 * 2) == (4 - 2) / (10 - 2)
+</code></pre><p>In similar logic which I will not explain much in depth, the chance of 
+getting <code>i</code> consecutively occupied cells is just the product of the 
+chance of getting all previous cells occupied. The calculation is just 
+the opposite of what we had above.</p><p><div class="tex-math">\[ P(i \text{ consecutively occupied}) = \prod_{j=1}^{i} \frac{l - dj}{1 - dj} \]</div></p><p>So the chance that we will find the empty cell after _exactly_ <span class="tex-math">\( i \)</span> 
+probes is these two probabilities multiplied together.</p><p><div class="tex-math">\[ \lim_{d \rightarrow 0 }\frac{1 - l}{1 - di} \prod_{j=1}^{i - 1} \frac{l - dj}{1 - dj} = l^{i - 1}(1 - l) \]</div></p><p>I've taken an extra step with the above and rearranged the first 
+equation. Now, as the hashmap size tends towards infinity, the step 
+factor <span class="tex-math">\( d \)</span> becomes closer and closer to 0. When <span class="tex-math">\( d \)</span> is 0, the equation
+is just equivalent to that small little thing on the right! </p><p>That's pretty useless though, because we want to find the chance of 
+getting a result in <span class="tex-math">\( i \)</span> probes _or fewer_. So we want to know the chance 
+of getting it in <span class="tex-math">\( 1 \)</span> probe or <span class="tex-math">\( 2 \)</span> probes or <span class="tex-math">\( 3 \)</span> or <span class="tex-math">\( 4 \)</span> or <span class="tex-math">\( 5 \)</span> probes
+etc. etc. all the way to <span class="tex-math">\( i \)</span>. First, the chance of geting our slot in
+less than <span class="tex-math">\( i \)</span> steps is the sum of all the chances of getting a miss 
+before <span class="tex-math">\( i \)</span>.</p><p><div class="tex-math">\[ \sum_{j=1}^i l^{j - 1} \]</div></p><p>And if we rewrite this with <span class="tex-math">\( i - 1 \)</span> at the top, we can take it as a 
+geometric series and find a closed form of the whole thing, including 
+the chance of a hit bit.</p><p><div class="tex-math">\[ (1 - l)\sum_{j=0}^{i - 1} l^j = (1 - l)\frac{1 - l^i}{1-l} = 1 - l^i \]</div></p><p>This tells us the chance of finding an empty slot after doing <span class="tex-math">\( i \)</span> 
+probes. The graph of that looks like this for <span class="tex-math">\( l = 0.75 \)</span></p><p><img alt="A graph of 1 - 0.75^x" src="image-5.png"></p><p>The chance of reaching the <span class="tex-math">\( i \)</span>th probe is just <span class="tex-math">\( L^(i - 1) \)</span>. There's no
+math for that, it's just the opposite of that. Starts at 0.75 and goes 
+down to 0, instead of the other way round.</p><p>So what's the average <strong>cost</strong> of an insertion? Well, that's the chance
+of getting to probe <span class="tex-math">\( i \)</span> multiplied by the cost of probing <span class="tex-math">\( i \)</span> times...
+which is just <span class="tex-math">\( i \)</span>. I notice now while writing this article that I've 
+done a little more work than I need. I'm not really sure how this one 
+worked out actually, since the intuition isn't quite right here... </p><p>Regardless, the probe cost calculation looks like this.</p><p><div class="tex-math">\[ \sum_{i=1}^{x}iL^{i-1} = 1L^0 + 2L^1 + 3L^2 + \ldots (x + 1) L^{x} \]</div></p><p>If you're clever, you'll notice that this is a geometric sequence that 
+has been differentiated! So we can find <span class="tex-math">\( \frac{d}{dL} \)</span> for some geometric 
+series, and this is going to be our summation closed form!</p><p><div class="tex-math">\[ \frac{d}{dL}L^0 + L^1 + L^2 + L^3 + \ldots + L^{x + 1} \]</div>
+<div class="tex-math">\[ = \cancel{0L^{-1}} + 1L^0 + 2L^1 + 3L^2 + \ldots (x + 1)L^x \]</div>
+<div class="tex-math">\[ \sum_{i = 1}^x iL ^i = \frac{d}{dL} \frac{1 - L^{x + 1}}{1 - L} \]</div>
+<div class="tex-math">\[ \frac{d}{dL}\frac{1 - L^{x + 1}}{1 - L} = \frac{xL^x - xL^{x + 1} + L^x - 1}{(1 - L)^2} \]</div></p><br><p>This is for reaching only up to the <span class="tex-math">\( x \)</span>th probe though. For us, we want 
+to consider the entire space all the way up to infinity. Taking the 
+limit of <span class="tex-math">\( x \)</span> to infinity gives us </p><p><div class="tex-math">\[ \lim_{x \rightarrow \infty} - \frac{xL^x - xL^{x + 1} + L^x - 1}{(1 - L)^2} = \frac{1}{(1 - L)^2} \]</div></p><p>Tada! ✨ That's the cost of an insertion at <code>L</code> load. (I know I said <code>l</code>
+would be the load, oops). I have to remember to go back and clean up 
+that mistake earlier. I can't remember exactly my thinking now, but to
+me, you don't need to do that previous summation, just the one above.
+Anyway.</p><p>Finally, as I said before, we are considering the average cost for all
+insertions to our map in the range <code>0..L</code>. So we should take the average
+insertion cost over the allocations lifetime. This is just the integral
+over <code>L</code>.</p><p><div class="tex-math">\[ \frac{\int_0^L \frac{1}{(1 - x)^2}} dx{L} = \frac{1}{1 - L} \]</div></p><h2>It doesn't work though! 😔</h2><p>
+So that's all well and good. And I looked it up and <a href="https://stackoverflow.com/questions/61494530/relation-between-the-load-factor-and-time-complexity-in-hash-tables">this stack 
+overflow post</a>
+tells me I'm right. I was really happy about this (even though it looks
+like my math will need an errata soon). The thing is, that's not how 
+my actual hash table behaves... Like _at all_.</p><p>You can find the source code of a hashtable in the folder that you're 
+in right now. It's at <a href="table.c">`table.c`</a> and <a href="table.h">`table.h`</a>.
+This hashtable is _thoroughly tested_ against hundreds of millions of 
+random operations on an oracle map. It works. It comes with an option
+to set the load factor and keeps track of the number of probes it's 
+done in its lifetime.</p><p>I wrote some code that finds out both the probe cost at a given load <code>l</code>
+_and_ some code that finds out the probe cost across the hashmap
+allocation's lifetime for a given load-_factor_ <code>L</code>. You can find the
+full source <a href="graphs.c">here</a>. It's pretty simple though, for the first
+case, we just get a number _really_ close to the max capacity and fill
+a map all the way till its full.</p><pre lang="c"><code>for (double l = 0.01; l < 1; l += 0.01) {
+        table tbl;
+        table_init(&tbl, CAPACITY, l);
+
+        int nr_insert = (int)((double)CAPACITY * l);
+        for (int n = 0; n < nr_insert; ++n) {
+                table_insert(&tbl, rand(), 0);
+        }
+        printf("(%f,%f),", l, (double)tbl.nr_probes / (double)nr_insert);
+
+        table_free(&tbl);
+}
+</code></pre><p>This graph looks like this</p><p><img alt="A graph showing an almost-the-same-but-not-quite graph" src="image-11.png"></p><p>The red, dashed line shows what I calculated the average number of 
+probes to theoretically be and the purple shows what it actually is.
+I'm actually not so bothered about what I can do with this data, I'm
+more bothered that I screwed up the math.</p><p>Next, we have the average cost at a specific load. This one I ran this 
+test at an excessive number of iterations (hoping for a smoother graph)
+but it always remained very jittery</p><pre lang="c"><code>table tbl;
+table_init(&tbl, CAPACITY, 0.99999999);
+
+int nr_insert = CAPACITY - 1;
+for (int n = 0; n < nr_insert; ++n) {
+        size_t l = (size_t)(table_load(&tbl) * STEPS + 0.5);
+        size_t old_nr_probes = tbl.nr_probes;
+        table_insert(&tbl, rand(), 0);
+        size_t nr_probes = tbl.nr_probes - old_nr_probes;
+        probes_at[l] =
+                (probes_at[l] * (double)n + (double)nr_probes) / ((double)n + 1);
+}
+
+table_free(&tbl);
+</code></pre><p>This test fills a map of 1000 elements millions of times over and
+updates a big map of <code>(l, cost)</code> pairs. This one should behave like
+<code>1 / (1 - x)^2</code>.</p><p><img alt="also not quite right graph" src="image-12.png"></p><p>As you can see, also not quite right. But what's strange here too is 
+that even though this is the average over something like 100 million 
+updates, the line is still very jittery. I really have no idea what's 
+causing this, because it's not _reproducable_ jitter.</p><h2>So what's next?</h2><p>
+Well, a few things. There are lots of questions yet to be answered</p><p>1. Why do the theoretical results not match up... _at all_?
+2. Does the probing method affect the practically obtained results?
+3. Why is the graph of load vs probe count so jittery?
+4. How can we use all this data to make a faster hashtable?</p><p>I hope to answer all these questions soon! I suspect this series is not
+going to finish any time soon.
+</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

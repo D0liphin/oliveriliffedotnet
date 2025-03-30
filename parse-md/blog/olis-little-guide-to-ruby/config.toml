@@ -1,0 +1,15 @@
+title = "Oli's Little Guide to Ruby HDL"
+
+description = """A swift and easy guide to Ruby, an old relational HDL for 
+proving the correctness of circuits."""
+
+date = 2025-03-02
+
+[meta]
+keywords = ["Ruby", "Hardware", "Programming languages"]
+
+[[author]]
+name = "Oliver Iliffe"
+
+[[author]]
+name = "Dawid Lachowicz"

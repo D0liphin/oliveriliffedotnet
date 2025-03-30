@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Oliver Iliffe's Website</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="DESCRIPTION">
+    <meta name="keywords" content="hashtable">
+    <meta name="author" content="Oliver Iliffe">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+        rel="stylesheet">
+    <!-- MATH
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex/dist/contrib/auto-render.min.js" onload="renderMath()"></script>
+    <script>
+    const renderMath = () => {
+        document.querySelectorAll('.tex-math').forEach(el => {
+            renderMathInElement(el, {
+                delimiters: [
+                    { left: "\\(", right: "\\)", display: false },
+                    { left: "\\[", right: "\\]", display: true }
+                ]
+            });
+        });
+    };
+    </script>  
+    ENDMATH -->
+    <style>
+        :root {
+            --almost-black: rgb(30, 30, 30);
+            --almost-white: rgb(240, 240, 240);
+        }
+
+        :root {
+            --primary-color: var(--almost-white);
+            --secondary-color: var(--almost-black);
+        }
+
+        * {
+            box-sizing: border-box;
+            color: var(--primary-color);
+        }
+
+        .sans-serif {
+            font-family: "Open Sans", sans-serif;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: "Open Sans", sans-serif;
+            font-weight: 800;
+        }
+        
+        p {
+            font-family: "Open Sans", sans-serif;
+        }
+
+        a:hover {
+            color: var(--primary-color);
+        }
+
+        html {
+            margin: 0px;
+        }
+
+        body {
+            margin: 0px;
+            background-color: var(--secondary-color);
+            overflow-x: hidden;
+        }
+
+        .everything-container {
+            padding: 20px;
+        }
+
+        @media (max-width: 500px) {
+            .everything-container {
+                padding: 0px;
+            }
+        }
+
+        .heading-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0px 20px 0px 20px;
+        }
+
+        @media (max-width: 500px) {
+            .heading-container {
+                margin-bottom: 10px;
+            }
+        }
+
+        .img-with-border {
+            border: 5px solid var(--primary-color);
+        }
+
+        .inverse * {
+            color: var(--secondary-color);
+        }
+
+        .inverse * a:hover {
+            color: var(--secondary-color);
+        }
+
+        .content-container {
+            border-radius: 6px;
+            background-color: var(--primary-color);
+            padding: 20px 30px 30px 30px;
+            position: relative;
+        }
+
+        .content-container *>img {
+            max-width: 100%;
+        }
+
+        @media (max-width: 500px) {
+            .content-container {
+                border-radius: 0px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .ferris-the-crab {
+                visibility: hidden;
+            }
+        }
+
+        pre *,
+        code *,
+        code {
+            font-family: "Roboto Mono", monospace;
+            font-size: 14px;
+            line-height: 20px;
+        }
+
+        h1 *,
+        h2 *,
+        h3 *,
+        h4 * {
+            font-size: inherit;
+        }
+
+        pre {
+            overflow-x: auto;
+            background-color: var(--almost-black);
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        pre>code {
+            color: rgb(78, 233, 194) !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="max-width: 800px; margin-left: auto; margin-right: auto;">
+        <div class="everything-container">
+            <div class="heading-container">
+                <div style="display: flex; flex-direction: column;">
+                    <h1>Making a Hashtable: SIMD Probing</h1>
+                    <span style="position: relative; bottom: 10px; padding-left: 2px;" class="sans-serif">June 19, 2024</span>
+                </div>
+                <a href="/">
+                    <img src="/img/go-back.svg" alt="A navigation arrow to send you back to the site homepage"
+                        style="filter: invert(1); height: 30px;" />
+                </a>
+            </div>
+            <div class="content-container inverse">
+                <h1>Yet Another Hashtable</h1><p>
+This article details how my hashtable implementation evolves over time.
+First, I will detail my high-level logic and version 0.1.0. Hopefully
+things will get a lot faster over time.</p><p>The hashtable is being built as part of a hashtable drag-race. The
+participants are <code>std::unordered_map</code>, FFHT (by 
+<a href="https://www.rubensystems.com">this guy</a>) and me. Mine is just called <code>HashTbl</code>.</p><h2>High-level Design</h2><p>
+My table is a probing table, 0.1.0 currently does linear probing. 
+Entries are stored as <code>(key, value)</code> pairs in a big pool, with only one 
+allocation for the lifetime of the table.</p><h2>Memory Layout </h2><p>
+The single allocation is laid out like this:</p><pre lang="plaintext"><code> ┌----------------┐
+ │                │
+ │    metadata    │
+ │                │
+ ├----------------┤
+ │                │
+ │    data        │
+ │                │
+ └----------------┘
+</code></pre><p>Very innovative. The <code>data</code> section is just an array of <code>Entry</code>s. Where
+an <code>Entry</code> is </p><pre lang="cpp"><code>struct HashTbl<Key, Val>::Entry {
+    size_t hash; // precomputed hash
+    Key key;
+    Val val;
+};
+</code></pre><p>The metadata section ought to store some kind of information that lets
+us figure out what entries are valid. For this, we use an array of 
+bytes, we will call this <code>ctrlbytes</code>. Essentially, we have this set up
+such that <code>ctrlbytes[i]</code> stores a byte of metadata about <code>entries[i]</code>.</p><p>Each byte can be either <code>CTRL_EMPTY</code> (the slot is free, no need to 
+probe), <code>CTRL_DEL</code> (the slot is deleted) or stores 7 bits of hashcode
+so that we can quickly check if we should even bother looking in the 
+main buffer. This is obviously inspired by swisstable's SIMD lookup,
+which lots of hashtables use now (e.g. 
+<a href="https://doc.rust-lang.org/std/collections/struct.HashMap.html">`std::collections::HashMap`</a>
+).</p><h2>Lookup</h2><p>
+We have one function that does all the heavy lifting here -- 
+<code>get_slot()</code>.</p><pre lang="cpp"><code>bool get_slot(size_t h, Key const &key, Entry *&slot, char *&ctrl_slot)
+</code></pre><p>This function just returns a pointer to the slot where we can put an 
+entry with key <code>key</code>, and tells us if that slot is empty or already
+occupied. From this, we derive both <code>insert()</code> and <code>get()</code>. </p><p>Ctrl bytes are arranged in aligned chunks. These chunks currently are 16
+bytes wide. Typically, we would iterate over each byte in the chunk,
+but hopefully doing a few SIMD instructions will let us do this faster.
+What's exciting is I made the whole thing generic over a chunk size and 
+an underlying generic SIMD vector type... Incoming comparison of 
+different vector sizes. My hardware supports AVX-512, so that should be
+fun.</p><p>The only SIMD instruction we need to understand is 
+`simd<vector_t</p><blockquote><p>::movemask_eq`.
+</p></blockquote><p>
+</p><pre lang="cpp"><code>template <typename T> struct simd
+{
+    using movemask_t = typename usimd<T>::movemask_t;
+
+    /**
+     * Construct a mask, where each high bit represents an equality match
+     * of the byte `b`.
+     */
+    static movemask_t movemask_eq(T v, char b)
+    {
+        T const splat = usimd<T>::splat_i8(b);
+        T const eqmask = usimd<T>::cmpeq_i8(splat, v);
+        return usimd<T>::movemask_i8(eqmask);
+    }
+};
+</code></pre><p>As the docs above say, we are constructing a bitmask, with 1 bit for 
+each byte in the vector type, where the bit at index <code>mask[i]</code> is <code>1</code> 
+iff the byte at index <code>v[i]</code> is equal to <code>b</code>. E.g. a <code>i8x4</code> vector type
+would map (remember, little-endian)</p><pre lang="plaintext"><code>simd<i8x4>::movemask_eq(0xab12ab34, 0xab) -> 0b0101
+</code></pre><p>For SSE, this is three instructions and is done as follows:</p><p>1. Splat (broadcast) <code>b</code> to every byte in the vector, to create a new
+   vector <code>u</code>.
+2. Do a bytewise equality comparison with <code>u</code> and <code>v</code>. This gets you
+  <code>0x00ff00ff</code> for the above example.
+3. Squish this to a bitmask.</p><p>Lookup, conceptually, is very simple then. Once we have the insertion 
+index (<code>hash % size</code>), we find the chunk that's a part of. Then we 
+produce a few masks:</p><pre lang="cpp"><code>ctrlmask_t keep_mask = std::numeric_limits<ctrlmask_t>::max() << ctrlbyte_offset;
+ctrlmask_t hit_mask = movemask_eq(ctrlchunk.as_simd(), h7(h)) & keep_mask;
+ctrlmask_t empty_mask =
+    movemask_eq(ctrlchunk.as_simd(), CtrlChunk::CTRL_EMPTY) & keep_mask;
+</code></pre><p>First, to clear any confusion, bit indices start at the 
+_least_-significant bit. The <code>keep_mask</code> is telling us to ignore the 
+first few bits. Index <code>18</code> for example would require us to skip bits 
+<code>0..=1</code>, since there is no point probing those.</p><p>We use <code>__builtin_ctz()</code> to find the next offset to probe at. This 
+compiles to a <code>rep bsf</code> string instruction... Since we're actually
+trying to produce a mask equal to the final high-bit, there are other
+bit-manipulation ways we can do this, and we spam <code>__builtin_ctz()</code>
+_a lot_. More to come on benchmarks with this.</p><p>So, as you can imagine, we're essentially getting these chunk masks in
+order and consuming either the next empty entry or the next h7 hit and
+updating the masks as we go. Whenever we get an h7 hit, we go into the
+main <code>Entry[]</code> buffer and test full equality on the key. A type trait is
+added for how key equality should be computed, either first test the
+hash then the full key, or just test the keys right away. For a
+<code>std::string</code>, you could be better off testing the hash first, but
+again, I'd need to do some benchmarks to find out.</p><h2>So how fast is it?</h2><p>
+Not very. But, I think we can get this much, much faster. The next
+article will hopefully detail how I do that.</p><p><img alt="Graph of benchmarks" src="./hashtbl-v0.0.1-bms.png"></p><p>The graph shows a variety of different benchmarks (could do an 
+interactive one, but I want to keep my website simple HTML). The Y-axis
+shows the number of operations we do for every 1 operation 
+<code>std::unordered_map</code> does in the same benchmark.</p><p>Each benchmarks has a name, parameterized by some value <code>N</code>.</p><p>- <code>insert_in_order</code>: Insert <code>0..N</code> in order.
+- <code>insert_randoms</code>:  Insert <code>N</code> random ints in order.
+- <code>insert_2update_randoms</code>: Insert <code>N</code> random ints in order, then update
+  them all, then update them all again.
+- <code>insert_in_order_xl_vals</code>: <code>insert_in_order</code>, but with <code>512</code>-byte
+  types for the <code>Val</code> type.
+- <code>insert_randoms_xl_vals</code>: <code>insert_randoms</code>, but with <code>512</code>-byte types
+  for the <code>Val</code> type.</p><p>The benchmark I will be most focusing on is <code>insert_2update_randoms</code>, 
+since it provides a pretty holistic judgement about the table. Right
+now, I get -13% to +17% performance vs <code>std::unordered_map</code>, which is
+fine, I guess. I'm not too worried about the XL vals benchmark, 
+because you can always just put pointers to a buffer in your map 
+instead. Across non-XL benchmarks we have an average speed buff of +37%
+over <code>std::unordered_map</code>, which I'm pretty happy about.</p><p>The map is also tested against an oracle on a series of a billion 
+random operations. I also did that thing where you change values across
+the code by 1 in a bunch of spots and see if the oracle fails and it 
+does everywhere I tried, so I'm confident these results aren't bogus 
+no-ops (not that they're good enough to suggest that).
+</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

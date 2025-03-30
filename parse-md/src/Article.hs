@@ -10,8 +10,8 @@ import Data.ByteString (ByteString)
 import Data.ByteString qualified as ByteString
 import Data.Either (isLeft)
 import Data.FileEmbed (embedStringFile)
-import Data.List (find, intercalate, isSuffixOf)
-import Data.Maybe (fromJust)
+import Data.List (find, intercalate, isSuffixOf, sortBy)
+import Data.Maybe (catMaybes, fromJust)
 import Data.Text qualified as Text
 import Data.Text.Encoding qualified as Text
 import Data.Time (defaultTimeLocale, formatTime, fromGregorian)
@@ -23,6 +23,12 @@ import System.Directory
   )
 import System.FilePath (combine)
 import System.IO.Error
+
+green :: String -> String
+green s = "\ESC[1;32m" ++ s ++ "\ESC[0m"
+
+orange :: String -> String
+orange s = "\ESC[1;38;5;208m" ++ s ++ "\ESC[0m"
 
 type IOResult = Either IOError
 
@@ -69,7 +75,7 @@ data ArticleError
 warnArticleError :: FilePath -> ArticleError -> IO ()
 warnArticleError path e = putStrLn (pfx ++ msg)
   where
-    pfx = "WARN: failed generating " ++ path ++ ":\n  "
+    pfx = orange "WARNING" ++ ": failed generating " ++ path ++ ":\n  "
     msg = case e of
       MissingIndex -> "missing index.md"
       MissingConfig -> "missing config.toml"
@@ -106,21 +112,24 @@ makeArticle fes = do
     files = foldr push [] fes
     decode = Text.decodeUtf8Lenient
 
-writeArticleToFile :: FEntry -> IO ()
+writeArticleToFile :: FEntry -> IO (Maybe (String, Config))
 writeArticleToFile (Directory articlePath (Just fes)) = do
   let indexHtmlPath = articlePath `combine` "index.html"
   case makeArticle fes of
-    Left e -> warnArticleError articlePath e
-    Right art -> do
+    Left e -> do
+      warnArticleError articlePath e
+      return Nothing
+    Right art@(Article {config}) -> do
       e <- tryIOError (writeFile indexHtmlPath (indexHtml art))
       if isLeft e
-        then warnArticleError articlePath BadStructure
-        else putStrLn ("SUCCESS: generated " ++ indexHtmlPath)
-
-  -- writeFile indexHtmlPath
-  return ()
+        then do
+          warnArticleError articlePath BadStructure
+          return Nothing
+        else do
+          putStrLn (green "SUCCESS: " ++ "generated " ++ indexHtmlPath)
+          return (Just (articlePath, config))
 -- Just skip anything that's not a directory
-writeArticleToFile _ = return ()
+writeArticleToFile _ = return Nothing
 
 makeBlog :: String -> IO (IOResult ())
 makeBlog blogPath = do
@@ -132,8 +141,16 @@ makeBlog blogPath = do
     Left e -> return (Left e)
   where
     writeBlog tree = case tree of
-      Directory _ (Just fes) -> mapM_ writeArticleToFile fes
-      _ -> putStrLn $ "ERR: " ++ blogPath ++ " is not a directory"
+      Directory _ (Just fes) -> do
+        cfgs <- mapM writeArticleToFile fes
+        let cfgs' = catMaybes cfgs
+        let blogEntries = sortBy (\x y -> snd y `compare` snd x) cfgs'
+        let blogEntries' = concatMap (uncurry configToHtml) blogEntries
+        writeFile
+          "./index.html"
+          (findAndReplace "BLOG_ENTRIES" blogEntries' homeHtmlT)
+        return ()
+      _ -> putStrLn $ "ERROR  : " ++ blogPath ++ " is not a directory"
 
 -- CONVERTING ARTICLES TO HTML -------------------------------------------------
 
@@ -163,3 +180,18 @@ indexHtml
         . findAndReplace "DATE" (formatDate date)
     )
       headHtmlT
+
+configHtmlT :: String
+configHtmlT = $(embedStringFile "./src/config-template.html")
+
+homeHtmlT :: String
+homeHtmlT = $(embedStringFile "./src/home-template.html")
+
+configToHtml :: String -> Config -> String
+configToHtml path (Config {date, description, title}) =
+  ( findAndReplace "TITLE" title
+      . findAndReplace "DATE" (formatDate date)
+      . findAndReplace "LINK" path
+      . findAndReplace "DESCRIPTION" description
+  )
+    configHtmlT

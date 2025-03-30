@@ -1,0 +1,13 @@
+title = "Really Fast Decision Trees"
+
+description = """I describe my experience making a machine learning classifier
+for acute kidney injury (AKI) in pure C. It's interesting because I use a cool
+technique to compress the data."""
+
+date = 2025-02-10
+
+[meta]
+keywords = ["Machine Learning"]
+
+[[author]]
+name = "Oliver Iliffe"

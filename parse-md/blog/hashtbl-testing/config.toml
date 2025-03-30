@@ -1,0 +1,12 @@
+title = "Making a Hashtable: Testing"
+
+description = """I work through various known hashtable designs, and also a new
+one, hoping to see some performance increase."""
+
+date = 2024-07-18
+
+[meta]
+keywords = ["hashtable", "testing"]
+
+[[author]]
+name = "Oliver Iliffe"

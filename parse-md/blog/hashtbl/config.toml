@@ -1,0 +1,11 @@
+title = "Making a Hashtable: SIMD Probing"
+
+description = """I make a hashtable with SIMD probing for a drag race."""
+
+date = 2024-06-19
+
+[meta]
+keywords = ["hashtable"]
+
+[[author]]
+name = "Oliver Iliffe"

@@ -1,0 +1,13 @@
+title = "Item-scoped Unsafe Code"
+
+description = """I discuss a new idea for safety that I call "item-scoped unsafe
+code". The idea is to try and get as few things as possible be 'unsafe' and 
+hopefully have everything that is be verifiably safe at runtime."""
+
+date = 2023-11-09
+
+[meta]
+keywords = ["Rust"]
+
+[[author]]
+name = "Oliver Iliffe"

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Oliver Iliffe's Website</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="DESCRIPTION">
+    <meta name="keywords" content="algorithms">
+    <meta name="author" content="Oliver Iliffe">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+        rel="stylesheet">
+    <!-- MATH
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex/dist/contrib/auto-render.min.js" onload="renderMath()"></script>
+    <script>
+    const renderMath = () => {
+        document.querySelectorAll('.tex-math').forEach(el => {
+            renderMathInElement(el, {
+                delimiters: [
+                    { left: "\\(", right: "\\)", display: false },
+                    { left: "\\[", right: "\\]", display: true }
+                ]
+            });
+        });
+    };
+    </script>  
+    ENDMATH -->
+    <style>
+        :root {
+            --almost-black: rgb(30, 30, 30);
+            --almost-white: rgb(240, 240, 240);
+        }
+
+        :root {
+            --primary-color: var(--almost-white);
+            --secondary-color: var(--almost-black);
+        }
+
+        * {
+            box-sizing: border-box;
+            color: var(--primary-color);
+        }
+
+        .sans-serif {
+            font-family: "Open Sans", sans-serif;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: "Open Sans", sans-serif;
+            font-weight: 800;
+        }
+        
+        p {
+            font-family: "Open Sans", sans-serif;
+        }
+
+        a:hover {
+            color: var(--primary-color);
+        }
+
+        html {
+            margin: 0px;
+        }
+
+        body {
+            margin: 0px;
+            background-color: var(--secondary-color);
+            overflow-x: hidden;
+        }
+
+        .everything-container {
+            padding: 20px;
+        }
+
+        @media (max-width: 500px) {
+            .everything-container {
+                padding: 0px;
+            }
+        }
+
+        .heading-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0px 20px 0px 20px;
+        }
+
+        @media (max-width: 500px) {
+            .heading-container {
+                margin-bottom: 10px;
+            }
+        }
+
+        .img-with-border {
+            border: 5px solid var(--primary-color);
+        }
+
+        .inverse * {
+            color: var(--secondary-color);
+        }
+
+        .inverse * a:hover {
+            color: var(--secondary-color);
+        }
+
+        .content-container {
+            border-radius: 6px;
+            background-color: var(--primary-color);
+            padding: 20px 30px 30px 30px;
+            position: relative;
+        }
+
+        .content-container *>img {
+            max-width: 100%;
+        }
+
+        @media (max-width: 500px) {
+            .content-container {
+                border-radius: 0px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .ferris-the-crab {
+                visibility: hidden;
+            }
+        }
+
+        pre *,
+        code *,
+        code {
+            font-family: "Roboto Mono", monospace;
+            font-size: 14px;
+            line-height: 20px;
+        }
+
+        h1 *,
+        h2 *,
+        h3 *,
+        h4 * {
+            font-size: inherit;
+        }
+
+        pre {
+            overflow-x: auto;
+            background-color: var(--almost-black);
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        pre>code {
+            color: rgb(78, 233, 194) !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="max-width: 800px; margin-left: auto; margin-right: auto;">
+        <div class="everything-container">
+            <div class="heading-container">
+                <div style="display: flex; flex-direction: column;">
+                    <h1>Enumerating Arbitrary Tree Types in Logarithmic Time</h1>
+                    <span style="position: relative; bottom: 10px; padding-left: 2px;" class="sans-serif">June  1, 2024</span>
+                </div>
+                <a href="/">
+                    <img src="/img/go-back.svg" alt="A navigation arrow to send you back to the site homepage"
+                        style="filter: invert(1); height: 30px;" />
+                </a>
+            </div>
+            <div class="content-container inverse">
+                <h1>How Enumerate Works</h1><p>
+I was recently tasked with enumerating all possible trees. The trees can
+be of any type -- regexes, binary trees etc. Specifically, I need to
+be able to associate every integer with a unique tree. Here is the 
+entire code for this</p><pre lang="hs"><code>rdigits b 0 = [0, 0 ..]
+rdigits b n = n `mod` b : rdigits b (n `div` b)
+
+perms ns 0 = 0
+perms ns d = sum $ nodePerms ns d
+
+nodePerms ns d = (perms ns (d - 1) ^) . fst <$> ns
+
+perm ns d i = n children
+  where
+    l = reverse $ zip (scanl (+) 0 (nodePerms ns d)) ns
+    (g, (_, n)) = head $ dropWhile ((i <) . fst) l
+    children = perm ns (d - 1) <$> rdigits (perms ns (d - 1)) (i - g)
+</code></pre><p><code>perm ns d i</code> takes some node constructors <code>ns</code>, a maximum depth <code>d</code> 
+and an integer <code>i</code> and produces the same tree every time. It is 
+guaranteed that for all <code>i</code>, the tree is different or does not exist.</p><h2>Digits</h2><p>
+This is understood best by example. Take <code>549</code> that we wish to convert
+to base-10 digits. <code>549 % 10</code> is <code>9</code> and <code>549 / 10</code> is <code>54</code>. It is
+clear, we can define a recursive function based on the update rule
+<code>digits(n / base) :+ n % base</code>.</p><pre lang="hs"><code>rdigits b 0 = [0, 0 ..]
+rdigits b n = n `mod` b : rdigits b (n `div` b)
+</code></pre><p>This function returns the reversed digits, since we later do not care
+about the order the digits are in. It is also quite convenient that the
+digits are ordered least-significant to most significant, because it
+allows us to concatenate an infinite list of <code>0</code>s onto the end.</p><h2>Perms </h2><p>
+All parameters <code>ns</code> contain a list of "node constructors". A node 
+constructor is a tuple <code>(childCount, constructor)</code>. <code>childCount</code> 
+naturally describes how many children the node has. <code>constructor</code> 
+is a function that takes a list of child nodes and constructs a node 
+with these as children.</p><p>The function <code>perms</code> takes a list of node constructors and a maximum 
+depth and returns the number of possible permutations up to this depth.</p><pre lang="hs"><code>perms :: [(Int, [a] -> a)] -> Int -> Int
+</code></pre><p>To compute it, we consider the number of permutations for a tree rooted
+at node <code>p</code>, <code>∀p ∈ ns</code>. The sum of all these is the result. Of course,
+there are no trees of depth <code>0</code>.</p><pre lang="hs"><code>perms ns 0 = 0
+perms ns d = sum $ nodePerms ns d
+</code></pre><p>The helper function <code>nodePerms</code> maps each node constructor <code>p</code> to the 
+number of permutations of trees rooted at <code>p</code>. Each child can have 
+<code>perms ns (d - 1)</code> children, so the total permutations is 
+<code>perms ns (d - 1) ^ p.childCount</code>. Recall that the child count is the 
+<code>fst</code> element of the tuple.</p><pre lang="hs"><code>nodePerms ns d = (perms ns (d - 1) ^) . fst <$> ns
+</code></pre><p>A fun property here is that for <code>d = 1</code>, we are effectively counting 
+the number of nodes with 0 children, or all the leaf nodes. A previous
+implementation considered leaf and branch nodes differently, but this 
+property of exponents comes in very handy here!</p><h2>Perm</h2><p>
+Recall the original task of ordering all possible tree permutations
+and accessing the <code>i</code>ᵗʰ one. Well, what should be the <code>i</code>ᵗʰ permutation?
+This is best understood by example. Consider the nodes used in regular
+expressions. You do not need to know what they do, but comments are 
+provided.</p><pre lang="hs"><code>data Reg 
+    = Eps         -- the empty string ε
+    | Sym Char    -- a single character
+    | Seq Reg Reg -- a sequence of two regular expressions
+    | Alt Reg Reg -- either of two regular expressions
+    | Rep Reg     -- a regular expression, repeated at least 0 times
+</code></pre><p>Consider the alphabet <code>{'a', 'b'}</code>. For trees up to depth 3, we can 
+generate the number of permutations for trees rooted at each of these 
+nodes. For <code>Eps</code>, this is obviously just <code>1</code>, but the others can grow 
+double-exponentially.</p><pre lang="plaintext"><code>| tree root | # trees with this root |
+|:---------:|:----------------------:|
+|    Eps    |           1            |
+|  Sym 'a'  |           1            |
+|  Sym 'b'  |           1            |
+|    Rep    |           24           |
+|    Alt    |          576           |
+|    Seq    |          576           |
+</code></pre><p>We could say that tree <code>0</code> starts with <code>Eps</code>, tree <code>1</code> starts with 
+<code>Sym 'a'</code>, tree <code>10</code> starts with <code>Rep</code>, tree <code>700</code> starts with <code>Seq</code>
+etc. etc. One can see this is related to the prefix sum. In Haskell,
+this is</p><pre lang="hs"><code>scanl (+) 0 (nodePerms ns d)
+</code></pre><p>The prefix sum for the above case is <code>[0,1,2,3,27,603,1179]</code> Consider we
+take the <code>300</code>ᵗʰ term. This is the <code>300 - 27</code>ᵗʰ term of <code>Alt</code>. We
+acquire the node constructor <code>n</code> and the previous group start index <code>g</code>
+like this</p><pre lang="hs"><code>l = reverse $ scanl (+) 0 (nodePerms ns d) `zip` ns
+(g, (_, n)) = head $ dropWhile ((i <) . fst) l
+</code></pre><p>We go in reverse, selecting the first one that is greater than or 
+equal to <code>i</code>. The associated node is zipped with a sheer of one to the
+left, so we also have the correct node constructor. For the above 
+example, <code>l</code> is </p><pre lang=""><code>[(0, Eps), (1, Sym 'a'), (2, Sym 'b'), (3, Rep), (27, Alt), (603, Seq)]
+</code></pre><p>So, we want the <code>i - g</code>ᵗʰ child of <code>Alt</code>. We can get this by considering
+each child of <code>Alt</code> as a digit in a base-<code>perms ns (d - 1)</code>
+representation of <code>i - g</code>. The intuition for this is that each child has
+<code>perms ns (d - 1)</code> permutations. We use our function from earlier,
+<code>rdigits</code>. This gives an index for the tree of each child, which we can
+map to a concrete permutation.</p><pre lang="hs"><code>children = perm ns (d - 1) <$> rdigits (perms ns (d - 1)) (i - g)
+</code></pre><p>Finally, we construct the node with the node constructor acquired 
+earlier, <code>n</code>.</p><pre lang="hs"><code>perm ns d i = n children
+</code></pre><p>To actually use the code, we have to define our node constructors and 
+whatnot...</p><pre lang="hs "><code>data Tree
+  = L1
+  | L2
+  | B1 Tree Tree
+  | B2 Tree Tree
+  deriving (Show)
+
+ns =
+  [ (0, const L1),
+    (2, \(l : r : _) -> B1 l r),
+    (2, \(l : r : _) -> B2 l r)
+  ]
+</code></pre><h2>Issues</h2><p>
+The issue is that the number of permutations of a tree grows
+double-exponentially with the depth. As a result, the algorithm runs in
+worse than exponential time (but not double-exponential) with respect to
+the tree depth. I only managed to compute the values for trees of depth
+12 before I got too bored to wait. There's no a lot to do about this,
+since the task requires compactly assigning an integer to every tree.
+</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

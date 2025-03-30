@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Oliver Iliffe's Website</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="Oliver Iliffe's personal website and blog and stuff">
+    <meta name="keywords" content="Oliver, Iliffe, Personal, Website, oliver, iliffe">
+    <meta name="author" content="Oliver Iliffe">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --almost-black: rgb(30, 30, 30);
+            --almost-white: rgb(240, 240, 240);
+        }
+
+        :root {
+            --primary-color: var(--almost-white);
+            --secondary-color: var(--almost-black);
+        }
+
+        * {
+            font-family: "Open Sans", sans-serif;
+            box-sizing: border-box;
+            color: var(--primary-color);
+        }
+
+        p {
+            font-family: "Open Sans", sans-serif;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: "Open Sans", sans-serif;
+            font-weight: 800;
+        }
+
+        a:hover {
+            color: var(--primary-color);
+        }
+
+        html {
+            margin: 0px;
+        }
+
+        body {
+            margin: 0px;
+            background-color: var(--secondary-color);
+        }
+
+        .everything-container {
+            padding: 20px;
+        }
+
+        @media (max-width: 500px) {
+            .everything-container {
+                padding: 0px;
+            }
+        }
+
+        .name-and-face {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0px 20px 0px 20px;
+        }
+
+        .name-and-face>img {
+            border-radius: 50%;
+            max-height: 140px;
+            z-index: 100;
+        }
+
+        @media (max-width: 500px) {
+            .name-and-face>img {
+                max-height: 100px;
+            }
+
+            .name-and-face p {
+                font-size: 12px;
+            }
+
+            .name-and-face {
+                margin-bottom: 10px;
+            }
+        }
+
+        .img-with-border {
+            border: 5px solid var(--primary-color);
+        }
+
+        .inverse * {
+            color: var(--secondary-color);
+        }
+
+        .inverse * a:hover {
+            color: var(--secondary-color);
+        }
+
+        .content-container {
+            border-radius: 6px;
+            background-color: var(--primary-color);
+            padding: 20px 30px 30px 30px;
+            bottom: 30px;
+            position: relative;
+        }
+
+        @media (max-width: 500px) {
+            .content-container {
+                border-radius: 0px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .ferris-the-crab {
+                visibility: hidden;
+            }
+        }
+
+        .blog-entry:hover {
+            cursor: pointer;
+            transition-duration: 100ms;
+        }
+
+        .blog-entry {
+            text-decoration: none;
+        }
+
+        .blog-entry .blog-h {
+            display: flex;
+            flex-flow: row;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0 0 0;
+            margin-top: 10px;
+            border-top: 1px solid black;
+        }
+
+        .blog-entry .blog-h h4 {
+            margin: 0px;
+            font-weight: bold;
+        }
+
+        .blog-entry p {
+            font-size: 12px;
+            margin: 0px;
+        }
+    </style>
+</head>
+<body>
+    <div style="max-width: 800px; margin-left: auto; margin-right: auto;">
+        <div class="everything-container">
+            <div class="name-and-face">
+                <div>
+                    <h1>OLIVER ILIFFE</h1>
+                    <p style="position: relative; bottom: 20px;">Computer Science Student @ Imperial</p>
+                </div>
+                <img src="img/me.jpeg" class="img-with-border" alt="Me, on a boat!" />
+            </div>
+
+            <div class="content-container inverse">
+                <img src="img/ferris.png" alt="Ferris the crab, the Rust mascot" style="
+                        position: absolute; 
+                        transform: rotate(-10deg);
+                        left: -15px;
+                        top: -20px;
+                        height: 40px;
+                        z-index: 1000;
+                    " class="ferris-the-crab" />
+                <p>
+                    I am currently a student at <a href="https://www.imperial.ac.uk/">Imperial College London</a> completing
+                    an
+                    <a href="https://www.imperial.ac.uk/computing/prospective-students/courses/pg/mac/">MSc in "Advanced
+                        Computer Science"</a>.
+                    Previously, I graduated from <a href="https://www.kcl.ac.uk/">King's College London</a> with a
+                    <a href="https://www.kcl.ac.uk/study/undergraduate/courses/computer-science-bsc">BSc in Computer
+                        Science</a>.
+                </p>
+                <p>
+                    I am particularly interested in the tools we use to build systems that are resilient, secure and fast.
+                    I like quite a lot of things. Computer architecture, compilers, operating systems and
+                    programming languages (not necessarily in that order). This means, for example, I would be interested
+                    in both formalising an ISA and designing hardware to execute it.
+                </p>
+                <p>
+                    If you want a more comprehensive list of skills + experience, consult <a href="OliverIliffeCv.pdf">my
+                        CV</a>.
+                </p>
+
+                <h2>BLOG</h2>
+                <p>
+                    I am always trying to get better at technical writing and hopefully share some interesting stuff while I do it. 
+                    Each blog entry has a corresponding `.md` file in the same directory, if you prefer reading plaintext.
+                </p>
+                <div class="blog-entries">
+                BLOG_ENTRIES
+                </div>
+                <h2>CONTACT</h2>
+                <table>
+                    <tr>
+                        <td><b>Email (prefer)</b></td>
+                        <td>oli.iliffe at gmail.com</td>
+                    </tr>
+                    <tr>
+                        <td><b>Another Email</b></td>
+                        <td>oli_iliffe at hotmail.com</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

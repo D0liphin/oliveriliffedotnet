@@ -1,0 +1,12 @@
+title = "Making a Hashtable: Hashtable Math"
+
+description = """I work through a derivation for the average number of probes in
+a hashtable, then try and verify it through real data."""
+
+date = 2024-06-25
+
+[meta]
+keywords = ["hashtable", "math"]
+
+[[author]]
+name = "Oliver Iliffe"

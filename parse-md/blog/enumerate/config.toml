@@ -1,0 +1,16 @@
+title = "Enumerating Arbitrary Tree Types in Logarithmic Time"
+
+description = """Some of the work I did for a summer research project with one
+of my very favourite professors. It's quite rare that you get to do 'algorithms
+research'. I was looking at how we can quickly associate an integer with a 
+specific tree in a nice, ordered way. WARNING: this is one of my first articles
+I wrote on this website and hence, it's a pretty tough read. Proceed with 
+caution."""
+
+date = 2024-06-01
+
+[meta]
+keywords = ["algorithms"]
+
+[[author]]
+name = "Oliver Iliffe"
