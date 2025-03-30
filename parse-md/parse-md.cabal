@@ -58,7 +58,7 @@ library
     import:           warnings
 
     -- Modules exported by the library.
-    exposed-modules:  Md
+    exposed-modules:  Index, Article, Config
 
     -- Modules included in this library but not exported.
     -- other-modules:
@@ -67,7 +67,11 @@ library
     -- other-extensions:
 
     -- Other library packages from which modules are imported.
-    build-depends:    base ^>=4.17.2.1
+    build-depends:    base ^>=4.17.2.1, 
+                      toml-parser, 
+                      text,
+                      containers,
+                      time
 
     -- Directories containing source files.
     hs-source-dirs:   src
@@ -90,7 +94,8 @@ executable parse-md
 
     -- Other library packages from which modules are imported.
     build-depends:
-        base ^>=4.17.2.1,
+        base ^>=4.17.2.1, 
+        text,
         parse-md
 
     -- Directories containing source files.

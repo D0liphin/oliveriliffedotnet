@@ -1,0 +1,9 @@
+title = "Test Article"
+description = "A test article, to iron out what kind of features I want."
+date = 2025-03-09
+
+[meta]
+keywords = ["test", "article"]
+
+[[author]]
+name = "Oliver Iliffe"
