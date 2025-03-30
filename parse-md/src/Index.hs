@@ -94,7 +94,8 @@ findAndReplace find replace = f []
   where
     f str' [] = reverse str'
     f str' cs@(c : ct)
-      | find `isPrefixOf` cs = f (replace ++ str') (drop (length find) cs)
+      | find `isPrefixOf` cs =
+          f (reverse replace ++ str') (drop (length find) cs)
       | otherwise = f (c : str') ct
 
 -- TOKENIZER -------------------------------------------------------------------
@@ -260,6 +261,20 @@ parseMarkdown input = do
   (tokens', blocks) <- parseBlocks tokens
   if null tokens' then Just blocks else Nothing
 
+hasMath :: [Block] -> Bool
+hasMath = any hasMathB
+
+hasMathI :: Inline -> Bool
+hasMathI (Index.MathBlock _) = True
+hasMathI (Index.Equation _) = True
+hasMathI _ = False
+
+hasMathB :: Block -> Bool
+hasMathB (Index.Paragraph is) = any hasMathI is
+hasMathB (Index.Quote bs) = hasMath bs
+hasMathB (Index.Heading _ is) = any hasMathI is
+hasMathB _ = False
+
 -- HTML ------------------------------------------------------------------------
 
 -- Attributes, with a leading space
@@ -270,7 +285,7 @@ attributes ((k, v) : xs) = " " ++ k ++ "=\"" ++ v ++ "\"" ++ attributes xs
 tag :: String -> [(String, String)] -> String -> String
 tag t attrs content =
   "<"
-    ++ t
+    ++ t  
     ++ attributes attrs
     ++ ">"
     ++ content
@@ -304,5 +319,5 @@ blockToHtml (LineBreak n) = concat (replicate n "<br>")
 blockToHtml (Paragraph xs) = tag "p" [] (inlinesToHtml xs)
 blockToHtml (Heading n str) = tag ("h" ++ show (min 6 n)) [] (inlinesToHtml str)
 blockToHtml (CodeBlock lang text) =
-  tag "div" [] (tag "pre" [("lang", lang)] text)
+  tag "pre" [("lang", lang)] (tag "code" [] text)
 blockToHtml (Quote blocks) = tag "blockquote" [] (blocksToHtml blocks)

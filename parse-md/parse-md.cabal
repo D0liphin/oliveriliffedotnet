@@ -71,6 +71,11 @@ library
                       toml-parser, 
                       text,
                       containers,
+                      directory,
+                      bytestring,
+                      filepath,
+                      template-haskell,
+                      file-embed,
                       time
 
     -- Directories containing source files.

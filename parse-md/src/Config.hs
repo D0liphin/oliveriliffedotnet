@@ -112,3 +112,4 @@ parseConfig :: Text -> Result Config
 parseConfig text = do
   toml <- first EToml (Toml.parse text)
   readConfig toml
+

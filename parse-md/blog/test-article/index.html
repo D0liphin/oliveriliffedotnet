@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Oliver Iliffe's Website</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="DESCRIPTION">
+    <meta name="keywords" content="test, article">
+    <meta name="author" content="Oliver Iliffe">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+        rel="stylesheet">
+    <!-- -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex/dist/contrib/auto-render.min.js" onload="renderMath()"></script>
+    <script>
+    const renderMath = () => {
+        document.querySelectorAll('.tex-math').forEach(el => {
+            renderMathInElement(el, {
+                delimiters: [
+                    { left: "\\(", right: "\\)", display: false },
+                    { left: "\\[", right: "\\]", display: true }
+                ]
+            });
+        });
+    };
+    </script>  
+    <!-- -->
+    <style>
+        :root {
+            --almost-black: rgb(30, 30, 30);
+            --almost-white: rgb(240, 240, 240);
+        }
+
+        :root {
+            --primary-color: var(--almost-white);
+            --secondary-color: var(--almost-black);
+        }
+
+        * {
+            box-sizing: border-box;
+            color: var(--primary-color);
+        }
+
+        .sans-serif {
+            font-family: "Open Sans", sans-serif;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: "Open Sans", sans-serif;
+            font-weight: 800;
+        }
+        
+        p {
+            font-family: "Open Sans", sans-serif;
+        }
+
+        a:hover {
+            color: var(--primary-color);
+        }
+
+        html {
+            margin: 0px;
+        }
+
+        body {
+            margin: 0px;
+            background-color: var(--secondary-color);
+            overflow-x: hidden;
+        }
+
+        .everything-container {
+            padding: 20px;
+        }
+
+        @media (max-width: 500px) {
+            .everything-container {
+                padding: 0px;
+            }
+        }
+
+        .heading-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0px 20px 0px 20px;
+        }
+
+        @media (max-width: 500px) {
+            .heading-container {
+                margin-bottom: 10px;
+            }
+        }
+
+        .img-with-border {
+            border: 5px solid var(--primary-color);
+        }
+
+        .inverse * {
+            color: var(--secondary-color);
+        }
+
+        .inverse * a:hover {
+            color: var(--secondary-color);
+        }
+
+        .content-container {
+            border-radius: 6px;
+            background-color: var(--primary-color);
+            padding: 20px 30px 30px 30px;
+            position: relative;
+        }
+
+        .content-container *>img {
+            max-width: 100%;
+        }
+
+        @media (max-width: 500px) {
+            .content-container {
+                border-radius: 0px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .ferris-the-crab {
+                visibility: hidden;
+            }
+        }
+
+        pre *,
+        code *,
+        code {
+            font-family: "Roboto Mono", monospace;
+            font-size: 14px;
+            line-height: 20px;
+        }
+
+        h1 *,
+        h2 *,
+        h3 *,
+        h4 * {
+            font-size: inherit;
+        }
+
+        pre {
+            overflow-x: auto;
+            background-color: var(--almost-black);
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        pre>code {
+            color: rgb(78, 233, 194) !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="max-width: 800px; margin-left: auto; margin-right: auto;">
+        <div class="everything-container">
+            <div class="heading-container">
+                <div style="display: flex; flex-direction: column;">
+                    <h1>Test Article</h1>
+                    <span style="position: relative; bottom: 10px; padding-left: 2px;" class="sans-serif">March  9, 2025</span>
+                </div>
+                <a href="/">
+                    <img src="/img/go-back.svg" alt="A navigation arrow to send you back to the site homepage"
+                        style="filter: invert(1); height: 30px;" />
+                </a>
+            </div>
+            <div class="content-container inverse">
+                <h1>Heading 1</h1><p>
+Here is a paragraph, which should be on a new line from the previous
+thing. It should all be in one big block, nothing fancy. No line breaks
+yet... stil no. Still no! Okay, now:</p><p>This is on a newline. I will use this opportunity to look at some of
+the inline stylings. First we have <strong>bold</strong>, then we have <em>italic</em>. 
+Very cool! Now, we also have <code>code snippets</code>. What's more -- we have
+<strong><code>bold code snippets</code></strong> and <em><code>italic code snippets</code></em>. We also even have
+inline<strong>bold</strong>text and inline<em>italic</em>text. </p><p>We also have <span class="tex-math">\( equations \)</span> like <span class="tex-math">\( 5 + 5 \)</span> and <span class="tex-math">\( \sqrt{6} \)</span></p><blockquote><p> Block quotes
+ may or may not
+ work...
+ 
+</p><blockquote><p> What about this
+</p></blockquote></blockquote><p>
+Links work too. For example, a link to <a href="https://www.google.com">Google</a>. </p><p><div class="tex-math">\[ \text{Equations work too } e = mc^2 \]</div> </p><h2>Subheading</h2><p>
+We also have <strong><em>bold italic</em></strong> and <strong><em><code>bold italic code</code></em></strong> hopefully!</p><h3>H3</h3><h4>H4</h4><h5>H5</h5><h6>H6</h6><p>
+We don't have h7, of course.</p><h3>You can put <code>code</code>, <em>italic</em> etc. in headings!</h3><p>
+</p><h1>Images </h1><p>
+We also have images, look:</p><p><img alt="mammoth mice" src="./mammoth-mice.jpg"></p><h2>Code Blocks </h2><p>
+Okay... not sure if this is going to work. We had <code>code</code> and even 
+<em><code>code</code></em>, <strong><code>code</code></strong> and <strong><em><code>code</code></em></strong>... but what about:</p><pre lang="c"><code>int main() {
+    printf("This is C code!");
+}
+</code></pre><pre lang="py"><code>if __name__ == "__main__": 
+    print("This is python :)")
+</code></pre><pre lang="md"><code># MD in MD?
+WHAT! *italics* (but not really)
+</code></pre><h2>Edge Cases</h2><p>
+A </p><br><p>B</p><p>C</p><p>blah: <em> this </em>hi*
+</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
