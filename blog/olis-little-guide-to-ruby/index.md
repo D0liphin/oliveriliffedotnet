@@ -1,6 +1,9 @@
 # Oli's Little Guide to Ruby
 
 This is about the 1986 HDL Ruby, made by [Mary Sheeran](https://www.cse.chalmers.se/~ms/).
+It's not quite finished, but I think provides a nice swift introduction
+to many of the basic concepts (everything up until registers). If you
+are interested in contributing, please do!
 
 ## Basic Relations
 

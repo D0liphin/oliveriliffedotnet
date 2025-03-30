@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <title>Oliver Iliffe's Website</title>
     <meta charset="UTF-8">
-    <meta name="description" content="Oliver Iliffe's personal website and blog and stuff">
-    <meta name="keywords" content="Oliver, Iliffe, Personal, Website, oliver, iliffe">
+    <meta name="description" content="DESCRIPTION">
+    <meta name="keywords" content="Machine Learning">
     <meta name="author" content="Oliver Iliffe">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,6 +16,23 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
         rel="stylesheet">
+    <!-- MATH
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex/dist/contrib/auto-render.min.js" onload="renderMath()"></script>
+    <script>
+    const renderMath = () => {
+        document.querySelectorAll('.tex-math').forEach(el => {
+            renderMathInElement(el, {
+                delimiters: [
+                    { left: "\\(", right: "\\)", display: false },
+                    { left: "\\[", right: "\\]", display: true }
+                ]
+            });
+        });
+    };
+    </script>  
+    ENDMATH -->
     <style>
         :root {
             --almost-black: rgb(30, 30, 30);
@@ -29,9 +45,12 @@
         }
 
         * {
-            font-family: "Open Sans", sans-serif;
             box-sizing: border-box;
             color: var(--primary-color);
+        }
+
+        .sans-serif {
+            font-family: "Open Sans", sans-serif;
         }
 
         h1,
@@ -40,6 +59,10 @@
         h4 {
             font-family: "Open Sans", sans-serif;
             font-weight: 800;
+        }
+        
+        p {
+            font-family: "Open Sans", sans-serif;
         }
 
         a:hover {
@@ -118,9 +141,8 @@
         code *,
         code {
             font-family: "Roboto Mono", monospace;
-            font-weight: bold;
             font-size: 14px;
-            line-height: 12px;
+            line-height: 20px;
         }
 
         h1 *,
@@ -143,90 +165,78 @@
     </style>
 </head>
 
-<div style="max-width: 800px; margin-left: auto; margin-right: auto;">
-    <div class="everything-container">
-        <div class="heading-container">
-            <div>
-                <h1>Compacting Decision Trees</h1>
+<body>
+    <div style="max-width: 800px; margin-left: auto; margin-right: auto;">
+        <div class="everything-container">
+            <div class="heading-container">
+                <div style="display: flex; flex-direction: column;">
+                    <h1>Really Fast Decision Trees</h1>
+                    <span style="position: relative; bottom: 10px; padding-left: 2px;" class="sans-serif">February 10, 2025</span>
+                </div>
+                <a href="/">
+                    <img src="/img/go-back.svg" alt="A navigation arrow to send you back to the site homepage"
+                        style="filter: invert(1); height: 30px;" />
+                </a>
             </div>
-            <a href="/">
-                <img src="/img/go-back.svg" alt="A navigation arrow to send you back to the site homepage"
-                    style="filter: invert(1); height: 30px;" />
-            </a>
-        </div>
-        <div class="content-container inverse">
-            <p>Recently, I was making a classifier for acute kidney injury (AKI). I
+            <div class="content-container inverse">
+                <h1>Compacting Decision Trees</h1><p>
+Recently, I was making a classifier for acute kidney injury (AKI). I
 have a dataset of around 14,000 entries, each representing a patient. I
-have their age, sex and between 0 and 45 timestamped creatinine samples.</p>
-<h2>Background</h2>
-<p>If you don't know, a 'decision tree' is a learned function that takes
+have their age, sex and between 0 and 45 timestamped creatinine samples.</p><h2>Background</h2><p>
+If you don't know, a 'decision tree' is a learned function that takes
 the form of a flow chart. The questions on the flow chart ask me
-something about the patient &quot;is the patient older than 65?&quot;. If yes, I
+something about the patient "is the patient older than 65?". If yes, I
 might go down one path, if no, I'll go down another. It's my job to
 construct a sufficiently complex tree with lots of good questions so
 that if you walked through this tree, you could decide whether somebody
-has AKI with pretty good confidence.</p>
-<p>First, we need to aggregate everyone's creatinine test results, because
+has AKI with pretty good confidence.</p><p>First, we need to aggregate everyone's creatinine test results, because
 it's hard to compare Bob with 41 test results with Dylan who only has 2.
-You can choose things like the <em>median</em> of Bob's creatinine results, or
-the <em>range</em>. Something like that. Then we just have one value for Bob
-and one for Dylan. Our patient data might look something like this now:</p>
-<pre><code class="language-c">struct patient_data {
+You can choose things like the <em>median</em> of Bob's creatinine results, or 
+the <em>range</em>. Something like that. Then we just have one value for Bob 
+and one for Dylan. Our patient data might look something like this now:</p><pre lang="c"><code>struct patient_data {
     bool sex;
     uint8_t age;
     float mean_cr; 
     float recent_cr;
     float stdv_cr; 
 };
-</code></pre>
-<p>Next, we need to construct our tree. The classic way of doing this is to
+</code></pre><p>Next, we need to construct our tree. The classic way of doing this is to
 cycle through a bunch of questions about the data that split it in half.
-We give each split a score (e.g. <a href="https://en.wikipedia.org/wiki/Information_gain_ratio">information gain</a>) and make the
-first question in our tree the one that maximized that score. Then we
-ask questions about each half of the split data in the same way until
-we reach some terminating condition.</p>
-<p>The trickiest part of this is &quot;what questions do I ask?&quot;. If the patient
-data is already a list of <strong>binary features</strong> (e.g. &quot;male/female&quot; for
-sex), it's easy just say &quot;is this patient male?&quot;. The hard part comes
+We give each split a score (e.g. <a href="
+https://en.wikipedia.org/wiki/Information_gain_ratio">information gain</a>) and make the
+first question in our tree the one that maximized that score. Then we 
+ask questions about each half of the split data in the same way until 
+we reach some terminating condition.</p><p>The trickiest part of this is "what questions do I ask?". If the patient
+data is already a list of <strong>binary features</strong> (e.g. "male/female" for
+sex), it's easy just say "is this patient male?". The hard part comes
 when you need to ask questions about real numbers, like creatinine test
-results.</p>
-<h2>Deciding Features</h2>
-<p>What if I told you that I can get good performance by turning my real
-numbers into around <strong>four</strong> binary features? This <em>vastly</em> simplifies
-decision tree construction, <em>hugely</em> compacts the data and is generally
-just cool. For example our patient data can be packed into around 16
+results.</p><h2>Deciding Features</h2><p>
+What if I told you that I can get good performance by turning my real
+numbers into around <strong>four</strong> binary features? This _vastly_ simplifies
+decision tree construction, _hugely_ compacts the data and is generally
+just cool. For example our patient data can be packed into around 16 
 bits (down from 112) and there are only 16 questions to try out (instead
-of hundreds or even thousands with traditional methods).</p>
-<p>If we take the data for a given feature (<code>mean_cr</code> for example) we get
-some distribution like this:</p>
-<p><img src="image.png" alt="Distribution for mean creatinine for each patient" /></p>
-<p>Think of this kind of like a histogram. We're trying to see how many
-people have a mean creatinine value (look, I don't know what this is
-measured in -- the dataset doesn't say) of X.</p>
-<p>I take all this data and divide it into <strong>N</strong> buckets. The <strong>nᵗʰ</strong>
+of hundreds or even thousands with traditional methods). </p><p>If we take the data for a given feature (<code>mean_cr</code> for example) we get
+some distribution like this:</p><p><img alt="Distribution for mean creatinine for each patient" src="image.png"></p><p>Think of this kind of like a histogram. We're trying to see how many 
+people have a mean creatinine value (look, I don't know what this is 
+measured in -- the dataset doesn't say) of X. </p><p>I take all this data and divide it into <strong>N</strong> buckets. The <strong>nᵗʰ</strong>
 bucket is assigned a value such that <strong>(n/N)%</strong> of people have a
 <code>mean_cr</code> less than that value and the rest have a <code>mean_cr</code> greater
 than that value (basically). If you had 100 buckets, the iᵗʰ bucket
 would represent the mean of the values in the i..i+1ᵗʰ percentiles.
 Conceptually you can think of this as squishing the sparse bits of the
-data and stretching the dense bits of the data.</p>
-<p>If I split this into 32 buckets, I now have a function that takes a
+data and stretching the dense bits of the data.</p><p>If I split this into 32 buckets, I now have a function that takes a 
 <code>mean_cr</code> and spits out which percentile (really 'per-32-ile') it fits
 into. I dont want you to think of this as percentiles though. I want you
-to think of it as squashing the data into as few integral values as
-possible, while keeping <em>as much information as possible</em>. It's a form
-of <em>compression</em>, <strong><em>that's</em></strong> the intuition!</p>
-<p>Now, we take this function (which, btw is a binary search) and use it to
+to think of it as squashing the data into as few integral values as 
+possible, while keeping _as much information as possible_. It's a form
+of _compression_, <strong>_that's_</strong> the intuition!</p><p>Now, we take this function (which, btw is a binary search) and use it to
 convert each <code>mean_cr</code> into a value from 0 to 31. Then, we encode this
-5-bit number as 5 binary features. That's it... and it <em>works</em>! For
-example, we take a <code>mean_cr=202.45</code>.</p>
-<ol>
-<li>Find which bucket this is in. Let's say it's 19.</li>
-<li>Convert 19 to a 5-bit integer <code>0b10011</code></li>
-<li>The <code>float mean_cr</code> feature is now 5 binary features, so we assign
-the value to each of these.</li>
-</ol>
-<pre><code class="language-c">struct patient_data {
+5-bit number as 5 binary features. That's it... and it _works_! For 
+example, we take a <code>mean_cr=202.45</code>. </p><p>1. Find which bucket this is in. Let's say it's 19.
+2. Convert 19 to a 5-bit integer <code>0b10011</code> 
+3. The <code>float mean_cr</code> feature is now 5 binary features, so we assign
+   the value to each of these.</p><pre lang="c"><code>struct patient_data {
     // ...other fields
     uint1_t mean_cr_0 = 1; 
     uint1_t mean_cr_1 = 1;
@@ -234,54 +244,45 @@ the value to each of these.</li>
     uint1_t mean_cr_3 = 0;
     uint1_t mean_cr_4 = 1;
 }
-</code></pre>
-<h2>Why Does it Work?</h2>
-<p>Here's a graph when I first started adding features to this model. I
+</code></pre><h2>Why Does it Work?</h2><p>
+Here's a graph when I first started adding features to this model. I
 think at this point I just use <code>{ sex, age, recent_cr, median_cr }</code>. I
 train on 7000 datapoints and test on another 7000 datapoints and compute
-an F₃-score.</p>
-<p><img src="image-1.png" alt="A graph showing that performance plateaus after 3 bits of precision" /></p>
-<p>As you can see, 3-5 bits is optimal for this. From tweaking the model,
-as training data increases using 6-7 bits becomes a better choice.</p>
-<p>I peaked at a 0.985 F₃-score, before screwing up some weights right
+an F₃-score. </p><p><img alt="A graph showing that performance plateaus after 3 bits of precision" src="image-1.png"></p><p>As you can see, 3-5 bits is optimal for this. From tweaking the model,
+as training data increases using 6-7 bits becomes a better choice. </p><p>I peaked at a 0.985 F₃-score, before screwing up some weights right
 before the deadline for this coursework (you receive full marks for a
 0.95 F₃-score). This puts me around the middle of the class average.
 Considering though that I don't implement pruning, or take into account
 the dates of the creatinine scores and only use 40 bits of features, the
 fact that I am doing better than random forest models that train for 20x
 longer with some Python framework is genuinely not that bad (I think).
-Anyway, it's more cool that this works <em>at all</em>.</p>
-<p>I think the intuition here is that a 4-bit number representing the
-per-16-ile is acutally a really nice way of representing decisions to
-narrow down a region of a distribution. The first bit says &quot;I am in the
-top or bottom 50%&quot; The second says &quot;I am in the top or bottom 50% of
-<em>this</em> subdistribution&quot;. Etc. Fun.</p>
-<h2>Speed</h2>
-<p>What we should really be comparing this to is the performance of the
+Anyway, it's more cool that this works _at all_.</p><p>I think the intuition here is that a 4-bit number representing the 
+per-16-ile is acutally a really nice way of representing decisions to 
+narrow down a region of a distribution. The first bit says "I am in the
+top or bottom 50%" The second says "I am in the top or bottom 50% of 
+_this_ subdistribution". Etc. Fun. </p><h2>Speed</h2><p>
+What we should really be comparing this to is the performance of the
 <a href="https://www.england.nhs.uk/akiprogramme/aki-algorithm/">NHS algorithm</a>.
 I don't know the exact performance (I need to test it). But roughly, for
 every 1000 people who come have AKI, we send ~200 of them home saying
 they don't have it. With this simple classifier that number gets reduce
-to ~20.</p>
-<p>What's <em>even worse</em> is that the <strong>most complicated version of</strong> the
+to ~20.</p><p>What's _even worse_ is that the <strong>most complicated version of</strong> the
 algorithm I've made could be run in reasonable time in the 1990s on a
-<em>PC CPU</em> when we
-<a href="https://www.taylorfrancis.com/books/mono/10.1201/9781315139470/classification-regression-trees-leo-breiman-jerome-friedman-olshen-charles-stone"><em>knew about decision trees</em></a> already.</p>
-<p>Currently inference (read string data in, parse, produce classification,
+_PC CPU_ when we
+<a href="https://www.taylorfrancis.com/books/mono/10.1201/9781315139470/classification-regression-trees-leo-breiman-jerome-friedman-olshen-charles-stone">_knew about decision trees_</a> already.</p><p>Currently inference (read string data in, parse, produce classification,
 on my laptop [single core, ]) takes ~1.5μs. Even if we assume that the
 Pentium 60 was 1000x slower (which is probably wasn't), that's still in
-the order of milliseconds!</p>
-<p>Training takes 10ms-150ms depending on the size of the random forest and
+the order of milliseconds!</p><p>Training takes 10ms-150ms depending on the size of the random forest and
 the amount of input data. On a Pentium 60, That's 10s to 3 minutes. This
-is <em>totally reasonable numbers</em>!!! This code isn't even particularly
+is _totally reasonable numbers_!!! This code isn't even particularly
 aggressively optimized. Basically, we've had the ability and knowledge
 to diagnose this illness with excellent accuracy for over 30 years and
-we're still not doing it. What the heck.</p>
-<p>Here's a fancy representation of my random forest though.</p>
-<p><img src="image-2.png" alt="A random forest" /></p>
+we're still not doing it. What the heck.</p><p>Here's a fancy representation of my random forest though.</p><p><img alt="A random forest" src="image-2.png">
 
+</p>
+            </div>
         </div>
     </div>
-</div>
+</body>
 
 </html>

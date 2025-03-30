@@ -241,9 +241,9 @@ additional CPUs through a proprietary interconnect. It is natural in
 this design to put CXL.mem devices behind the home agent, as this is the
 same location DDR-attached memory would go.
 
-## CXL 2.0
+<!-- ## CXL 2.0 -->
 
-I bet you're excited for this. That was just CXL 1.0. 
+<!-- I bet you're excited for this. That was just CXL 1.0. 
 
 Multiple hosts may wish to use multiple devices, with some overlap.
 
@@ -270,5 +270,5 @@ virtual bridges as managed by the virtual cxl switches.
 
 However, this virtualization is done by the CXL switch by tracking the
 address maps, which is expensive so we cannot scale more than a single
-layer in CXL 2.0.
+layer in CXL 2.0. -->
 
