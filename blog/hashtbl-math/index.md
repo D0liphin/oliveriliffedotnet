@@ -138,7 +138,7 @@ probes. The graph of that looks like this for $l = 0.75$
 
 ![A graph of 1 - 0.75^x](image-5.png)
 
-The chance of reaching the $i$th probe is just $L^(i - 1)$. There's no
+The chance of reaching the $i$th probe is just $L^{i - 1}$. There's no
 math for that, it's just the opposite of that. Starts at 0.75 and goes 
 down to 0, instead of the other way round.
 
