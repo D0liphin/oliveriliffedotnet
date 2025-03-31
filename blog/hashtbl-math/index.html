@@ -201,7 +201,7 @@ be found <a href="https://github.com/D0liphin/HashTable/blob/master/include/tabl
                 }
         }
 }
-</code></pre><p><img alt="A graph showing that it's just wayyy faster" src="<Operations per second vs std__unordered_map.png>"></p><p>The graph above is in operations performed for every equivalent 
+</code></pre><p><img alt="A graph showing that it's just wayyy faster" src="image-1.png"></p><p>The graph above is in operations performed for every equivalent 
 <code>std::unordered_map</code> operation. The tests are the same as last time.
 Again, <code>insert_2update_randoms</code> performs the worst, but yo ucan see how
 much better the C version is overall!</p><p>This got me thinking about why this version might be so much faster. I
@@ -255,7 +255,7 @@ less than <span class="tex-math">\( i \)</span> steps is the sum of all the chan
 before <span class="tex-math">\( i \)</span>.</p><p><div class="tex-math">\[ \sum_{j=1}^i l^{j - 1} \]</div></p><p>And if we rewrite this with <span class="tex-math">\( i - 1 \)</span> at the top, we can take it as a 
 geometric series and find a closed form of the whole thing, including 
 the chance of a hit bit.</p><p><div class="tex-math">\[ (1 - l)\sum_{j=0}^{i - 1} l^j = (1 - l)\frac{1 - l^i}{1-l} = 1 - l^i \]</div></p><p>This tells us the chance of finding an empty slot after doing <span class="tex-math">\( i \)</span> 
-probes. The graph of that looks like this for <span class="tex-math">\( l = 0.75 \)</span></p><p><img alt="A graph of 1 - 0.75^x" src="image-5.png"></p><p>The chance of reaching the <span class="tex-math">\( i \)</span>th probe is just <span class="tex-math">\( L^(i - 1) \)</span>. There's no
+probes. The graph of that looks like this for <span class="tex-math">\( l = 0.75 \)</span></p><p><img alt="A graph of 1 - 0.75^x" src="image-5.png"></p><p>The chance of reaching the <span class="tex-math">\( i \)</span>th probe is just <span class="tex-math">\( L^{i - 1} \)</span>. There's no
 math for that, it's just the opposite of that. Starts at 0.75 and goes 
 down to 0, instead of the other way round.</p><p>So what's the average <strong>cost</strong> of an insertion? Well, that's the chance
 of getting to probe <span class="tex-math">\( i \)</span> multiplied by the cost of probing <span class="tex-math">\( i \)</span> times...
