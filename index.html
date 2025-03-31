@@ -112,18 +112,6 @@
             position: relative;
         }
 
-        @media (max-width: 500px) {
-            .content-container {
-                border-radius: 0px;
-            }
-        }
-
-        @media (max-width: 500px) {
-            .ferris-the-crab {
-                visibility: hidden;
-            }
-        }
-
         .blog-entry:hover {
             cursor: pointer;
             transition-duration: 100ms;
@@ -136,7 +124,7 @@
         .blog-entry .blog-h {
             display: flex;
             flex-flow: row;
-            align-items: center;
+            align-items: top;
             justify-content: space-between;
             padding: 10px 0 0 0;
             margin-top: 10px;
@@ -151,6 +139,26 @@
         .blog-entry p {
             font-size: 12px;
             margin: 0px;
+        }
+
+        @media (max-width: 500px) {
+            .content-container {
+                border-radius: 0px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .ferris-the-crab {
+                visibility: hidden;
+            }
+
+            .blog-entry .blog-h div {
+                font-size: 12px;
+            }
+
+            .blog-entry .blog-h {
+                flex-flow: column;
+            }
         }
     </style>
 </head>
@@ -203,7 +211,7 @@
                 <a href="./blog/olis-little-guide-to-ruby/index.html" class="blog-entry">
     <div class="blog-h">
         <h4>Oli's Little Guide to Ruby HDL</h4>
-        March  2, 2025
+        <div class="date">March  2, 2025</div>
     </div>
     <p>
         A swift and easy guide to Ruby, an old relational HDL for 
@@ -212,7 +220,7 @@ proving the correctness of circuits.
 </a><a href="./blog/compacting-decision-trees/index.html" class="blog-entry">
     <div class="blog-h">
         <h4>Really Fast Decision Trees</h4>
-        February 10, 2025
+        <div class="date">February 10, 2025</div>
     </div>
     <p>
         I describe my experience making a machine learning classifier
@@ -222,7 +230,7 @@ technique to compress the data.
 </a><a href="./blog/olis-little-guide-to-cxl/index.html" class="blog-entry">
     <div class="blog-h">
         <h4>Oli's Little Guide to CXL</h4>
-        February 10, 2025
+        <div class="date">February 10, 2025</div>
     </div>
     <p>
         How CXL 1.0 and related concepts work.
@@ -230,7 +238,7 @@ technique to compress the data.
 </a><a href="./blog/hashtbl-testing/index.html" class="blog-entry">
     <div class="blog-h">
         <h4>Making a Hashtable: Testing</h4>
-        July 18, 2024
+        <div class="date">July 18, 2024</div>
     </div>
     <p>
         I work through various known hashtable designs, and also a new
@@ -239,7 +247,7 @@ one, hoping to see some performance increase.
 </a><a href="./blog/hashtbl-math/index.html" class="blog-entry">
     <div class="blog-h">
         <h4>Making a Hashtable: Hashtable Math</h4>
-        June 25, 2024
+        <div class="date">June 25, 2024</div>
     </div>
     <p>
         I work through a derivation for the average number of probes in
@@ -248,7 +256,7 @@ a hashtable, then try and verify it through real data.
 </a><a href="./blog/hashtbl/index.html" class="blog-entry">
     <div class="blog-h">
         <h4>Making a Hashtable: SIMD Probing</h4>
-        June 19, 2024
+        <div class="date">June 19, 2024</div>
     </div>
     <p>
         I make a hashtable with SIMD probing for a drag race.
@@ -256,7 +264,7 @@ a hashtable, then try and verify it through real data.
 </a><a href="./blog/enumerate/index.html" class="blog-entry">
     <div class="blog-h">
         <h4>Enumerating Arbitrary Tree Types in Logarithmic Time</h4>
-        June  1, 2024
+        <div class="date">June  1, 2024</div>
     </div>
     <p>
         Some of the work I did for a summer research project with one
@@ -269,7 +277,7 @@ caution.
 </a><a href="./blog/item-scoped-unsafe/index.html" class="blog-entry">
     <div class="blog-h">
         <h4>Item-scoped Unsafe Code</h4>
-        November  9, 2023
+        <div class="date">November  9, 2023</div>
     </div>
     <p>
         I discuss a new idea for safety that I call "item-scoped unsafe

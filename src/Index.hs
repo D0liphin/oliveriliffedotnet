@@ -302,7 +302,7 @@ escapeHtml plaintext = esc' plaintext "" where
 
 tag :: String -> [(String, String)] -> String -> String
 tag t attrs content =
-  "<"
+  "<"  
     ++ t
     ++ attributes attrs
     ++ ">"

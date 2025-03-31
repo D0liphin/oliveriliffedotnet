@@ -112,18 +112,6 @@
             position: relative;
         }
 
-        @media (max-width: 500px) {
-            .content-container {
-                border-radius: 0px;
-            }
-        }
-
-        @media (max-width: 500px) {
-            .ferris-the-crab {
-                visibility: hidden;
-            }
-        }
-
         .blog-entry:hover {
             cursor: pointer;
             transition-duration: 100ms;
@@ -136,7 +124,7 @@
         .blog-entry .blog-h {
             display: flex;
             flex-flow: row;
-            align-items: center;
+            align-items: top;
             justify-content: space-between;
             padding: 10px 0 0 0;
             margin-top: 10px;
@@ -151,6 +139,26 @@
         .blog-entry p {
             font-size: 12px;
             margin: 0px;
+        }
+
+        @media (max-width: 500px) {
+            .content-container {
+                border-radius: 0px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .ferris-the-crab {
+                visibility: hidden;
+            }
+
+            .blog-entry .blog-h div {
+                font-size: 12px;
+            }
+
+            .blog-entry .blog-h {
+                flex-flow: column;
+            }
         }
     </style>
 </head>

@@ -31,7 +31,7 @@ orange :: String -> String
 orange s = "\ESC[1;38;5;208m" ++ s ++ "\ESC[0m"
 
 type IOResult = Either IOError
-
+    
 data FEntry
   = File FilePath ByteString
   | Directory FilePath (Maybe [FEntry])

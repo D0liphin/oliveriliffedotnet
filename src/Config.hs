@@ -23,11 +23,11 @@ data Config = Config
 
 instance Eq Config where
   (==) :: Config -> Config -> Bool
-  (Config { date = d1 }) == (Config {date = d2}) = d1 == d2
+  (Config {date = d1}) == (Config {date = d2}) = d1 == d2
 
 instance Ord Config where
   (<=) :: Config -> Config -> Bool
-  (Config { date = d1 }) <= (Config {date = d2}) = d1 <= d2
+  (Config {date = d1}) <= (Config {date = d2}) = d1 <= d2
 
 data Error
   = EToml String
@@ -120,4 +120,4 @@ parseConfig :: Text -> Result Config
 parseConfig text = do
   toml <- first EToml (Toml.parse text)
   readConfig toml
-
+  
