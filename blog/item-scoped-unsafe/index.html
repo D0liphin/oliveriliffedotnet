@@ -191,13 +191,13 @@ safe operation without first checking preconditions.</p><p>For examlpe "calling 
 unsafe, since you can prove soundness without checking any
 preconditions.</p><pre lang="rust"><code>/// # Safety
 /// always safe
-unsafe fn puts(s: &str) {
-    println!("{}", s);
+unsafe fn puts(s: &amp;str) {
+    println!(&quot{}&quot, s);
 }
 
 // SAFETY: always safe
 unsafe {
-    puts("Hello, world!");
+    puts(&quotHello, world!&quot);
 }
 </code></pre><p>I can prove this program is sound, without checking any preconditions.
 It is always sound to call <code>puts</code>, in any form. Therefore although it is
@@ -211,12 +211,12 @@ _without_ a safety contract, without that being unsound.</p><pre lang="rust"><co
 /// - pointer is non-null
 /// - pointer must be within the bounds of the allocated object
 /// - the object must not have been deallocated (this is different from never having been
-///   allocated. e.g. dereferencing a `NonNull::<ZST>::dangling()` is fine)
+///   allocated. e.g. dereferencing a `NonNull::&ltZST&gt::dangling()` is fine)
 /// -
-unsafe fn deref<T>(*const T) -> T;
+unsafe fn deref&ltT&gt(*const T) -&gt T;
 </code></pre><p>There are ways we could restrict <code>T</code>, such that this operation would be
 valid, but that would be a different operation.</p><p>Basically all compiler intrinsic unsafe functions are "axiomatically
-unsafe". For example, <code>std::intrinsics::offset<Ptr, Delta>(Ptr, Delta)</code>
+unsafe". For example, <code>std::intrinsics::offset&ltPtr, Delta&gt(Ptr, Delta)</code>
 as on operation cannot be defined without a safety contract. However the
 safety contract that rust defines for this operation, is slightly
 different in its scope.</p><pre lang="rust"><code>/// Note: in reality, the type of `Ptr` is enforced by the compiler when we use stabilized 
@@ -229,7 +229,7 @@ different in its scope.</p><pre lang="rust"><code>/// Note: in reality, the type
 ///  undefined behavior: 
 ///  - `Ptr` and `Ptr + Delta` must be within bounds (isize::MAX) 
 ///  - `Ptr + Delta` must not overflow unsafe fn
-fn offset<Ptr, Delta>(Ptr, Delta) -> Ptr;
+fn offset&ltPtr, Delta&gt(Ptr, Delta) -&gt Ptr;
 </code></pre><p><strong>Important-ish note:</strong> I'm actually very much unsure what these docs
 mean. The actual notes in <code>core</code> are</p><blockquote><p> any further use of the returned value will result in undefined behavior
 </p></blockquote><p>So is <code>offset(ptr, usize::MAX)</code> safe? It shouldn't produce a pointer
@@ -240,8 +240,8 @@ works as you would expect.</p><p>So, we can read this as "it's not undefined beh
 value afterwards _is_". This makes it considerably different from the
 previous safety contract. Here, I can prove a call to this function is
 sound, but I might not be able to prove that my whole program is sound
-after this:</p><pre lang="rs"><code>let n: *const i32 = alloc::<i32>();
-if random::<bool>() {
+after this:</p><pre lang="rs"><code>let n: *const i32 = alloc::&lti32&gt();
+if random::&ltbool&gt() {
     // assignment is (probably) unsound actually...
     n = unsafe {
         // sound operation
@@ -259,18 +259,18 @@ of a few exceptions to the rule, that we can provide in a library).</p><h2>What 
 the struct <strong>at all times</strong>, instead of just when they might actually
 cause UB. Basically, trying to make <code>unsafe</code> code really, really simple
 to prove safety.</p><p>That's why all my code has <code># Safety</code> contracts and <code>SAFETY:</code> contract
-clearances at every <code>unsafe</code> call-site (I think).</p><p>It's also why I use <code>len: UnsafeWrite<usize, 0></code>. So that I cannot
+clearances at every <code>unsafe</code> call-site (I think).</p><p>It's also why I use <code>len: UnsafeWrite&ltusize, 0&gt</code>. So that I cannot
 accidentally set the length to an invalid value without using <code>unsafe</code>,
 which reminds me to clear the safety contract i might be violating.</p><p>And why I can't <code>impl Drop</code>, because otherwise a semantically
 simultaneous write (not realy true, but it's good enough) is impossible
 for <code>capacity</code> and <code>buf</code>. E.g. this code would become impossible (I need
 to write both <code>capacity</code> and <code>buf</code> 'at the same time', so that
 <code>LongString</code> is never invalid.</p><pre lang="rust"><code>/// free the buffer of this string, setting the `len` and `capacity` to `0`
-pub fn free(&mut self) {
+pub fn free(&amp;mut self) {
     let capacity = self.capacity();
     *self = unsafe {
         Self {
-            // SAFETY: 0 always satisfies len's invaraints
+            // SAFETY: 0 always satisfies len&aposs invaraints
             len: UnsafeWrite::new(0),
             // SAFETY: the buffer is dangling and the capacity is 0, which is a valid
             // state for LongString
@@ -280,7 +280,7 @@ pub fn free(&mut self) {
                     .own()
                     // SAFETY: capacity is the exact size of the buffer
                     .dealloc(capacity)
-                    .expect("should be the exact capacity"),
+                    .expect(&quotshould be the exact capacity&quot),
             ),
         }
     };

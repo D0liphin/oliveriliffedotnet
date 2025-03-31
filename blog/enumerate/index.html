@@ -188,13 +188,13 @@ rdigits b n = n `mod` b : rdigits b (n `div` b)
 perms ns 0 = 0
 perms ns d = sum $ nodePerms ns d
 
-nodePerms ns d = (perms ns (d - 1) ^) . fst <$> ns
+nodePerms ns d = (perms ns (d - 1) ^) . fst &lt$&gt ns
 
 perm ns d i = n children
   where
     l = reverse $ zip (scanl (+) 0 (nodePerms ns d)) ns
-    (g, (_, n)) = head $ dropWhile ((i <) . fst) l
-    children = perm ns (d - 1) <$> rdigits (perms ns (d - 1)) (i - g)
+    (g, (_, n)) = head $ dropWhile ((i &lt) . fst) l
+    children = perm ns (d - 1) &lt$&gt rdigits (perms ns (d - 1)) (i - g)
 </code></pre><p><code>perm ns d i</code> takes some node constructors <code>ns</code>, a maximum depth <code>d</code> 
 and an integer <code>i</code> and produces the same tree every time. It is 
 guaranteed that for all <code>i</code>, the tree is different or does not exist.</p><h2>Digits</h2><p>This is understood best by example. Take <code>549</code> that we wish to convert
@@ -210,7 +210,7 @@ constructor is a tuple <code>(childCount, constructor)</code>. <code>childCount<
 naturally describes how many children the node has. <code>constructor</code> 
 is a function that takes a list of child nodes and constructs a node 
 with these as children.</p><p>The function <code>perms</code> takes a list of node constructors and a maximum 
-depth and returns the number of possible permutations up to this depth.</p><pre lang="hs"><code>perms :: [(Int, [a] -> a)] -> Int -> Int
+depth and returns the number of possible permutations up to this depth.</p><pre lang="hs"><code>perms :: [(Int, [a] -&gt a)] -&gt Int -&gt Int
 </code></pre><p>To compute it, we consider the number of permutations for a tree rooted
 at node <code>p</code>, <code>∀p ∈ ns</code>. The sum of all these is the result. Of course,
 there are no trees of depth <code>0</code>.</p><pre lang="hs"><code>perms ns 0 = 0
@@ -219,7 +219,7 @@ perms ns d = sum $ nodePerms ns d
 number of permutations of trees rooted at <code>p</code>. Each child can have 
 <code>perms ns (d - 1)</code> children, so the total permutations is 
 <code>perms ns (d - 1) ^ p.childCount</code>. Recall that the child count is the 
-<code>fst</code> element of the tuple.</p><pre lang="hs"><code>nodePerms ns d = (perms ns (d - 1) ^) . fst <$> ns
+<code>fst</code> element of the tuple.</p><pre lang="hs"><code>nodePerms ns d = (perms ns (d - 1) ^) . fst &lt$&gt ns
 </code></pre><p>A fun property here is that for <code>d = 1</code>, we are effectively counting 
 the number of nodes with 0 children, or all the leaf nodes. A previous
 implementation considered leaf and branch nodes differently, but this 
@@ -233,36 +233,36 @@ provided.</p><pre lang="hs"><code>data Reg
     | Seq Reg Reg -- a sequence of two regular expressions
     | Alt Reg Reg -- either of two regular expressions
     | Rep Reg     -- a regular expression, repeated at least 0 times
-</code></pre><p>Consider the alphabet <code>{'a', 'b'}</code>. For trees up to depth 3, we can 
+</code></pre><p>Consider the alphabet <code>{&aposa&apos, &aposb&apos}</code>. For trees up to depth 3, we can 
 generate the number of permutations for trees rooted at each of these 
 nodes. For <code>Eps</code>, this is obviously just <code>1</code>, but the others can grow 
 double-exponentially.</p><pre lang="plaintext"><code>| tree root | # trees with this root |
 |:---------:|:----------------------:|
 |    Eps    |           1            |
-|  Sym 'a'  |           1            |
-|  Sym 'b'  |           1            |
+|  Sym &aposa&apos  |           1            |
+|  Sym &aposb&apos  |           1            |
 |    Rep    |           24           |
 |    Alt    |          576           |
 |    Seq    |          576           |
 </code></pre><p>We could say that tree <code>0</code> starts with <code>Eps</code>, tree <code>1</code> starts with 
-<code>Sym 'a'</code>, tree <code>10</code> starts with <code>Rep</code>, tree <code>700</code> starts with <code>Seq</code>
+<code>Sym &aposa&apos</code>, tree <code>10</code> starts with <code>Rep</code>, tree <code>700</code> starts with <code>Seq</code>
 etc. etc. One can see this is related to the prefix sum. In Haskell,
 this is</p><pre lang="hs"><code>scanl (+) 0 (nodePerms ns d)
 </code></pre><p>The prefix sum for the above case is <code>[0,1,2,3,27,603,1179]</code> Consider we
 take the <code>300</code>ᵗʰ term. This is the <code>300 - 27</code>ᵗʰ term of <code>Alt</code>. We
 acquire the node constructor <code>n</code> and the previous group start index <code>g</code>
 like this</p><pre lang="hs"><code>l = reverse $ scanl (+) 0 (nodePerms ns d) `zip` ns
-(g, (_, n)) = head $ dropWhile ((i <) . fst) l
+(g, (_, n)) = head $ dropWhile ((i &lt) . fst) l
 </code></pre><p>We go in reverse, selecting the first one that is greater than or 
 equal to <code>i</code>. The associated node is zipped with a sheer of one to the
 left, so we also have the correct node constructor. For the above 
-example, <code>l</code> is </p><pre lang=""><code>[(0, Eps), (1, Sym 'a'), (2, Sym 'b'), (3, Rep), (27, Alt), (603, Seq)]
+example, <code>l</code> is </p><pre lang=""><code>[(0, Eps), (1, Sym &aposa&apos), (2, Sym &aposb&apos), (3, Rep), (27, Alt), (603, Seq)]
 </code></pre><p>So, we want the <code>i - g</code>ᵗʰ child of <code>Alt</code>. We can get this by considering
 each child of <code>Alt</code> as a digit in a base-<code>perms ns (d - 1)</code>
 representation of <code>i - g</code>. The intuition for this is that each child has
 <code>perms ns (d - 1)</code> permutations. We use our function from earlier,
 <code>rdigits</code>. This gives an index for the tree of each child, which we can
-map to a concrete permutation.</p><pre lang="hs"><code>children = perm ns (d - 1) <$> rdigits (perms ns (d - 1)) (i - g)
+map to a concrete permutation.</p><pre lang="hs"><code>children = perm ns (d - 1) &lt$&gt rdigits (perms ns (d - 1)) (i - g)
 </code></pre><p>Finally, we construct the node with the node constructor acquired 
 earlier, <code>n</code>.</p><pre lang="hs"><code>perm ns d i = n children
 </code></pre><p>To actually use the code, we have to define our node constructors and 
@@ -275,8 +275,8 @@ whatnot...</p><pre lang="hs "><code>data Tree
 
 ns =
   [ (0, const L1),
-    (2, \(l : r : _) -> B1 l r),
-    (2, \(l : r : _) -> B2 l r)
+    (2, \(l : r : _) -&gt B1 l r),
+    (2, \(l : r : _) -&gt B2 l r)
   ]
 </code></pre><h2>Issues</h2><p>The issue is that the number of permutations of a tree grows
 double-exponentially with the depth. As a result, the algorithm runs in

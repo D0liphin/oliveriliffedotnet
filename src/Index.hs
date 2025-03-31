@@ -286,6 +286,20 @@ attributes :: [(String, String)] -> String
 attributes [] = ""
 attributes ((k, v) : xs) = " " ++ k ++ "=\"" ++ v ++ "\"" ++ attributes xs
 
+escapeHtml :: String -> String
+escapeHtml plaintext = esc' plaintext "" where
+  esc' [] html = reverse html
+  esc' (c:cs) html = esc' cs html'
+    where 
+      pushStr s = reverse s ++ html
+      html' = case c of 
+        '"' -> pushStr "&quot"
+        '\'' -> pushStr "&apos"
+        '&' -> pushStr "&amp;" 
+        '<' -> pushStr "&lt"
+        '>' -> pushStr "&gt"
+        _ -> c : html
+
 tag :: String -> [(String, String)] -> String -> String
 tag t attrs content =
   "<"
@@ -304,8 +318,10 @@ inlinesToHtml :: [Inline] -> String
 inlinesToHtml = concatMap inlineToHtml
 
 inlineToHtml :: Inline -> String
+-- We don't want to escape in this case, to allow the user to write HTML inline
 inlineToHtml (Plaintext str) = str
-inlineToHtml (Code str) = tag "code" [] str
+-- But in the case of code, we do!
+inlineToHtml (Code str) = tag "code" [] (escapeHtml str)
 inlineToHtml (Italic xs) = tag "em" [] (inlinesToHtml xs)
 inlineToHtml (Bold xs) = tag "strong" [] (inlinesToHtml xs)
 inlineToHtml (Image altTxt src) = tag' "img" [("alt", altTxt), ("src", src)]
@@ -323,5 +339,5 @@ blockToHtml (LineBreak n) = concat (replicate n "<br>")
 blockToHtml (Paragraph xs) = tag "p" [] (inlinesToHtml xs)
 blockToHtml (Heading n str) = tag ("h" ++ show (min 6 n)) [] (inlinesToHtml str)
 blockToHtml (CodeBlock lang text) =
-  tag "pre" [("lang", lang)] (tag "code" [] text)
+  tag "pre" [("lang", lang)] (tag "code" [] (escapeHtml text))
 blockToHtml (Quote blocks) = tag "blockquote" [] (blocksToHtml blocks)

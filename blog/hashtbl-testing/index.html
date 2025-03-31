@@ -198,11 +198,11 @@ did was make this exact replica of C++'s <code>std::unordered_map</code>...</p><
         intptr_t _[7];
 } cpp_std_unordered_map;
 </code></pre><p>Perfect! Just kidding. We just use this as a dummy to write the actual
-<code>std::unordered_map<keyint_t, valint_t></code> to. We can also wrap all the 
+<code>std::unordered_map&ltkeyint_t, valint_t&gt</code> to. We can also wrap all the 
 operations of <code>std::unordered_map</code> in C functions so that we can use
 them, something like this:</p><pre lang="cpp"><code>void cpp_std_unordered_map_insert(void *tbl, keyint_t k, valint_t v) 
 {
-    (*(std::unordered_map<keyint_t, valint_t> *)tbl)[k] = v;
+    (*(std::unordered_map&ltkeyint_t, valint_t&gt *)tbl)[k] = v;
 }
 </code></pre><p>Next up, we can just run random operations on both our implementation
 and this at the same time and wait for it to fail. Let's call this
@@ -221,13 +221,13 @@ int main()
 {
         jtable tbl;
         struct astv_array_vtable vtbl = jtable_vtable();
-        vtbl.init(&tbl);
-        vtbl.insert(&tbl, 6, 0);
-        vtbl.insert(&tbl, 0, 1);
-        valint_t *v = vtbl.lookup(&tbl, 0);
+        vtbl.init(&amp;tbl);
+        vtbl.insert(&amp;tbl, 6, 0);
+        vtbl.insert(&amp;tbl, 0, 1);
+        valint_t *v = vtbl.lookup(&amp;tbl, 0);
         assert(v != NULL);
         assert(*v == 1);
-        vtbl.deinit(&tbl);
+        vtbl.deinit(&amp;tbl);
         return 0;
 }
 </code></pre><p>Indeed, I found <strong>seven</strong> _different_ bugs this way! However, my code

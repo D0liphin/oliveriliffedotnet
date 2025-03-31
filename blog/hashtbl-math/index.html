@@ -188,15 +188,14 @@ simple. Below is the lookup code, which encapsulates pretty much all the
 hashtable-specific logic. The full source can be found The full code can
 be found <a href="https://github.com/D0liphin/HashTable/blob/master/include/table.h">here</a>.</p><pre lang="c"><code>struct entry *table_get_slot(table *tbl, key_t k)
 {
-        size_t h = hash(&k, sizeof(key_t));
-        for (size_t i = h % tbl->capacity; true; i = (i + 1) % tbl->capacity) {
-                tbl->nr_probes++;
-                struct entry *e = &tbl->buf[i];
-                if (e->meta == CTRL_EMPTY) {
+        size_t h = hash(&amp;k, sizeof(key_t));
+        for (size_t i = h % tbl-&gtcapacity; true; i = (i + 1) % tbl-&gtcapacity) {
+                struct entry *e = &amp;tbl-&gtbuf[i];
+                if (e-&gtmeta == CTRL_EMPTY) {
                         return e;
-                } else if (e->meta == CTRL_DEL) {
+                } else if (e-&gtmeta == CTRL_DEL) {
                         continue;
-                } else if (e->key == k) {
+                } else if (e-&gtkey == k) {
                         return e;
                 }
         }
@@ -289,17 +288,17 @@ _and_ some code that finds out the probe cost across the hashmap
 allocation's lifetime for a given load-_factor_ <code>L</code>. You can find the
 full source <a href="graphs.c">here</a>. It's pretty simple though, for the first
 case, we just get a number _really_ close to the max capacity and fill
-a map all the way till its full.</p><pre lang="c"><code>for (double l = 0.01; l < 1; l += 0.01) {
+a map all the way till its full.</p><pre lang="c"><code>for (double l = 0.01; l &lt 1; l += 0.01) {
         table tbl;
-        table_init(&tbl, CAPACITY, l);
+        table_init(&amp;tbl, CAPACITY, l);
 
         int nr_insert = (int)((double)CAPACITY * l);
-        for (int n = 0; n < nr_insert; ++n) {
-                table_insert(&tbl, rand(), 0);
+        for (int n = 0; n &lt nr_insert; ++n) {
+                table_insert(&amp;tbl, rand(), 0);
         }
-        printf("(%f,%f),", l, (double)tbl.nr_probes / (double)nr_insert);
+        printf(&quot(%f,%f),&quot, l, (double)tbl.nr_probes / (double)nr_insert);
 
-        table_free(&tbl);
+        table_free(&amp;tbl);
 }
 </code></pre><p>This graph looks like this</p><p><img alt="A graph showing an almost-the-same-but-not-quite graph" src="image-11.png"></p><p>The red, dashed line shows what I calculated the average number of 
 probes to theoretically be and the purple shows what it actually is.
@@ -307,19 +306,19 @@ I'm actually not so bothered about what I can do with this data, I'm
 more bothered that I screwed up the math.</p><p>Next, we have the average cost at a specific load. This one I ran this 
 test at an excessive number of iterations (hoping for a smoother graph)
 but it always remained very jittery</p><pre lang="c"><code>table tbl;
-table_init(&tbl, CAPACITY, 0.99999999);
+table_init(&amp;tbl, CAPACITY, 0.99999999);
 
 int nr_insert = CAPACITY - 1;
-for (int n = 0; n < nr_insert; ++n) {
-        size_t l = (size_t)(table_load(&tbl) * STEPS + 0.5);
+for (int n = 0; n &lt nr_insert; ++n) {
+        size_t l = (size_t)(table_load(&amp;tbl) * STEPS + 0.5);
         size_t old_nr_probes = tbl.nr_probes;
-        table_insert(&tbl, rand(), 0);
+        table_insert(&amp;tbl, rand(), 0);
         size_t nr_probes = tbl.nr_probes - old_nr_probes;
         probes_at[l] =
                 (probes_at[l] * (double)n + (double)nr_probes) / ((double)n + 1);
 }
 
-table_free(&tbl);
+table_free(&amp;tbl);
 </code></pre><p>This test fills a map of 1000 elements millions of times over and
 updates a big map of <code>(l, cost)</code> pairs. This one should behave like
 <code>1 / (1 - x)^2</code>.</p><p><img alt="also not quite right graph" src="image-12.png"></p><p>As you can see, also not quite right. But what's strange here too is 

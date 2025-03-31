@@ -16,7 +16,6 @@ struct entry *table_get_slot(table *tbl, key_t k)
 {
         size_t h = hash(&k, sizeof(key_t));
         for (size_t i = h % tbl->capacity; true; i = (i + 1) % tbl->capacity) {
-                tbl->nr_probes++;
                 struct entry *e = &tbl->buf[i];
                 if (e->meta == CTRL_EMPTY) {
                         return e;

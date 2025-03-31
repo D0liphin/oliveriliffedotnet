@@ -195,7 +195,7 @@ allocation for the lifetime of the table.</p><h2>Memory Layout </h2><p>The singl
  │                │
  └----------------┘
 </code></pre><p>Very innovative. The <code>data</code> section is just an array of <code>Entry</code>s. Where
-an <code>Entry</code> is </p><pre lang="cpp"><code>struct HashTbl<Key, Val>::Entry {
+an <code>Entry</code> is </p><pre lang="cpp"><code>struct HashTbl&ltKey, Val&gt::Entry {
     size_t hash; // precomputed hash
     Key key;
     Val val;
@@ -210,7 +210,7 @@ main buffer. This is obviously inspired by swisstable's SIMD lookup,
 which lots of hashtables use now (e.g. 
 <a href="https://doc.rust-lang.org/std/collections/struct.HashMap.html">`std::collections::HashMap`</a>
 ).</p><h2>Lookup</h2><p>We have one function that does all the heavy lifting here -- 
-<code>get_slot()</code>.</p><pre lang="cpp"><code>bool get_slot(size_t h, Key const &key, Entry *&slot, char *&ctrl_slot)
+<code>get_slot()</code>.</p><pre lang="cpp"><code>bool get_slot(size_t h, Key const &amp;key, Entry *&amp;slot, char *&amp;ctrl_slot)
 </code></pre><p>This function just returns a pointer to the slot where we can put an 
 entry with key <code>key</code>, and tells us if that slot is empty or already
 occupied. From this, we derive both <code>insert()</code> and <code>get()</code>. </p><p>Ctrl bytes are arranged in aligned chunks. These chunks currently are 16
@@ -220,9 +220,9 @@ What's exciting is I made the whole thing generic over a chunk size and
 an underlying generic SIMD vector type... Incoming comparison of 
 different vector sizes. My hardware supports AVX-512, so that should be
 fun.</p><p>The only SIMD instruction we need to understand is 
-<code>simd<vector_t>::movemask_eq</code>.</p><pre lang="cpp"><code>template <typename T> struct simd
+<code>simd&ltvector_t&gt::movemask_eq</code>.</p><pre lang="cpp"><code>template &lttypename T&gt struct simd
 {
-    using movemask_t = typename usimd<T>::movemask_t;
+    using movemask_t = typename usimd&ltT&gt::movemask_t;
 
     /**
      * Construct a mask, where each high bit represents an equality match
@@ -230,25 +230,25 @@ fun.</p><p>The only SIMD instruction we need to understand is
      */
     static movemask_t movemask_eq(T v, char b)
     {
-        T const splat = usimd<T>::splat_i8(b);
-        T const eqmask = usimd<T>::cmpeq_i8(splat, v);
-        return usimd<T>::movemask_i8(eqmask);
+        T const splat = usimd&ltT&gt::splat_i8(b);
+        T const eqmask = usimd&ltT&gt::cmpeq_i8(splat, v);
+        return usimd&ltT&gt::movemask_i8(eqmask);
     }
 };
 </code></pre><p>As the docs above say, we are constructing a bitmask, with 1 bit for 
 each byte in the vector type, where the bit at index <code>mask[i]</code> is <code>1</code> 
 iff the byte at index <code>v[i]</code> is equal to <code>b</code>. E.g. a <code>i8x4</code> vector type
-would map (remember, little-endian)</p><pre lang="plaintext"><code>simd<i8x4>::movemask_eq(0xab12ab34, 0xab) -> 0b0101
+would map (remember, little-endian)</p><pre lang="plaintext"><code>simd&lti8x4&gt::movemask_eq(0xab12ab34, 0xab) -&gt 0b0101
 </code></pre><p>For SSE, this is three instructions and is done as follows:</p><p>1. Splat (broadcast) <code>b</code> to every byte in the vector, to create a new
    vector <code>u</code>.
 2. Do a bytewise equality comparison with <code>u</code> and <code>v</code>. This gets you
   <code>0x00ff00ff</code> for the above example.
 3. Squish this to a bitmask.</p><p>Lookup, conceptually, is very simple then. Once we have the insertion 
 index (<code>hash % size</code>), we find the chunk that's a part of. Then we 
-produce a few masks:</p><pre lang="cpp"><code>ctrlmask_t keep_mask = std::numeric_limits<ctrlmask_t>::max() << ctrlbyte_offset;
-ctrlmask_t hit_mask = movemask_eq(ctrlchunk.as_simd(), h7(h)) & keep_mask;
+produce a few masks:</p><pre lang="cpp"><code>ctrlmask_t keep_mask = std::numeric_limits&ltctrlmask_t&gt::max() &lt&lt ctrlbyte_offset;
+ctrlmask_t hit_mask = movemask_eq(ctrlchunk.as_simd(), h7(h)) &amp; keep_mask;
 ctrlmask_t empty_mask =
-    movemask_eq(ctrlchunk.as_simd(), CtrlChunk::CTRL_EMPTY) & keep_mask;
+    movemask_eq(ctrlchunk.as_simd(), CtrlChunk::CTRL_EMPTY) &amp; keep_mask;
 </code></pre><p>First, to clear any confusion, bit indices start at the 
 _least_-significant bit. The <code>keep_mask</code> is telling us to ignore the 
 first few bits. Index <code>18</code> for example would require us to skip bits 
