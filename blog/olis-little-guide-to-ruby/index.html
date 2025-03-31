@@ -179,12 +179,10 @@
                 </a>
             </div>
             <div class="content-container inverse">
-                <h1>Oli's Little Guide to Ruby</h1><p>
-This is about the 1986 HDL Ruby, made by <a href="https://www.cse.chalmers.se/~ms/">Mary Sheeran</a>.
+                <h1>Oli's Little Guide to Ruby</h1><p>This is about the 1986 HDL Ruby, made by <a href="https://www.cse.chalmers.se/~ms/">Mary Sheeran</a>.
 It's not quite finished, but I think provides a nice swift introduction
 to many of the basic concepts (everything up until registers). If you
-are interested in contributing, please do!</p><h2>Basic Relations</h2><p>
-- Ruby defines blocks with a domain and range.
+are interested in contributing, please do!</p><h2>Basic Relations</h2><p>- Ruby defines blocks with a domain and range.
 - Domain variables are read bottom-to-top, left-to-right and are on the
   left or top of the block.
 - Range variables are read left-to-right, bottom-to-top and are on the
@@ -196,28 +194,20 @@ are interested in contributing, please do!</p><h2>Basic Relations</h2><p>
 new block <code>e == f == g</code>: </p><pre lang=""><code>e = VAR a . a $rel (`f` a).
 </code></pre><p>If we have multiple range/domain variables.</p><p><img alt="As before, but now with two incoming/outgoing arrows on both sides of 
   f" src="image-1.png">
-  
-</p><pre lang=""><code>f = VAR a b . <a, b> $rel <a, b>.
+  </p><pre lang=""><code>f = VAR a b . <a, b> $rel <a, b>.
 </code></pre><p>Or, with computation:</p><pre lang=""><code>f = VAR a b . <a, b> $rel <(`inc` a), (`inc` b)>.
 </code></pre><p>Tuples/lists are defined with angle brackets. </p><p>The left/right sides of <code>$rel</code> can be either inputs or outputs.</p><pre lang=""><code>f = VAR a b . <(`inc` a), b> $rel <a, (`inc` b)>.
 </code></pre><p><img alt="f has a left-incoming wire and a right-outgoing wire, but also two 
   arrows flowing in the other direction, underneath the left-to-right 
-  arrows" src="image-2.png"></p><p>With <code>VAR</code> we declare the inputs, in this case <code>a</code> and <code>b</code>.</p><h2>Running things</h2><p>
-This is dependent on your compiler. You will pass your <code>.rby</code> file into
+  arrows" src="image-2.png"></p><p>With <code>VAR</code> we declare the inputs, in this case <code>a</code> and <code>b</code>.</p><h2>Running things</h2><p>This is dependent on your compiler. You will pass your <code>.rby</code> file into
 a compiler and execute it with another program and some inputs. These 
 are passed to the <code>current</code> block in your program. For me this looks 
 like:</p><pre lang=""><code>rc mycode.rby && re "a b"
-</code></pre><p>You can pass symbols for symbolic execution, or concrete values.</p><h2>One input, lots of input wires</h2><p>
-<code>$wire</code> is a shorthand for <code>$rel</code> without explicit inputs. </p><p>Consider </p><pre lang=""><code>id = a $wire a.
-</code></pre><p>Obviously, <code></code> <code>id</code> 5 <code></code> is just <code>5</code>. But what about <code></code> <code>id</code> <5, 5</p><blockquote><p> <code></code>? 
-</p></blockquote><p>This is `<5, 5</p><blockquote><p>`. Consider a more useful example.
-</p></blockquote><p>
-</p><pre lang=""><code>fork = a $wire <a, a>.
-</code></pre><p><code></code> <code>fork</code> a <code></code> is `<a, a</p><blockquote><p><code>, and </code><code> </code>fork` <a, a</p><blockquote><p> <code></code> is 
-</p></blockquote></blockquote><p>`<<a, a</p><blockquote><p>, <a, a</p><blockquote><blockquote><p>`.
-</p></blockquote></blockquote></blockquote><p>
-</p><h2>Defining Blocks Without <code>$rel</code></h2><p>
-We can sequence (compose) blocks with <code>;</code>. E.g. <code>f ; g</code>. </p><p><img alt="Two blocks labeled f and g are connected in sequence. g is positioned
+</code></pre><p>You can pass symbols for symbolic execution, or concrete values.</p><h2>One input, lots of input wires</h2><p><code>$wire</code> is a shorthand for <code>$rel</code> without explicit inputs. </p><p>Consider </p><pre lang=""><code>id = a $wire a.
+</code></pre><p>Obviously, <code>id 5</code> is just <code>5</code>. But what about <code>id <5, 5></code>? 
+This is <code><5, 5></code>. Consider a more useful example.</p><pre lang=""><code>fork = a $wire <a, a>.
+</code></pre><p><code>fork a</code> is <code><a, a></code>, and <code>fork <a, a></code> is 
+<code><<a, a>, <a, a>></code>.</p><h2>Defining Blocks Without <code>$rel</code></h2><p>We can sequence (compose) blocks with <code>;</code>. E.g. <code>f ; g</code>. </p><p><img alt="Two blocks labeled f and g are connected in sequence. g is positioned
 to the right of f. An incoming arrow from the left enters f. From the
 right of f, an outgoing arrow enters the left-side of g. g has a single
 outgoing arrow to the right." src="image-3.png"></p><p>You can do this lots of times with the same block by raising it to the 
@@ -226,11 +216,10 @@ id blocks from which it is composed" src="image-4.png"></p><p>A more complex exa
 through forked wires. The entire system has two inputs and two outputs,
 one representing the output of the multiplier and one the
 adder." src="image-5.png"></p><p>The 4-input part after the forking is clearly </p><pre lang=""><code><<a, b>, <a, b>> ; [mult, add]
-</code></pre><p>`<<a, b</p><blockquote><p>, <a, b</p><blockquote><blockquote><p><code> is equivalent to </code>fork <a, b</p><blockquote><p>`. Thus the entire 
-</p></blockquote></blockquote></blockquote></blockquote><p>block is representable as</p><pre lang=""><code>f = fork ; [mult, add].
+</code></pre><p><code><<a, b>, <a, b>></code> is equivalent to <code>fork <a, b></code>. Thus the entire 
+block is representable as</p><pre lang=""><code>f = fork ; [mult, add].
 </code></pre><p>Here's another example </p><pre lang=""><code>add3 = [id, add] ; add.
-</code></pre><h2><code>$rel</code> vs block composition</h2><p>
-Think of $rel as a lambda (anonymous) function, but for relations.</p><p>You can use a lambda everywhere where you can use a named function.</p><pre lang=""><code>f = [VAR x. x $rel x, add].
+</code></pre><h2><code>$rel</code> vs block composition</h2><p>Think of $rel as a lambda (anonymous) function, but for relations.</p><p>You can use a lambda everywhere where you can use a named function.</p><pre lang=""><code>f = [VAR x. x $rel x, add].
 </code></pre><p>You can also give a lambda a name, just as we have been doing all along, and
 then refer to it in other parts of the code.</p><pre lang=""><code>id = VAR x. x $rel x.
 f = [id, add].
@@ -244,8 +233,7 @@ follows:</p><pre lang=""><code>f = VAR x y z. <x, <y, z>> $rel <(`id` x), (`add`
 </code></pre><p>We can see that <code>;</code> and <code>[]</code> are really just a nice syntactic sugar for
 composing blocks, without having to explicitly declare input/output variables.</p><p>We can encode sequential composition with <code>$rel</code> using function application
 nesting:</p><pre lang=""><code>fTwice = VAR x. x $rel (`f` (`f` x)).
-</code></pre><h2>More Wiring Patterns</h2><p>
-<code>append m n</code> takes a pair of lists of size <code>m</code> and <code>n</code> respectively and
+</code></pre><h2>More Wiring Patterns</h2><p><code>append m n</code> takes a pair of lists of size <code>m</code> and <code>n</code> respectively and
 concatenates them into a list of size <code>m+n</code>. E.g.</p><pre lang=""><code>append 2 3 <<x0,x1>,<y0,y1,y2>>
 # <x0,x1,y0,y1,y2>
 </code></pre><p><code>apl n</code> takes a pair of singleton, n-length vector and flattens it.
@@ -255,8 +243,7 @@ apr 4 <<x0,x1,x2,x3>,y>
 # <x0,x1,x2,x3,y>
 </code></pre><p><code>zip n</code> is a regular zip function. <code>tran n m</code> extends this to a vector
 transpose. <code>zip n</code> is equivalent to <code>tran 2 n</code>. <code>zip</code> takes 2 n-length
-vectors.</p><h2>Higher-order Functions</h2><p>
-You can pass arguments to your functions. Here's an example</p><pre lang=""><code>fst R = [R, id].
+vectors.</p><h2>Higher-order Functions</h2><p>You can pass arguments to your functions. Here's an example</p><pre lang=""><code>fst R = [R, id].
 </code></pre><p><code>R</code> is a block, so is <code>id</code>. Thus <code>fst R</code> is a 2-input, 2-output block.
 A flipped version, <code>snd</code> also exists. We could therefore define <code>add3</code>
 like so:</p><pre lang=""><code>add3 = fst add ; add.
@@ -265,13 +252,11 @@ We'll learn how to write it ourselves later.</p><pre lang=""><code>squared n = m
 current = squared 3.
 </code></pre><pre lang="sh"><code>$ re "1 2 3"
     0 - <1,2,3> ~ <1,4,9>
-</code></pre><h2>Converse</h2><p>
-The converse of a component is defined in the prelude. We write the 
+</code></pre><h2>Converse</h2><p>The converse of a component is defined in the prelude. We write the 
 converse of <code>R</code> as <code>R^~1</code>. </p><p><img alt="A diagramatic representation of the converse function" src="image-7.png"></p><pre lang=""><code>R^~1 = x $wire <a, a, x> ; [id, R, id] ; <b, y, y> $wire b.
 </code></pre><p><code>pi1</code> and <code>pi2</code> are common selection operators.</p><pre lang=""><code>pi1 = <a, b> $wire a.
 pi2 = <a, b> $wire b.
-</code></pre><p>They are also frequently inverted. </p><h3>Conjugate</h3><p>
-A converse is not an inverse. It is just swapping the direction of the
+</code></pre><p>They are also frequently inverted. </p><h3>Conjugate</h3><p>A converse is not an inverse. It is just swapping the direction of the
 wires. This might mean that <code>R^~1</code> is an inverse function (as in the 
 case of <code>id</code>, or <code>fork</code>).</p><p><code>Q^~1 ; R ; Q</code> is a common enough pattern that we shorthand it with 
 <code>R \ Q</code>. This is called the conjugate. You might want to do this to 
@@ -280,8 +265,7 @@ map between types and back again. </p><p><code>P \ (Q ; R)</code> is <code>(P \ 
 a box with two inputs <code>[R1, [R2, [R3, [...]]]]</code>. Recall that  <code>apl n</code> 
 looks like this</p><pre lang=""><code><a,<x1,..,xn>> (apl n) <a,x1,..,xn>
 </code></pre><p>So this nested map conjugated by <code>apl</code> will first translate the flat 
-vector input into a nested from, and then undo that translation.</p><h2>Constants </h2><p>
-Ruby has constant values. For example, if we wish to ignore the input
+vector input into a nested from, and then undo that translation.</p><h2>Constants </h2><p>Ruby has constant values. For example, if we wish to ignore the input
 to a block and output a constant instead.</p><pre lang=""><code>fourtytwo = VAR x . x $rel 42.
 </code></pre><p>A constant is also a component that has a an output on the range and the
 domain.</p><p><img alt="A block with '42' inside has an outgoing arrow on both its left and
@@ -291,26 +275,19 @@ input does not make sense in Ruby.</p><pre lang=""><code>splitIgnore x = VAR a .
 const x = pi2^~1 ; splitIgnore x.
 </code></pre><p>Diagrams just show what circuit things represent. In this case, the 
 diagram is not a circuit you would ever build.</p><p><img alt="A diagramatic representation of const 42, with internal 
-components" src="image-8.png"></p><h2>Types</h2><p>
-Ruby has <code>uint</code>s, <code>int</code> and <code>sreal</code>s. It also has tuples like 
-`<int, uint, <int, sreal</p><blockquote><blockquote><p><code> or </code><int, int, int</p><blockquote><p><code> which is just </code><int</p><blockquote><p>₃`.
-</p></blockquote></blockquote></blockquote></blockquote><p>It also has bits.</p><p>Ruby is typechecked at runtime and compile time in the Rebecca 
-simulator.</p><h2>Grid Components</h2><p>
-It can be useful to arrange components in a grid, like this:</p><p>DIAGRAM</p><p>For these kind of arrangements, all blocks have two inputs and two
-outputs, so they look like `<a, b</p><blockquote><p> R <c, d</p><blockquote><p>`.
-</p></blockquote></blockquote><p>
-we have new combinators. `<-</p><blockquote><p>` (beside) connects things next to each
-</p></blockquote><p>other. Thus we have a type like `<a, <b, c</p><blockquote><blockquote><p> (Q <-</p><blockquote><p> R) <<p, q</p><blockquote><p>, r</p><blockquote><p>`.
-</p></blockquote></blockquote></blockquote></blockquote></blockquote><p>
-DIAGRAM</p><p>`<|</p><blockquote><p><code> is 'below'. </code>(Q^~1 <-</p><blockquote><p> R^~1)^~1<code> is equivalent to </code>Q <|</p><blockquote><p> R`. 
-</p></blockquote></blockquote></blockquote><p>If you work through that equivalence you will see that it means 'place
+components" src="image-8.png"></p><h2>Types</h2><p>Ruby has <code>uint</code>s, <code>int</code> and <code>sreal</code>s. It also has tuples like 
+<code><int, uint, <int, sreal>></code> or <code><int, int, int></code> which is just <code><int>₃</code>.
+It also has bits.</p><p>Ruby is typechecked at runtime and compile time in the Rebecca 
+simulator.</p><h2>Grid Components</h2><p>It can be useful to arrange components in a grid, like this:</p><p>DIAGRAM</p><p>For these kind of arrangements, all blocks have two inputs and two
+outputs, so they look like <code><a, b> R <c, d></code>.</p><p>we have new combinators. <code><-></code> (beside) connects things next to each
+other. Thus we have a type like <code><a, <b, c>> (Q <-> R) <<p, q>, r></code>.</p><p>DIAGRAM</p><p><code><|></code> is 'below'. <code>(Q^~1 <-> R^~1)^~1</code> is equivalent to <code>Q <|> R</code>. 
+If you work through that equivalence you will see that it means 'place
 <code>Q</code> below <code>R</code>'. <code>row n</code> and <code>col n</code> are the repeated versions of these 
 combinators.</p><p>It is common to convert a chain component into a grid component. We
 can do this with <code>pi1 ; R ; pi2~1</code>. This looks like this:</p><p>DIAGRAM</p><p>The transposed conjugate <code>\\</code> is a special conjugate operator for grid
 components. It is <code>R \\ [P, Q]</code>.</p><pre lang=""><code>R \\ [S, T] = [T^~1, S^~1] ; R ; [S, T]
 </code></pre><p>Essentially this has the conjugate flowing down on <code>S</code> and left-to-right
-on <code>T</code>.</p><h3>Reduce</h3><p>
-<code>rdr n</code> is "reduce-right". Here is the definition. It is hard to 
+on <code>T</code>.</p><h3>Reduce</h3><p><code>rdr n</code> is "reduce-right". Here is the definition. It is hard to 
 understand right away, so just keep reading and I'll get back to it
 later.</p><pre lang=""><code>rdr n R = col n (R ; pi1^~1) ; pi1.
 </code></pre><p>It is useful to recall what this operation means in a functional 
@@ -331,15 +308,15 @@ whereas the <code>foldl</code> version never terminates.</p><p>Anyway, this does
 no wires coming out of it.</p><p>Let's return to the definition of <code>rdr</code>. It's supposed to make something
 that looks like the diagram we made for a fold. It's useful to also 
 wonder a bit about how the definition expands, so that we can better
-understand some of the tricks used in making complex combinators.</p><p><code>R ; pi1^~1</code> turns a component `<a, b</p><blockquote><p> R b` into a grid component. We'll
-</p></blockquote><p>call this <code>R'</code>. Then, we arrange these components in a column. Note that
+understand some of the tricks used in making complex combinators.</p><p><code>R ; pi1^~1</code> turns a component <code><a, b> R b</code> into a grid component. We'll
+call this <code>R'</code>. Then, we arrange these components in a column. Note that
 this column arrangement still has type
-`<X, Y</p><blockquote><p> (col n (R ; pi1^~1)) <Y, Z</p><blockquote><p><code>. The </code>X<code> and </code>Z` here are tuples of
-</p></blockquote></blockquote><p>size <code>n</code>. This component is the one with the dark grey background on
+<code><X, Y> (col n (R ; pi1^~1)) <Y, Z></code>. The <code>X</code> and <code>Z</code> here are tuples of
+size <code>n</code>. This component is the one with the dark grey background on
 the right circuit in the diagram below. </p><p>All the wires on the right are useless, so we ignore them with <code>pi1</code>. </p><p><img alt="TODO" src="image-10.png"></p><h2>Registers </h2><p><!-- 
 btree 1 R = R 
-btree (n+1) R = half m ; [btree n R, btree n R] ; R, m = 2^n</p><br><p> --</p><blockquote><p>
-</p></blockquote><p>’
+btree (n+1) R = half m ; [btree n R, btree n R] ; R, m = 2^n</p><p> -->
+’
 </p>
             </div>
         </div>

@@ -179,16 +179,13 @@
                 </a>
             </div>
             <div class="content-container inverse">
-                <h1>Yet Another Hashtable</h1><p>
-This article details how my hashtable implementation evolves over time.
+                <h1>Yet Another Hashtable</h1><p>This article details how my hashtable implementation evolves over time.
 First, I will detail my high-level logic and version 0.1.0. Hopefully
 things will get a lot faster over time.</p><p>The hashtable is being built as part of a hashtable drag-race. The
 participants are <code>std::unordered_map</code>, FFHT (by 
-<a href="https://www.rubensystems.com">this guy</a>) and me. Mine is just called <code>HashTbl</code>.</p><h2>High-level Design</h2><p>
-My table is a probing table, 0.1.0 currently does linear probing. 
+<a href="https://www.rubensystems.com">this guy</a>) and me. Mine is just called <code>HashTbl</code>.</p><h2>High-level Design</h2><p>My table is a probing table, 0.1.0 currently does linear probing. 
 Entries are stored as <code>(key, value)</code> pairs in a big pool, with only one 
-allocation for the lifetime of the table.</p><h2>Memory Layout </h2><p>
-The single allocation is laid out like this:</p><pre lang="plaintext"><code> ┌----------------┐
+allocation for the lifetime of the table.</p><h2>Memory Layout </h2><p>The single allocation is laid out like this:</p><pre lang="plaintext"><code> ┌----------------┐
  │                │
  │    metadata    │
  │                │
@@ -212,8 +209,7 @@ so that we can quickly check if we should even bother looking in the
 main buffer. This is obviously inspired by swisstable's SIMD lookup,
 which lots of hashtables use now (e.g. 
 <a href="https://doc.rust-lang.org/std/collections/struct.HashMap.html">`std::collections::HashMap`</a>
-).</p><h2>Lookup</h2><p>
-We have one function that does all the heavy lifting here -- 
+).</p><h2>Lookup</h2><p>We have one function that does all the heavy lifting here -- 
 <code>get_slot()</code>.</p><pre lang="cpp"><code>bool get_slot(size_t h, Key const &key, Entry *&slot, char *&ctrl_slot)
 </code></pre><p>This function just returns a pointer to the slot where we can put an 
 entry with key <code>key</code>, and tells us if that slot is empty or already
@@ -224,9 +220,7 @@ What's exciting is I made the whole thing generic over a chunk size and
 an underlying generic SIMD vector type... Incoming comparison of 
 different vector sizes. My hardware supports AVX-512, so that should be
 fun.</p><p>The only SIMD instruction we need to understand is 
-`simd<vector_t</p><blockquote><p>::movemask_eq`.
-</p></blockquote><p>
-</p><pre lang="cpp"><code>template <typename T> struct simd
+<code>simd<vector_t>::movemask_eq</code>.</p><pre lang="cpp"><code>template <typename T> struct simd
 {
     using movemask_t = typename usimd<T>::movemask_t;
 
@@ -269,8 +263,7 @@ main <code>Entry[]</code> buffer and test full equality on the key. A type trait
 added for how key equality should be computed, either first test the
 hash then the full key, or just test the keys right away. For a
 <code>std::string</code>, you could be better off testing the hash first, but
-again, I'd need to do some benchmarks to find out.</p><h2>So how fast is it?</h2><p>
-Not very. But, I think we can get this much, much faster. The next
+again, I'd need to do some benchmarks to find out.</p><h2>So how fast is it?</h2><p>Not very. But, I think we can get this much, much faster. The next
 article will hopefully detail how I do that.</p><p><img alt="Graph of benchmarks" src="./hashtbl-v0.0.1-bms.png"></p><p>The graph shows a variety of different benchmarks (could do an 
 interactive one, but I want to keep my website simple HTML). The Y-axis
 shows the number of operations we do for every 1 operation 

@@ -191,7 +191,7 @@ configToHtml :: String -> Config -> String
 configToHtml path (Config {date, description, title}) =
   ( findAndReplace "TITLE" title
       . findAndReplace "DATE" (formatDate date)
-      . findAndReplace "LINK" path
+      . findAndReplace "LINK" (path `combine` "index.html")
       . findAndReplace "DESCRIPTION" description
   )
     configHtmlT

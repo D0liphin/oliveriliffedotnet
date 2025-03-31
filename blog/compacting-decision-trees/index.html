@@ -179,11 +179,9 @@
                 </a>
             </div>
             <div class="content-container inverse">
-                <h1>Compacting Decision Trees</h1><p>
-Recently, I was making a classifier for acute kidney injury (AKI). I
+                <h1>Compacting Decision Trees</h1><p>Recently, I was making a classifier for acute kidney injury (AKI). I
 have a dataset of around 14,000 entries, each representing a patient. I
-have their age, sex and between 0 and 45 timestamped creatinine samples.</p><h2>Background</h2><p>
-If you don't know, a 'decision tree' is a learned function that takes
+have their age, sex and between 0 and 45 timestamped creatinine samples.</p><h2>Background</h2><p>If you don't know, a 'decision tree' is a learned function that takes
 the form of a flow chart. The questions on the flow chart ask me
 something about the patient "is the patient older than 65?". If yes, I
 might go down one path, if no, I'll go down another. It's my job to
@@ -210,8 +208,7 @@ we reach some terminating condition.</p><p>The trickiest part of this is "what q
 data is already a list of <strong>binary features</strong> (e.g. "male/female" for
 sex), it's easy just say "is this patient male?". The hard part comes
 when you need to ask questions about real numbers, like creatinine test
-results.</p><h2>Deciding Features</h2><p>
-What if I told you that I can get good performance by turning my real
+results.</p><h2>Deciding Features</h2><p>What if I told you that I can get good performance by turning my real
 numbers into around <strong>four</strong> binary features? This _vastly_ simplifies
 decision tree construction, _hugely_ compacts the data and is generally
 just cool. For example our patient data can be packed into around 16 
@@ -244,8 +241,7 @@ example, we take a <code>mean_cr=202.45</code>. </p><p>1. Find which bucket this
     uint1_t mean_cr_3 = 0;
     uint1_t mean_cr_4 = 1;
 }
-</code></pre><h2>Why Does it Work?</h2><p>
-Here's a graph when I first started adding features to this model. I
+</code></pre><h2>Why Does it Work?</h2><p>Here's a graph when I first started adding features to this model. I
 think at this point I just use <code>{ sex, age, recent_cr, median_cr }</code>. I
 train on 7000 datapoints and test on another 7000 datapoints and compute
 an F₃-score. </p><p><img alt="A graph showing that performance plateaus after 3 bits of precision" src="image-1.png"></p><p>As you can see, 3-5 bits is optimal for this. From tweaking the model,
@@ -260,8 +256,7 @@ Anyway, it's more cool that this works _at all_.</p><p>I think the intuition her
 per-16-ile is acutally a really nice way of representing decisions to 
 narrow down a region of a distribution. The first bit says "I am in the
 top or bottom 50%" The second says "I am in the top or bottom 50% of 
-_this_ subdistribution". Etc. Fun. </p><h2>Speed</h2><p>
-What we should really be comparing this to is the performance of the
+_this_ subdistribution". Etc. Fun. </p><h2>Speed</h2><p>What we should really be comparing this to is the performance of the
 <a href="https://www.england.nhs.uk/akiprogramme/aki-algorithm/">NHS algorithm</a>.
 I don't know the exact performance (I need to test it). But roughly, for
 every 1000 people who come have AKI, we send ~200 of them home saying
@@ -277,9 +272,7 @@ the amount of input data. On a Pentium 60, That's 10s to 3 minutes. This
 is _totally reasonable numbers_!!! This code isn't even particularly
 aggressively optimized. Basically, we've had the ability and knowledge
 to diagnose this illness with excellent accuracy for over 30 years and
-we're still not doing it. What the heck.</p><p>Here's a fancy representation of my random forest though.</p><p><img alt="A random forest" src="image-2.png">
-
-</p>
+we're still not doing it. What the heck.</p><p>Here's a fancy representation of my random forest though.</p><p><img alt="A random forest" src="image-2.png"></p>
             </div>
         </div>
     </div>

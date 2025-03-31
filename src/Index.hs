@@ -188,7 +188,7 @@ parseInline = multiple
         [ pmap (: []) fallible,
           -- get some plaintext up until we find a new 'fallible'
           pmap (\(a, b) -> [plaintext a, b]) (utl fallible),
-          -- backup, get everything up until linebreak
+          -- backup, get everything
           Just . ([],) . (: []) . plaintext
         ]
     -- we could prove that this never fails...
@@ -210,7 +210,6 @@ parseLineBreak input = do
   let eof = exactly [Eof]
   let nl = exactly [Newline]
   (input', brs) <- alt [rep nl `thn1` opt eof, pmap (: []) eof] input
-  _ <- if length brs > 1 then Just () else Nothing
   return (input', LineBreak (length brs - 2))
 
 parseHeading :: Parser Token Block
@@ -252,7 +251,12 @@ parseBlocks =
           pmap (: []) parseQuote
         ]
     makeP input = Paragraph (snd (parseInline input))
-    parseParagraph = pmap (\(para, blocks) -> makeP para : blocks) (utl special)
+    parseParagraph =
+      pmap
+        (\(para, blocks) -> makeP para : blocks)
+        -- Once we've started a paragraph, we should keep going until we hit at
+        -- least a newline
+        (utl $ exactly [Newline] `thn2` special)
     fallback input = Just ([], [makeP input])
 
 parseMarkdown :: String -> Maybe [Block]
@@ -285,7 +289,7 @@ attributes ((k, v) : xs) = " " ++ k ++ "=\"" ++ v ++ "\"" ++ attributes xs
 tag :: String -> [(String, String)] -> String -> String
 tag t attrs content =
   "<"
-    ++ t  
+    ++ t
     ++ attributes attrs
     ++ ">"
     ++ content

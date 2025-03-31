@@ -88,14 +88,14 @@ Consider
 id = a $wire a.
 ```
 
-Obviously, `` `id` 5 `` is just `5`. But what about `` `id` <5, 5> ``? 
+Obviously, `id 5` is just `5`. But what about `id <5, 5>`? 
 This is `<5, 5>`. Consider a more useful example.
 
 ```
 fork = a $wire <a, a>.
 ```
 
-`` `fork` a `` is `<a, a>`, and `` `fork` <a, a> `` is 
+`fork a` is `<a, a>`, and `fork <a, a>` is 
 `<<a, a>, <a, a>>`.
 
 ## Defining Blocks Without `$rel`

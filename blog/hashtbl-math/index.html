@@ -179,8 +179,7 @@
                 </a>
             </div>
             <div class="content-container inverse">
-                <h1>Hashtable Math </h1><p>
-As is evident from the <a href="/blog/hashtbl.html">previous article</a>, I am
+                <h1>Hashtable Math </h1><p>As is evident from the <a href="/blog/hashtbl.html">previous article</a>, I am
 currently building a hash table. I made my hash table rather fancy and 
 used lots of SIMD instructions. The thing is, this hashtable ended up
 not being very fast at all. In fact, I made an incredible simple C 
@@ -202,9 +201,7 @@ be found <a href="https://github.com/D0liphin/HashTable/blob/master/include/tabl
                 }
         }
 }
-</code></pre><p>![A graph showing that it's just wayyy faster](<Operations per second vs std__unordered_map.png</p><blockquote><p>)
-</p></blockquote><p>
-The graph above is in operations performed for every equivalent 
+</code></pre><p><img alt="A graph showing that it's just wayyy faster" src="<Operations per second vs std__unordered_map.png>"></p><p>The graph above is in operations performed for every equivalent 
 <code>std::unordered_map</code> operation. The tests are the same as last time.
 Again, <code>insert_2update_randoms</code> performs the worst, but yo ucan see how
 much better the C version is overall!</p><p>This got me thinking about why this version might be so much faster. I
@@ -217,8 +214,7 @@ fill up the instruction buffer so OOO hardware can prefetch more clevery
 if it ever needs to. But I think more importantly than something like
 that, we just do _less compute_ than the original version since we
 hardly ever probe anyway. If we do less than 3 probes 99% of the time,
-we may as well use a <code>uint8x4</code> instead of a <code>uint8x16</code>!</p><h2>Working out the average number of hashtable collisions</h2><p>
-I've always wanted to do this math. So I finally sat down and worked it
+we may as well use a <code>uint8x4</code> instead of a <code>uint8x16</code>!</p><h2>Working out the average number of hashtable collisions</h2><p>I've always wanted to do this math. So I finally sat down and worked it
 all out. It could be all wrong, but I looked it up and I got the right
 answer. Email me if it's wrong! Disclaimer, I wrote this really late at
 night and I'm pretty sure I made a mistake about halfway through and 
@@ -270,7 +266,7 @@ has been differentiated! So we can find <span class="tex-math">\( \frac{d}{dL} \
 series, and this is going to be our summation closed form!</p><p><div class="tex-math">\[ \frac{d}{dL}L^0 + L^1 + L^2 + L^3 + \ldots + L^{x + 1} \]</div>
 <div class="tex-math">\[ = \cancel{0L^{-1}} + 1L^0 + 2L^1 + 3L^2 + \ldots (x + 1)L^x \]</div>
 <div class="tex-math">\[ \sum_{i = 1}^x iL ^i = \frac{d}{dL} \frac{1 - L^{x + 1}}{1 - L} \]</div>
-<div class="tex-math">\[ \frac{d}{dL}\frac{1 - L^{x + 1}}{1 - L} = \frac{xL^x - xL^{x + 1} + L^x - 1}{(1 - L)^2} \]</div></p><br><p>This is for reaching only up to the <span class="tex-math">\( x \)</span>th probe though. For us, we want 
+<div class="tex-math">\[ \frac{d}{dL}\frac{1 - L^{x + 1}}{1 - L} = \frac{xL^x - xL^{x + 1} + L^x - 1}{(1 - L)^2} \]</div></p><p>This is for reaching only up to the <span class="tex-math">\( x \)</span>th probe though. For us, we want 
 to consider the entire space all the way up to infinity. Taking the 
 limit of <span class="tex-math">\( x \)</span> to infinity gives us </p><p><div class="tex-math">\[ \lim_{x \rightarrow \infty} - \frac{xL^x - xL^{x + 1} + L^x - 1}{(1 - L)^2} = \frac{1}{(1 - L)^2} \]</div></p><p>Tada! ✨ That's the cost of an insertion at <code>L</code> load. (I know I said <code>l</code>
 would be the load, oops). I have to remember to go back and clean up 
@@ -279,8 +275,7 @@ me, you don't need to do that previous summation, just the one above.
 Anyway.</p><p>Finally, as I said before, we are considering the average cost for all
 insertions to our map in the range <code>0..L</code>. So we should take the average
 insertion cost over the allocations lifetime. This is just the integral
-over <code>L</code>.</p><p><div class="tex-math">\[ \frac{\int_0^L \frac{1}{(1 - x)^2}} dx{L} = \frac{1}{1 - L} \]</div></p><h2>It doesn't work though! 😔</h2><p>
-So that's all well and good. And I looked it up and <a href="https://stackoverflow.com/questions/61494530/relation-between-the-load-factor-and-time-complexity-in-hash-tables">this stack 
+over <code>L</code>.</p><p><div class="tex-math">\[ \frac{\int_0^L \frac{1}{(1 - x)^2}} dx{L} = \frac{1}{1 - L} \]</div></p><h2>It doesn't work though! 😔</h2><p>So that's all well and good. And I looked it up and <a href="https://stackoverflow.com/questions/61494530/relation-between-the-load-factor-and-time-complexity-in-hash-tables">this stack 
 overflow post</a>
 tells me I'm right. I was really happy about this (even though it looks
 like my math will need an errata soon). The thing is, that's not how 
@@ -330,8 +325,7 @@ updates a big map of <code>(l, cost)</code> pairs. This one should behave like
 <code>1 / (1 - x)^2</code>.</p><p><img alt="also not quite right graph" src="image-12.png"></p><p>As you can see, also not quite right. But what's strange here too is 
 that even though this is the average over something like 100 million 
 updates, the line is still very jittery. I really have no idea what's 
-causing this, because it's not _reproducable_ jitter.</p><h2>So what's next?</h2><p>
-Well, a few things. There are lots of questions yet to be answered</p><p>1. Why do the theoretical results not match up... _at all_?
+causing this, because it's not _reproducable_ jitter.</p><h2>So what's next?</h2><p>Well, a few things. There are lots of questions yet to be answered</p><p>1. Why do the theoretical results not match up... _at all_?
 2. Does the probing method affect the practically obtained results?
 3. Why is the graph of load vs probe count so jittery?
 4. How can we use all this data to make a faster hashtable?</p><p>I hope to answer all these questions soon! I suspect this series is not

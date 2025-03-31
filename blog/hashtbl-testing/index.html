@@ -179,16 +179,14 @@
                 </a>
             </div>
             <div class="content-container inverse">
-                <h1>A New Idea For Reducing Probe-lengths...</h1><p>
-Recently, I've upgraded the hashtable project significantly. Firstly, I
+                <h1>A New Idea For Reducing Probe-lengths...</h1><p>Recently, I've upgraded the hashtable project significantly. Firstly, I
 am now referring to them as "associative arrays", which sounds far more
 fancy and academic. But more importantly, I have created a proper 
 framework that we can use to program our hashtables against. It includes
 a basic benchmark suite and an extensive suite of tests which can 
 generate counter examples. I used all these tools to program a new 
 table, which isn't very good (but failed research is still useful).</p><p><a href="https://github.com/D0liphin/AssociativeArrays">Here is a link</a> to the 
-repository. </p><h2>Testing </h2><p>
-The whole framework is built around one vtable struct, called
+repository. </p><h2>Testing </h2><p>The whole framework is built around one vtable struct, called
 <code>astv_array_vtable</code>. It contains five function pointers, <code>init()</code> and
 <code>deinit()</code> then <code>insert(k, v)</code>, <code>remove(k)</code> and <code>lookup(k)</code>. Sort of
 exactly what you would expect. Some other operations that I didn't
@@ -200,8 +198,8 @@ did was make this exact replica of C++'s <code>std::unordered_map</code>...</p><
         intptr_t _[7];
 } cpp_std_unordered_map;
 </code></pre><p>Perfect! Just kidding. We just use this as a dummy to write the actual
-`std::unordered_map<keyint_t, valint_t</p><blockquote><p>` to. We can also wrap all the 
-</p></blockquote><p>operations of <code>std::unordered_map</code> in C functions so that we can use
+<code>std::unordered_map<keyint_t, valint_t></code> to. We can also wrap all the 
+operations of <code>std::unordered_map</code> in C functions so that we can use
 them, something like this:</p><pre lang="cpp"><code>void cpp_std_unordered_map_insert(void *tbl, keyint_t k, valint_t v) 
 {
     (*(std::unordered_map<keyint_t, valint_t> *)tbl)[k] = v;
@@ -239,8 +237,7 @@ counter examples for different sequence lengths and with much larger
 possible keys (up to <code>32</code>). This approach generated another seven 
 counter examples. The last one only came up after 300-million tests!</p><p>Finally, I was confident that my table was working. At the same time 
 though, I am now totally convinced that I have almost never written
-correct software before this. </p><h2>Benchmarking</h2><p>
-Benchmarking is done with Google's benchmark library and then I plot 
+correct software before this. </p><h2>Benchmarking</h2><p>Benchmarking is done with Google's benchmark library and then I plot 
 things with <code>plotly</code>. Exactly what kind of benchmarks one should use for
 this sort of thing is a little tricky. In the end, I decided on four 
 options that are supposed to give you some kind of 'holistic' idea 
@@ -257,8 +254,7 @@ of usage</p><p>- <code>insert_2update_randoms</code>
 - <code>insert_remove_alt</code>
   - insert <code>N / 2</code> randoms in range <code>[0, N)</code>
   - remove <code>N / 2</code> randoms in range <code>[0, N)</code>
-  - repeat 8 times</p><h2><code>jtable</code></h2><p>
-<code>jtable</code> is a table that aims to benefit from some level of 
+  - repeat 8 times</p><h2><code>jtable</code></h2><p><code>jtable</code> is a table that aims to benefit from some level of 
 cache-locality that is provided by linear-probing lookup, but with
 the consistency of a chaining approach. It's a failed idea, at least 
 in its current form. Failed research is stil research though, especially
@@ -279,8 +275,7 @@ slot <code>i + 1</code> is not occupied is still just the load of the table.</p>
  the table that is occupied. The 'load-factor' (uppercase <code>L</code>) is the 
  percentage of the table that needs to be occupied for us to reallocate
  and rehash everything.
-</p></blockquote><p>
-However, this is just not true! Let's say I have 8 slots in my buffer.
+</p></blockquote><p>However, this is just not true! Let's say I have 8 slots in my buffer.
 They all start off empty, so whichever one I fill (considering a totally
 random hash function) is random. So let's go ahead and fill in slot <code>2</code>.</p><p><img alt="a flat buffer with the 3rd slot occupied" src="image-9.png"></p><p>A subsequent insert will select an index in the range <code>[0, 8)</code> at 
 random. However, slot <code>2</code> is occupied now. And if we choose slot <code>2</code>,
