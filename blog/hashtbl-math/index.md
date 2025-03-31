@@ -29,7 +29,7 @@ struct entry *table_get_slot(table *tbl, key_t k)
 }
 ```
 
-![A graph showing that it's just wayyy faster](<Operations per second vs std__unordered_map.png>)
+![A graph showing that it's just wayyy faster](image-1.png)
 
 The graph above is in operations performed for every equivalent 
 `std::unordered_map` operation. The tests are the same as last time.
