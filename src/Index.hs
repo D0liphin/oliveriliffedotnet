@@ -1,8 +1,8 @@
 module Index where
 
-import Data.Bifunctor (second)
+import Data.Bifunctor (Bifunctor (first), second)
 import Data.List (isPrefixOf)
-import Data.Maybe (fromJust)
+import Data.Maybe (fromJust, fromMaybe)
 
 --------------------------------------------------------------------------------
 
@@ -98,6 +98,11 @@ findAndReplace find replace = f []
           f (reverse replace ++ str') (drop (length find) cs)
       | otherwise = f (c : str') ct
 
+eth :: Parser a b -> Parser a c -> Parser a (Either b c)
+eth pl pr input = case pmap Left pl input of
+  Nothing -> pmap Right pr input
+  happy -> happy
+
 -- TOKENIZER -------------------------------------------------------------------
 
 data Token = Eof | Newline | Ch Char deriving (Show, Eq)
@@ -121,6 +126,12 @@ tokenize =
   pmap (++ [Eof]) (rep (alt [parseNewline, parseCh]))
 
 -- PARSER ----------------------------------------------------------------------
+
+parseUInt :: Parser Token Word
+parseUInt = pmap (read :: String -> Word) parseUInt'
+  where
+    parseUInt' = pmap (invToken <$>) (rep' (++) parseDigit)
+    parseDigit = alt (exactly . (: []) . Ch <$> "0123456789")
 
 -- Decorate certain lines of text, for example **bold** or *italic* or `code`
 data Inline
@@ -199,6 +210,8 @@ data Block
   | Paragraph [Inline]
   | Quote [Block]
   | Heading Int [Inline]
+  | UList [[Block]]
+  | OList [[Block]]
   | CodeBlock String String
   deriving (Show)
 
@@ -239,6 +252,39 @@ parseQuote input = do
       | nl == Newline || nl == Eof = Just (input', ())
     endQuote _ = Nothing
 
+parseUList :: Parser Token Block
+parseUList = pmap UList (rep (parseListItem (exactly [Ch '-'])))
+
+parseOList :: Parser Token Block
+parseOList = pmap OList (rep (parseListItem (parseUInt `thn` exactly [Ch '.'])))
+
+parseListItem :: Parser Token a -> Parser Token [Block]
+parseListItem parseOrd input = do
+  -- TODO: other languages (e.g. Japanese/Chinese) might use a full-width space
+  --       what should we do then? :O
+  (input1, line0) <- (parseOrd `thn2` utlNewlineInclusive) input
+  (input2, iLines) <- pmap (fromMaybe []) (opt (rep parseIndented)) input1
+  let minIndent = foldl min 0 (fst <$> iLines)
+  let contents = line0 ++ concatMap (drop minIndent . snd) iLines
+  (_, blocks) <- parseBlocks contents
+  Just (input2, blocks)
+  where
+    -- parses a line if it is indented or blank
+    -- returns the (indentWidth, tokens)
+    utlNewlineInclusive :: Parser Token [Token]
+    utlNewlineInclusive = pmap (uncurry (++)) (utl (exactly [Newline]))
+    parseIndented :: Parser Token (Int, [Token])
+    parseStuff =
+      pmap
+        length
+        (rep (alt [exactly [Ch '\t'], exactly [Ch ' ']]))
+        `thn` utlNewlineInclusive
+    parseBlank =
+      pmap
+        (first (const (maxBound :: Int)))
+        (opt (rep (exactly [Ch ' '])) `thn` exactly [Newline])
+    parseIndented = alt [parseStuff, parseBlank]
+
 parseBlocks :: Parser Token [Block]
 parseBlocks =
   rep' (++) (alt [special, parseParagraph, fallback])
@@ -248,6 +294,8 @@ parseBlocks =
         [ pmap (: []) parseLineBreak,
           pmap (: []) parseHeading,
           pmap (: []) parseCodeBlock,
+          pmap (: []) parseUList,
+          pmap (: []) parseOList,
           pmap (: []) parseQuote
         ]
     makeP input = Paragraph (snd (parseInline input))
@@ -287,22 +335,23 @@ attributes [] = ""
 attributes ((k, v) : xs) = " " ++ k ++ "=\"" ++ v ++ "\"" ++ attributes xs
 
 escapeHtml :: String -> String
-escapeHtml plaintext = esc' plaintext "" where
-  esc' [] html = reverse html
-  esc' (c:cs) html = esc' cs html'
-    where 
-      pushStr s = reverse s ++ html
-      html' = case c of 
-        '"' -> pushStr "&quot"
-        '\'' -> pushStr "&apos"
-        '&' -> pushStr "&amp;" 
-        '<' -> pushStr "&lt"
-        '>' -> pushStr "&gt"
-        _ -> c : html
+escapeHtml plaintext = esc' plaintext ""
+  where
+    esc' [] html = reverse html
+    esc' (c : cs) html = esc' cs html'
+      where
+        pushStr s = reverse s ++ html
+        html' = case c of
+          '"' -> pushStr "&quot"
+          '\'' -> pushStr "&apos"
+          '&' -> pushStr "&amp;"
+          '<' -> pushStr "&lt"
+          '>' -> pushStr "&gt"
+          _ -> c : html
 
 tag :: String -> [(String, String)] -> String -> String
 tag t attrs content =
-  "<"  
+  "<"
     ++ t
     ++ attributes attrs
     ++ ">"
@@ -341,3 +390,8 @@ blockToHtml (Heading n str) = tag ("h" ++ show (min 6 n)) [] (inlinesToHtml str)
 blockToHtml (CodeBlock lang text) =
   tag "pre" [("lang", lang)] (tag "code" [] (escapeHtml text))
 blockToHtml (Quote blocks) = tag "blockquote" [] (blocksToHtml blocks)
+blockToHtml (UList blocks) = tag "ul" [] (listEntriesToHtml blocks)
+blockToHtml (OList blocks) = tag "ol" [] (listEntriesToHtml blocks)
+
+listEntriesToHtml :: [[Block]] -> String
+listEntriesToHtml = concatMap (tag "li" [] . blocksToHtml) 

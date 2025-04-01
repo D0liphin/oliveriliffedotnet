@@ -184,11 +184,11 @@
             </div>
             <div class="content-container inverse">
                 <h1>Item-scoped Unsafe Code</h1><p>This document is a first? draft. Things might not be worded as
-accurately as I would like, but I am trying my best!</p><h2>Axiomatically Unsafe Operations</h2><p>Rust defines "the only things that you can do in unsafe code" as (reordered):</p><p>- Dereference a raw pointer
-- Access or modify a mutable static variable
-- Access fields of unions
-- Call an unsafe function or method
-- Implement an unsafe trait</p><p>This definition is accurate, but it's more from a code semantics
+accurately as I would like, but I am trying my best!</p><h2>Axiomatically Unsafe Operations</h2><p>Rust defines "the only things that you can do in unsafe code" as (reordered):</p><ul><li><p> Dereference a raw pointer
+</p></li><li><p> Access or modify a mutable static variable
+</p></li><li><p> Access fields of unions
+</p></li><li><p> Call an unsafe function or method
+</p></li><li><p> Implement an unsafe trait</p></li></ul><p>This definition is accurate, but it's more from a code semantics
 perspective, as opposed to a soundness perspective. When I say that
 something is "axiomatically unsafe", that means that it can _never_ be a
 safe operation without first checking preconditions.</p><p>For examlpe "calling an unsafe function or method" is not axiomatically

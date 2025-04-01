@@ -234,10 +234,10 @@ possible, while keeping _as much information as possible_. It's a form
 of _compression_, <strong>_that's_</strong> the intuition!</p><p>Now, we take this function (which, btw is a binary search) and use it to
 convert each <code>mean_cr</code> into a value from 0 to 31. Then, we encode this
 5-bit number as 5 binary features. That's it... and it _works_! For 
-example, we take a <code>mean_cr=202.45</code>. </p><p>1. Find which bucket this is in. Let's say it's 19.
-2. Convert 19 to a 5-bit integer <code>0b10011</code> 
-3. The <code>float mean_cr</code> feature is now 5 binary features, so we assign
-   the value to each of these.</p><pre lang="c"><code>struct patient_data {
+example, we take a <code>mean_cr=202.45</code>. </p><ol><li><p> Find which bucket this is in. Let's say it's 19.
+</p></li><li><p> Convert 19 to a 5-bit integer <code>0b10011</code> 
+</p></li><li><p> The <code>float mean_cr</code> feature is now 5 binary features, so we assign
+the value to each of these.</p></li></ol><pre lang="c"><code>struct patient_data {
     // ...other fields
     uint1_t mean_cr_0 = 1; 
     uint1_t mean_cr_1 = 1;
@@ -250,9 +250,8 @@ think at this point I just use <code>{ sex, age, recent_cr, median_cr }</code>. 
 train on 7000 datapoints and test on another 7000 datapoints and compute
 an F₃-score. </p><p><img alt="A graph showing that performance plateaus after 3 bits of precision" src="image-1.png"></p><p>As you can see, 3-5 bits is optimal for this. From tweaking the model,
 as training data increases using 6-7 bits becomes a better choice. </p><p>I peaked at a 0.985 F₃-score, before screwing up some weights right
-before the deadline for this coursework (you receive full marks for a
-0.95 F₃-score). This puts me around the middle of the class average.
-Considering though that I don't implement pruning, or take into account
+before the deadline for this coursework (you receive full marks for a</p><ol><li><p>95 F₃-score). This puts me around the middle of the class average.
+</p></li></ol><p>Considering though that I don't implement pruning, or take into account
 the dates of the creatinine scores and only use 40 bits of features, the
 fact that I am doing better than random forest models that train for 20x
 longer with some Python framework is genuinely not that bad (I think).

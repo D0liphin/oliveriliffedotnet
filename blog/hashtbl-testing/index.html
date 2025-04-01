@@ -245,20 +245,16 @@ correct software before this. </p><h2>Benchmarking</h2><p>Benchmarking is done w
 things with <code>plotly</code>. Exactly what kind of benchmarks one should use for
 this sort of thing is a little tricky. In the end, I decided on four 
 options that are supposed to give you some kind of 'holistic' idea 
-of usage</p><p>- <code>insert_2update_randoms</code> 
-  - insert <code>N</code> randoms in range <code>[0, N)</code>.
-  - update each key twice
-- <code>insert_remove_all_randoms</code> 
-  - insert <code>N</code> randoms in range <code>[0, N)</code>
-  - remove all entries in reverse order
-- <code>insert_remove_lookup</code>
-  - insert <code>N</code> randoms in range <code>[0, N)</code>
-  - remove <code>N / 2</code> randoms in range <code>[0, N)</code>
-  - lookup <code>N / 2</code> randoms in range <code>[0, N)</code>
-- <code>insert_remove_alt</code>
-  - insert <code>N / 2</code> randoms in range <code>[0, N)</code>
-  - remove <code>N / 2</code> randoms in range <code>[0, N)</code>
-  - repeat 8 times</p><h2><code>jtable</code></h2><p><code>jtable</code> is a table that aims to benefit from some level of 
+of usage</p><ul><li><p> <code>insert_2update_randoms</code> </p><ul><li><p> insert <code>N</code> randoms in range <code>[0, N)</code>.
+</p></li><li><p> update each key twice
+</p></li></ul></li><li><p> <code>insert_remove_all_randoms</code> </p><ul><li><p> insert <code>N</code> randoms in range <code>[0, N)</code>
+</p></li><li><p> remove all entries in reverse order
+</p></li></ul></li><li><p> <code>insert_remove_lookup</code></p><ul><li><p> insert <code>N</code> randoms in range <code>[0, N)</code>
+</p></li><li><p> remove <code>N / 2</code> randoms in range <code>[0, N)</code>
+</p></li><li><p> lookup <code>N / 2</code> randoms in range <code>[0, N)</code>
+</p></li></ul></li><li><p> <code>insert_remove_alt</code></p><ul><li><p> insert <code>N / 2</code> randoms in range <code>[0, N)</code>
+</p></li><li><p> remove <code>N / 2</code> randoms in range <code>[0, N)</code>
+</p></li><li><p> repeat 8 times</p></li></ul></li></ul><h2><code>jtable</code></h2><p><code>jtable</code> is a table that aims to benefit from some level of 
 cache-locality that is provided by linear-probing lookup, but with
 the consistency of a chaining approach. It's a failed idea, at least 
 in its current form. Failed research is stil research though, especially

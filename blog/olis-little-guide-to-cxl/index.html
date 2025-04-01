@@ -215,12 +215,12 @@ accesses do not. Wikipedia says this means:</p><blockquote><p> In a cache cohere
 have some mechanism to wait for those copies to be the same or 
 something. </p><p>Anyway, let's look at a use case of CXL that takes advantage of this.</p><h2>Use Case</h2><p>We have some kind of accelerator (processor that does a certain job
 better than our CPU) e.g. a GPU. If a GPU wants memory at the moment,
-it does so with a non-coherent DMA over PCIe.</p><p>1. Allocate buffer in host memory
-2. GPU makes request to the CPU
-3. Vaddr is translated
-4. Memory controller responds to RC
-5. CPU responds to GPU
-6. GPU puts memory in the right spot etc. </p><p>It would be much easier and more useful if we could just have a cache
+it does so with a non-coherent DMA over PCIe.</p><ol><li><p> Allocate buffer in host memory
+</p></li><li><p> GPU makes request to the CPU
+</p></li><li><p> Vaddr is translated
+</p></li><li><p> Memory controller responds to RC
+</p></li><li><p> CPU responds to GPU
+</p></li><li><p> GPU puts memory in the right spot etc. </p></li></ol><p>It would be much easier and more useful if we could just have a cache
 on the accelerator and do access of host memory through normal reads
 and writes. </p><p><img alt="Block diagram. There is an accelarator NIC with a cache connected to a 
   CPU via CXL. The CPU has two blocks of memory connected to it over

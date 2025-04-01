@@ -243,11 +243,11 @@ fun.</p><p>The only SIMD instruction we need to understand is
 each byte in the vector type, where the bit at index <code>mask[i]</code> is <code>1</code> 
 iff the byte at index <code>v[i]</code> is equal to <code>b</code>. E.g. a <code>i8x4</code> vector type
 would map (remember, little-endian)</p><pre lang="plaintext"><code>simd&lti8x4&gt::movemask_eq(0xab12ab34, 0xab) -&gt 0b0101
-</code></pre><p>For SSE, this is three instructions and is done as follows:</p><p>1. Splat (broadcast) <code>b</code> to every byte in the vector, to create a new
-   vector <code>u</code>.
-2. Do a bytewise equality comparison with <code>u</code> and <code>v</code>. This gets you
-  <code>0x00ff00ff</code> for the above example.
-3. Squish this to a bitmask.</p><p>Lookup, conceptually, is very simple then. Once we have the insertion 
+</code></pre><p>For SSE, this is three instructions and is done as follows:</p><ol><li><p> Splat (broadcast) <code>b</code> to every byte in the vector, to create a new
+vector <code>u</code>.
+</p></li><li><p> Do a bytewise equality comparison with <code>u</code> and <code>v</code>. This gets you
+<code>0x00ff00ff</code> for the above example.
+</p></li><li><p> Squish this to a bitmask.</p></li></ol><p>Lookup, conceptually, is very simple then. Once we have the insertion 
 index (<code>hash % size</code>), we find the chunk that's a part of. Then we 
 produce a few masks:</p><pre lang="cpp"><code>ctrlmask_t keep_mask = std::numeric_limits&ltctrlmask_t&gt::max() &lt&lt ctrlbyte_offset;
 ctrlmask_t hit_mask = movemask_eq(ctrlchunk.as_simd(), h7(h)) &amp; keep_mask;
@@ -271,14 +271,14 @@ again, I'd need to do some benchmarks to find out.</p><h2>So how fast is it?</h2
 article will hopefully detail how I do that.</p><p><img alt="Graph of benchmarks" src="./hashtbl-v0.0.1-bms.png"></p><p>The graph shows a variety of different benchmarks (could do an 
 interactive one, but I want to keep my website simple HTML). The Y-axis
 shows the number of operations we do for every 1 operation 
-<code>std::unordered_map</code> does in the same benchmark.</p><p>Each benchmarks has a name, parameterized by some value <code>N</code>.</p><p>- <code>insert_in_order</code>: Insert <code>0..N</code> in order.
-- <code>insert_randoms</code>:  Insert <code>N</code> random ints in order.
-- <code>insert_2update_randoms</code>: Insert <code>N</code> random ints in order, then update
-  them all, then update them all again.
-- <code>insert_in_order_xl_vals</code>: <code>insert_in_order</code>, but with <code>512</code>-byte
-  types for the <code>Val</code> type.
-- <code>insert_randoms_xl_vals</code>: <code>insert_randoms</code>, but with <code>512</code>-byte types
-  for the <code>Val</code> type.</p><p>The benchmark I will be most focusing on is <code>insert_2update_randoms</code>, 
+<code>std::unordered_map</code> does in the same benchmark.</p><p>Each benchmarks has a name, parameterized by some value <code>N</code>.</p><ul><li><p> <code>insert_in_order</code>: Insert <code>0..N</code> in order.
+</p></li><li><p> <code>insert_randoms</code>:  Insert <code>N</code> random ints in order.
+</p></li><li><p> <code>insert_2update_randoms</code>: Insert <code>N</code> random ints in order, then update
+them all, then update them all again.
+</p></li><li><p> <code>insert_in_order_xl_vals</code>: <code>insert_in_order</code>, but with <code>512</code>-byte
+types for the <code>Val</code> type.
+</p></li><li><p> <code>insert_randoms_xl_vals</code>: <code>insert_randoms</code>, but with <code>512</code>-byte types
+for the <code>Val</code> type.</p></li></ul><p>The benchmark I will be most focusing on is <code>insert_2update_randoms</code>, 
 since it provides a pretty holistic judgement about the table. Right
 now, I get -13% to +17% performance vs <code>std::unordered_map</code>, which is
 fine, I guess. I'm not too worried about the XL vals benchmark, 

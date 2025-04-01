@@ -208,11 +208,11 @@ be found <a href="https://github.com/D0liphin/HashTable/blob/master/include/tabl
 <code>std::unordered_map</code> operation. The tests are the same as last time.
 Again, <code>insert_2update_randoms</code> performs the worst, but yo ucan see how
 much better the C version is overall!</p><p>This got me thinking about why this version might be so much faster. I
-think it's because my version does the following:</p><p>1. Find the associated control chunk
-2. Do a bunch of vector instructions to generate a bitmask
-3. Consume the bitmask with <code>tzcnt</code> (3 cycles at a time)</p><p>The simple C version does the following:</p><p>1. Find the associated element
-2. Iterate over the elements in a predictable way with pointer offsets
-   (1 cycle).</p><p>There are all sorts of benefits for the latter. For example, we don't
+think it's because my version does the following:</p><ol><li><p> Find the associated control chunk
+</p></li><li><p> Do a bunch of vector instructions to generate a bitmask
+</p></li><li><p> Consume the bitmask with <code>tzcnt</code> (3 cycles at a time)</p></li></ol><p>The simple C version does the following:</p><ol><li><p> Find the associated element
+</p></li><li><p> Iterate over the elements in a predictable way with pointer offsets
+(1 cycle).</p></li></ol><p>There are all sorts of benefits for the latter. For example, we don't
 fill up the instruction buffer so OOO hardware can prefetch more clevery
 if it ever needs to. But I think more importantly than something like
 that, we just do _less compute_ than the original version since we
@@ -222,10 +222,10 @@ all out. It could be all wrong, but I looked it up and I got the right
 answer. Email me if it's wrong! Disclaimer, I wrote this really late at
 night and I'm pretty sure I made a mistake about halfway through and 
 just got lucky. You can skip to the last section if you just want the 
-results of it all.</p><p>There are two questions to ask here:</p><p>1. What is the average number of collisions when our hashtable is <code>l</code> 
-   full?
-2. What is the average number of collisions for a hashtable with load
-   factor <code>L</code>?</p><p>I'll try and use <code>l</code> and "load" for the proportion of our hashmap that 
+results of it all.</p><p>There are two questions to ask here:</p><ol><li><p> What is the average number of collisions when our hashtable is <code>l</code> 
+full?
+</p></li><li><p> What is the average number of collisions for a hashtable with load
+factor <code>L</code>?</p></li></ol><p>I'll try and use <code>l</code> and "load" for the proportion of our hashmap that 
 is _currently full right now_ and <code>L</code> and "load factor" for the maximum
 allowed <code>l</code> before we trigger a realloc. I'm using code snippets 
 because I generate these blogs from markdown. I'm using images for the 
@@ -328,10 +328,10 @@ updates a big map of <code>(l, cost)</code> pairs. This one should behave like
 <code>1 / (1 - x)^2</code>.</p><p><img alt="also not quite right graph" src="image-12.png"></p><p>As you can see, also not quite right. But what's strange here too is 
 that even though this is the average over something like 100 million 
 updates, the line is still very jittery. I really have no idea what's 
-causing this, because it's not _reproducable_ jitter.</p><h2>So what's next?</h2><p>Well, a few things. There are lots of questions yet to be answered</p><p>1. Why do the theoretical results not match up... _at all_?
-2. Does the probing method affect the practically obtained results?
-3. Why is the graph of load vs probe count so jittery?
-4. How can we use all this data to make a faster hashtable?</p><p>I hope to answer all these questions soon! I suspect this series is not
+causing this, because it's not _reproducable_ jitter.</p><h2>So what's next?</h2><p>Well, a few things. There are lots of questions yet to be answered</p><ol><li><p> Why do the theoretical results not match up... _at all_?
+</p></li><li><p> Does the probing method affect the practically obtained results?
+</p></li><li><p> Why is the graph of load vs probe count so jittery?
+</p></li><li><p> How can we use all this data to make a faster hashtable?</p></li></ol><p>I hope to answer all these questions soon! I suspect this series is not
 going to finish any time soon.
 </p>
             </div>

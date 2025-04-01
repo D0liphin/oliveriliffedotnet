@@ -186,12 +186,12 @@
                 <h1>Oli's Little Guide to Ruby</h1><p>This is about the 1986 HDL Ruby, made by <a href="https://www.cse.chalmers.se/~ms/">Mary Sheeran</a>.
 It's not quite finished, but I think provides a nice swift introduction
 to many of the basic concepts (everything up until registers). If you
-are interested in contributing, please do!</p><h2>Basic Relations</h2><p>- Ruby defines blocks with a domain and range.
-- Domain variables are read bottom-to-top, left-to-right and are on the
-  left or top of the block.
-- Range variables are read left-to-right, bottom-to-top and are on the
-  bottom or right of the block.
-- Blocks might perform computation.</p><p><img alt="A square labelled lowercase f has an incoming arrow from the left 
+are interested in contributing, please do!</p><h2>Basic Relations</h2><ul><li><p> Ruby defines blocks with a domain and range.
+</p></li><li><p> Domain variables are read bottom-to-top, left-to-right and are on the
+left or top of the block.
+</p></li><li><p> Range variables are read left-to-right, bottom-to-top and are on the
+bottom or right of the block.
+</p></li><li><p> Blocks might perform computation.</p></li></ul><p><img alt="A square labelled lowercase f has an incoming arrow from the left 
   and outgoing arrow to the right." src="image.png"></p><p>In ruby we can describe this as follows:</p><pre lang=""><code>f = VAR a . a $rel a.
 </code></pre><p>If <code>f</code> performs a function <code>g</code> on its input, we can write:</p><pre lang=""><code>f = VAR a . a $rel (`g` a).
 </code></pre><p><code>f</code> can be used as a function. For example, it is valid to declare a 
