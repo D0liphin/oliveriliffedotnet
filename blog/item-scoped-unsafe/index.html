@@ -190,7 +190,7 @@ accurately as I would like, but I am trying my best!</p><h2>Axiomatically Unsafe
 </p></li><li><p> Call an unsafe function or method
 </p></li><li><p> Implement an unsafe trait</p></li></ul><p>This definition is accurate, but it's more from a code semantics
 perspective, as opposed to a soundness perspective. When I say that
-something is "axiomatically unsafe", that means that it can _never_ be a
+something is "axiomatically unsafe", that means that it can <em>never</em> be a
 safe operation without first checking preconditions.</p><p>For examlpe "calling an unsafe function or method" is not axiomatically
 unsafe, since you can prove soundness without checking any
 preconditions.</p><pre lang="rust"><code>/// # Safety
@@ -205,13 +205,13 @@ unsafe {
 }
 </code></pre><p>I can prove this program is sound, without checking any preconditions.
 It is always sound to call <code>puts</code>, in any form. Therefore although it is
-"unsafe" to call <code>puts</code>, it is _never unsound_. That is to say: there is
+"unsafe" to call <code>puts</code>, it is <em>never unsound</em>. That is to say: there is
 no way I can invoke undefined behaviour with a call to <code>puts</code> in an
 otherwise safe environment.</p><p>This is not the case for what I would call "axiomatically unsafe
 operations". For example, dereferencing a raw pointer always has a
 safety contract. We couuld define this as a function (though it's not
 really) with a safety contract, but we could not define it as a function
-_without_ a safety contract, without that being unsound.</p><pre lang="rust"><code>/// # Safety
+<em>without</em> a safety contract, without that being unsound.</p><pre lang="rust"><code>/// # Safety
 /// - pointer is non-null
 /// - pointer must be within the bounds of the allocated object
 /// - the object must not have been deallocated (this is different from never having been
@@ -241,7 +241,7 @@ that is out of the allocated object if overflow is allowed, but I don't
 see why they wouldn't enforce the same rules as <code>unchecked_add</code> here.
 For the purposes of this theoretical point, I will assume that overflow
 works as you would expect.</p><p>So, we can read this as "it's not undefined behavior, but using the
-value afterwards _is_". This makes it considerably different from the
+value afterwards <em>is</em>". This makes it considerably different from the
 previous safety contract. Here, I can prove a call to this function is
 sound, but I might not be able to prove that my whole program is sound
 after this:</p><pre lang="rs"><code>let n: *const i32 = alloc::&lti32&gt();
@@ -256,7 +256,7 @@ if random::&ltbool&gt() {
 println!({n:?});
 </code></pre><p>We could structure the code differently and check if we invalidated the
 pointer every single time we want to 'use' it. However, the point of
-this document is to prove that this kind of safety contract is _never_
+this document is to prove that this kind of safety contract is <em>never</em>
 (well, almost never) required. We can do everything at what I call
 "item-scope" (with the addition of <code>unsafe</code> fields, or the the allowance
 of a few exceptions to the rule, that we can provide in a library).</p><h2>What is Item-scope?</h2><p>not written this bit yet.</p><h2>Implications</h2><p>A longer explanation to come. The idea is to uphold the invariants of

@@ -215,7 +215,7 @@ think it's because my version does the following:</p><ol><li><p> Find the associ
 (1 cycle).</p></li></ol><p>There are all sorts of benefits for the latter. For example, we don't
 fill up the instruction buffer so OOO hardware can prefetch more clevery
 if it ever needs to. But I think more importantly than something like
-that, we just do _less compute_ than the original version since we
+that, we just do <em>less compute</em> than the original version since we
 hardly ever probe anyway. If we do less than 3 probes 99% of the time,
 we may as well use a <code>uint8x4</code> instead of a <code>uint8x16</code>!</p><h2>Working out the average number of hashtable collisions</h2><p>I've always wanted to do this math. So I finally sat down and worked it
 all out. It could be all wrong, but I looked it up and I got the right
@@ -226,7 +226,7 @@ results of it all.</p><p>There are two questions to ask here:</p><ol><li><p> Wha
 full?
 </p></li><li><p> What is the average number of collisions for a hashtable with load
 factor <code>L</code>?</p></li></ol><p>I'll try and use <code>l</code> and "load" for the proportion of our hashmap that 
-is _currently full right now_ and <code>L</code> and "load factor" for the maximum
+is <em>currently full right now</em> and <code>L</code> and "load factor" for the maximum
 allowed <code>l</code> before we trigger a realloc. I'm using code snippets 
 because I generate these blogs from markdown. I'm using images for the 
 math. </p><p>So, we're looking for an empty cell to put our entry. Let's say we've 
@@ -236,7 +236,7 @@ Normally, the chance of finding an element would be <span class="tex-math">\( (1
 Remember, the hashtable is <span class="tex-math">\( l \)</span> full, so we just take the empty part,
 which is <span class="tex-math">\( 1 - l \)</span> and divide it by the total size of the hashtable, which
 is just <span class="tex-math">\( 1 \)</span>. If we know that <span class="tex-math">\( i \)</span> are occupied, we remove <span class="tex-math">\( i \)</span> from the
-total capacity _and_ <span class="tex-math">\( l \)</span>. An example would be like if we had 10 elements
+total capacity <em>and</em> <span class="tex-math">\( l \)</span>. An example would be like if we had 10 elements
 in the table and 4 were full. If we've checked 2 and they're both full
 we know the next one has a chance of <span class="tex-math">\( (4 - 2) / (10 - 2) \)</span> of being
 empty. Since we're taking the capacity to be <span class="tex-math">\( 1 \)</span> though, we just say
@@ -246,12 +246,12 @@ get the same values.</p><pre lang=""><code>(1 - 0.1 * 2) / (1 - 0.1 * 2) == (4 -
 </code></pre><p>In similar logic which I will not explain much in depth, the chance of 
 getting <code>i</code> consecutively occupied cells is just the product of the 
 chance of getting all previous cells occupied. The calculation is just 
-the opposite of what we had above.</p><p><div class="tex-math">\[ P(i \text{ consecutively occupied}) = \prod_{j=1}^{i} \frac{l - dj}{1 - dj} \]</div></p><p>So the chance that we will find the empty cell after _exactly_ <span class="tex-math">\( i \)</span> 
+the opposite of what we had above.</p><p><div class="tex-math">\[ P(i \text{ consecutively occupied}) = \prod_{j=1}^{i} \frac{l - dj}{1 - dj} \]</div></p><p>So the chance that we will find the empty cell after <em>exactly</em> <span class="tex-math">\( i \)</span> 
 probes is these two probabilities multiplied together.</p><p><div class="tex-math">\[ \lim_{d \rightarrow 0 }\frac{1 - l}{1 - di} \prod_{j=1}^{i - 1} \frac{l - dj}{1 - dj} = l^{i - 1}(1 - l) \]</div></p><p>I've taken an extra step with the above and rearranged the first 
 equation. Now, as the hashmap size tends towards infinity, the step 
 factor <span class="tex-math">\( d \)</span> becomes closer and closer to 0. When <span class="tex-math">\( d \)</span> is 0, the equation
 is just equivalent to that small little thing on the right! </p><p>That's pretty useless though, because we want to find the chance of 
-getting a result in <span class="tex-math">\( i \)</span> probes _or fewer_. So we want to know the chance 
+getting a result in <span class="tex-math">\( i \)</span> probes <em>or fewer</em>. So we want to know the chance 
 of getting it in <span class="tex-math">\( 1 \)</span> probe or <span class="tex-math">\( 2 \)</span> probes or <span class="tex-math">\( 3 \)</span> or <span class="tex-math">\( 4 \)</span> or <span class="tex-math">\( 5 \)</span> probes
 etc. etc. all the way to <span class="tex-math">\( i \)</span>. First, the chance of geting our slot in
 less than <span class="tex-math">\( i \)</span> steps is the sum of all the chances of getting a miss 
@@ -282,16 +282,16 @@ over <code>L</code>.</p><p><div class="tex-math">\[ \frac{\int_0^L \frac{1}{(1 -
 overflow post</a>
 tells me I'm right. I was really happy about this (even though it looks
 like my math will need an errata soon). The thing is, that's not how 
-my actual hash table behaves... Like _at all_.</p><p>You can find the source code of a hashtable in the folder that you're 
+my actual hash table behaves... Like <em>at all</em>.</p><p>You can find the source code of a hashtable in the folder that you're 
 in right now. It's at <a href="table.c">`table.c`</a> and <a href="table.h">`table.h`</a>.
-This hashtable is _thoroughly tested_ against hundreds of millions of 
+This hashtable is <em>thoroughly tested</em> against hundreds of millions of 
 random operations on an oracle map. It works. It comes with an option
 to set the load factor and keeps track of the number of probes it's 
 done in its lifetime.</p><p>I wrote some code that finds out both the probe cost at a given load <code>l</code>
-_and_ some code that finds out the probe cost across the hashmap
-allocation's lifetime for a given load-_factor_ <code>L</code>. You can find the
+<em>and</em> some code that finds out the probe cost across the hashmap
+allocation's lifetime for a given load-<em>factor</em> <code>L</code>. You can find the
 full source <a href="graphs.c">here</a>. It's pretty simple though, for the first
-case, we just get a number _really_ close to the max capacity and fill
+case, we just get a number <em>really</em> close to the max capacity and fill
 a map all the way till its full.</p><pre lang="c"><code>for (double l = 0.01; l &lt 1; l += 0.01) {
         table tbl;
         table_init(&amp;tbl, CAPACITY, l);
@@ -328,7 +328,7 @@ updates a big map of <code>(l, cost)</code> pairs. This one should behave like
 <code>1 / (1 - x)^2</code>.</p><p><img alt="also not quite right graph" src="image-12.png"></p><p>As you can see, also not quite right. But what's strange here too is 
 that even though this is the average over something like 100 million 
 updates, the line is still very jittery. I really have no idea what's 
-causing this, because it's not _reproducable_ jitter.</p><h2>So what's next?</h2><p>Well, a few things. There are lots of questions yet to be answered</p><ol><li><p> Why do the theoretical results not match up... _at all_?
+causing this, because it's not <em>reproducable</em> jitter.</p><h2>So what's next?</h2><p>Well, a few things. There are lots of questions yet to be answered</p><ol><li><p> Why do the theoretical results not match up... <em>at all</em>?
 </p></li><li><p> Does the probing method affect the practically obtained results?
 </p></li><li><p> Why is the graph of load vs probe count so jittery?
 </p></li><li><p> How can we use all this data to make a faster hashtable?</p></li></ol><p>I hope to answer all these questions soon! I suspect this series is not

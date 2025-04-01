@@ -213,8 +213,8 @@ data is already a list of <strong>binary features</strong> (e.g. "male/female" f
 sex), it's easy just say "is this patient male?". The hard part comes
 when you need to ask questions about real numbers, like creatinine test
 results.</p><h2>Deciding Features</h2><p>What if I told you that I can get good performance by turning my real
-numbers into around <strong>four</strong> binary features? This _vastly_ simplifies
-decision tree construction, _hugely_ compacts the data and is generally
+numbers into around <strong>four</strong> binary features? This <em>vastly</em> simplifies
+decision tree construction, <em>hugely</em> compacts the data and is generally
 just cool. For example our patient data can be packed into around 16 
 bits (down from 112) and there are only 16 questions to try out (instead
 of hundreds or even thousands with traditional methods). </p><p>If we take the data for a given feature (<code>mean_cr</code> for example) we get
@@ -230,10 +230,10 @@ data and stretching the dense bits of the data.</p><p>If I split this into 32 bu
 <code>mean_cr</code> and spits out which percentile (really 'per-32-ile') it fits
 into. I dont want you to think of this as percentiles though. I want you
 to think of it as squashing the data into as few integral values as 
-possible, while keeping _as much information as possible_. It's a form
-of _compression_, <strong>_that's_</strong> the intuition!</p><p>Now, we take this function (which, btw is a binary search) and use it to
+possible, while keeping <em>as much information as possible</em>. It's a form
+of <em>compression</em>, <strong><em>that's</em></strong> the intuition!</p><p>Now, we take this function (which, btw is a binary search) and use it to
 convert each <code>mean_cr</code> into a value from 0 to 31. Then, we encode this
-5-bit number as 5 binary features. That's it... and it _works_! For 
+5-bit number as 5 binary features. That's it... and it <em>works</em>! For 
 example, we take a <code>mean_cr=202.45</code>. </p><ol><li><p> Find which bucket this is in. Let's say it's 19.
 </p></li><li><p> Convert 19 to a 5-bit integer <code>0b10011</code> 
 </p></li><li><p> The <code>float mean_cr</code> feature is now 5 binary features, so we assign
@@ -255,24 +255,24 @@ before the deadline for this coursework (you receive full marks for a</p><ol><li
 the dates of the creatinine scores and only use 40 bits of features, the
 fact that I am doing better than random forest models that train for 20x
 longer with some Python framework is genuinely not that bad (I think).
-Anyway, it's more cool that this works _at all_.</p><p>I think the intuition here is that a 4-bit number representing the 
+Anyway, it's more cool that this works <em>at all</em>.</p><p>I think the intuition here is that a 4-bit number representing the 
 per-16-ile is acutally a really nice way of representing decisions to 
 narrow down a region of a distribution. The first bit says "I am in the
 top or bottom 50%" The second says "I am in the top or bottom 50% of 
-_this_ subdistribution". Etc. Fun. </p><h2>Speed</h2><p>What we should really be comparing this to is the performance of the
+<em>this</em> subdistribution". Etc. Fun. </p><h2>Speed</h2><p>What we should really be comparing this to is the performance of the
 <a href="https://www.england.nhs.uk/akiprogramme/aki-algorithm/">NHS algorithm</a>.
 I don't know the exact performance (I need to test it). But roughly, for
 every 1000 people who come have AKI, we send ~200 of them home saying
 they don't have it. With this simple classifier that number gets reduce
-to ~20.</p><p>What's _even worse_ is that the <strong>most complicated version of</strong> the
+to ~20.</p><p>What's <em>even worse</em> is that the <strong>most complicated version of</strong> the
 algorithm I've made could be run in reasonable time in the 1990s on a
-_PC CPU_ when we
+<em>PC CPU</em> when we
 <a href="https://www.taylorfrancis.com/books/mono/10.1201/9781315139470/classification-regression-trees-leo-breiman-jerome-friedman-olshen-charles-stone">_knew about decision trees_</a> already.</p><p>Currently inference (read string data in, parse, produce classification,
 on my laptop [single core, ]) takes ~1.5μs. Even if we assume that the
 Pentium 60 was 1000x slower (which is probably wasn't), that's still in
 the order of milliseconds!</p><p>Training takes 10ms-150ms depending on the size of the random forest and
 the amount of input data. On a Pentium 60, That's 10s to 3 minutes. This
-is _totally reasonable numbers_!!! This code isn't even particularly
+is <em>totally reasonable numbers</em>!!! This code isn't even particularly
 aggressively optimized. Basically, we've had the ability and knowledge
 to diagnose this illness with excellent accuracy for over 30 years and
 we're still not doing it. What the heck.</p><p>Here's a fancy representation of my random forest though.</p><p><img alt="A random forest" src="image-2.png"></p>

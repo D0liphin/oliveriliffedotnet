@@ -213,13 +213,13 @@ and this at the same time and wait for it to fail. Let's call this
 method <code>test_against_oracle_huge_randoms</code>. This approach is great,
 because it gives us pretty high confidence that our table works. The
 issue with it is that when it fails, tracing exactly why it failed is
-really _really_ hard. As a result, I did a couple extra things.</p><p>First, generate every single possible ordering of <code>remove()</code>/<code>insert()</code>.
+really <em>really</em> hard. As a result, I did a couple extra things.</p><p>First, generate every single possible ordering of <code>remove()</code>/<code>insert()</code>.
 We do this for up to <code>k = 8</code> and for sequences up to length <code>7</code>. Values
 only need to be binary (<code>1</code> or <code>0</code>). Using more values is basically 
 pointless because for any case where the value happens to be the same,
 there is another combination where it isn't. After executing each 
 sequence on the oracle and the test table, we check that looking up 
-all keys up to <code>k = 8</code> produces identical results.</p><p>This lets us generate _readable_ counter examples as code. Here's an 
+all keys up to <code>k = 8</code> produces identical results.</p><p>This lets us generate <em>readable</em> counter examples as code. Here's an 
 example output from the test suite.</p><pre lang="c"><code>// Failed to match oracle output on below test case
 int main()
 {
@@ -234,7 +234,7 @@ int main()
         vtbl.deinit(&amp;tbl);
         return 0;
 }
-</code></pre><p>Indeed, I found <strong>seven</strong> _different_ bugs this way! However, my code
+</code></pre><p>Indeed, I found <strong>seven</strong> <em>different</em> bugs this way! However, my code
 was still not working on <code>test_against_oracle_huge_randoms</code>. A new 
 test case was needed! This time, I generate about 100-million random 
 counter examples for different sequence lengths and with much larger
@@ -258,7 +258,7 @@ of usage</p><ul><li><p> <code>insert_2update_randoms</code> </p><ul><li><p> inse
 cache-locality that is provided by linear-probing lookup, but with
 the consistency of a chaining approach. It's a failed idea, at least 
 in its current form. Failed research is stil research though, especially
-if you learn _why_ it failed. The next article should be about trying 
+if you learn <em>why</em> it failed. The next article should be about trying 
 to make this approach work better, this one just describes it.</p><p><code>jtable</code> uses a flat buffer to store everything. Let's start by 
 inserting <code>a</code>, <code>b</code>, <code>c</code> and <code>d</code>. We ignore values here.</p><p><img alt="A flat buffer with snugly-placed entries" src="image.png"></p><p>Let's say that <code>hash(e) == hash(a)</code>. In this case, we want to place <code>e</code>
 in the same bucket.</p><p><img alt="e overlaps with bucket containing a" src="image-1.png"></p><p>Since we can't do this, we probe for an empty slot and insert <code>e</code>. </p><p><img alt="e is placed in an empty slot a few spaces to the right of a" src="image-3.png"></p><p>We maintain a pointer from the bucket containing <code>a</code> to the bucket 
@@ -279,8 +279,8 @@ slot <code>i + 1</code> is not occupied is still just the load of the table.</p>
 They all start off empty, so whichever one I fill (considering a totally
 random hash function) is random. So let's go ahead and fill in slot <code>2</code>.</p><p><img alt="a flat buffer with the 3rd slot occupied" src="image-9.png"></p><p>A subsequent insert will select an index in the range <code>[0, 8)</code> at 
 random. However, slot <code>2</code> is occupied now. And if we choose slot <code>2</code>,
-we deterministically end up filling slot <code>3</code>. So slot <code>3</code> is _twice_ 
-as likely to be filled. This actually _snowballs_ really fast!
+we deterministically end up filling slot <code>3</code>. So slot <code>3</code> is <em>twice</em> 
+as likely to be filled. This actually <em>snowballs</em> really fast!
 </p>
             </div>
         </div>

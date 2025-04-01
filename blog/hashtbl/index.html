@@ -254,13 +254,13 @@ ctrlmask_t hit_mask = movemask_eq(ctrlchunk.as_simd(), h7(h)) &amp; keep_mask;
 ctrlmask_t empty_mask =
     movemask_eq(ctrlchunk.as_simd(), CtrlChunk::CTRL_EMPTY) &amp; keep_mask;
 </code></pre><p>First, to clear any confusion, bit indices start at the 
-_least_-significant bit. The <code>keep_mask</code> is telling us to ignore the 
+<em>least</em>-significant bit. The <code>keep_mask</code> is telling us to ignore the 
 first few bits. Index <code>18</code> for example would require us to skip bits 
 <code>0..=1</code>, since there is no point probing those.</p><p>We use <code>__builtin_ctz()</code> to find the next offset to probe at. This 
 compiles to a <code>rep bsf</code> string instruction... Since we're actually
 trying to produce a mask equal to the final high-bit, there are other
 bit-manipulation ways we can do this, and we spam <code>__builtin_ctz()</code>
-_a lot_. More to come on benchmarks with this.</p><p>So, as you can imagine, we're essentially getting these chunk masks in
+<em>a lot</em>. More to come on benchmarks with this.</p><p>So, as you can imagine, we're essentially getting these chunk masks in
 order and consuming either the next empty entry or the next h7 hit and
 updating the masks as we go. Whenever we get an h7 hit, we go into the
 main <code>Entry[]</code> buffer and test full equality on the key. A type trait is

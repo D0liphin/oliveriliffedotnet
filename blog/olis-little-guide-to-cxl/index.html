@@ -199,7 +199,7 @@ of control tasks, as well as non-coherent direct memory access (DMA).</p><p><str
 from the CPU host.</p><p><strong>CXL.mem</strong> allows the host CPU to access device-attached memory. This
 is referred to as "Host managed Device Memory" (HDM).</p><p>The latter two are special because they allow these memory operations
 to happen in a 'cache coherent' way.</p><h2>It's All About Memory</h2><p>CXL is about accessing device memory from your host CPU and vice versa.
-CXL is _all about memory_ Don't get any ideas that CXL is for something
+CXL is <em>all about memory</em> Don't get any ideas that CXL is for something
 else.</p><h2>What is Cache Coherence?</h2><p>Here is a typical <a href="https://en.wikipedia.org/wiki/CPU_cache">cache</a> 
 diagram:</p><p><img alt="CPUs and Caches Block Diagram. There are two CPUs each with a cache 
   connected to a shared main memory." src="image-1.png"></p><p>Consider the case where CPU 1 writes some value. Upon write, the cache
@@ -264,7 +264,7 @@ matter, you just need to understand that this can be achieved like this.</p><p>O
 different message types that the device can send to the host and vice
 versa.</p><p>The device has various kinds of commands it can send. Most obvious are
 <code>Read</code> and <code>Write</code>. <code>Read</code> allows a device to request coherence state
-and data _for_ a cache line. <code>Write</code> is used for the device to evict
+and data <em>for</em> a cache line. <code>Write</code> is used for the device to evict
 data from the device cache. For both, the host tells the device what
 state is globally observed (GO) by the system.</p><p>The host can also send 'snoop's to the device to update its cache, or
 to read the current cache state from the device. Let's look at an 
@@ -289,7 +289,7 @@ device, it just goes straight to device cache!</p><p>How clever. We send off our
 and sends us back our data. If it's already in cache, we just read/write
 straight away. </p><h3>CXL.mem</h3><p>CXL.mem uses "host-managed device memory" (HDM). The basic form of the 
 protocol does not allow the device to also cache the host memory. A
-more complicated version _does_, though.</p><p>Memory that is host-managed coherent is called HDM-H and memory that is
+more complicated version <em>does</em>, though.</p><p>Memory that is host-managed coherent is called HDM-H and memory that is
 device-managed coherent is called HDM-D. The way HDM-D is managed much
 in the same way as CXL.cache, in fact, certain parts of it actually do
 perform CXL.cache requests to the host. I don't think going through the

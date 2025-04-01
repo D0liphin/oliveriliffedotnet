@@ -303,7 +303,7 @@ for x in xs:
 wondering if the "right" in "reduce-right" has anything to do with 
 that. If you're not, you can skip this bit. If you are, recall that:</p><pre lang="hs"><code>foldr f y [x₁,x₂,x₃] = (f x₁ (f x₂ (f x₃ y)))
 foldl f y [x₁,x₂,x₃] = (f (f (f y x₁) x₂) x₃)
-</code></pre><p>If you're clever, you might notice that _basically_ <code>foldr</code> is just
+</code></pre><p>If you're clever, you might notice that <em>basically</em> <code>foldr</code> is just
 <code>foldl</code> with the <code>xs</code> reversed. If you're really clever, you'll notice
 that in a lazy language, <code>foldr</code> can short circuit early and <code>foldl</code>
 can't. E.g. <code>foldr (||) False (True : repeat False)</code> actually evaluates,
