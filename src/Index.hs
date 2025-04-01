@@ -178,7 +178,10 @@ parseInline = multiple
       alt
         [ pmap (Bold . (: []) . Italic,) (tkDelimited "***" "***"),
           pmap (Bold,) (tkDelimited "**" "**"),
-          pmap (Italic,) (tkDelimited "*" "*")
+          pmap (Italic,) (tkDelimited "*" "*"),
+          pmap (Bold . (: []) . Italic,) (tkDelimited "___" "___"),
+          pmap (Bold,) (tkDelimited "__" "__"),
+          pmap (Italic,) (tkDelimited "_" "_")
         ]
     simple =
       alt
