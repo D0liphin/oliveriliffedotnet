@@ -1,0 +1,13 @@
+title = "Cache Coherence"
+
+description = """Cache coherence protocols that exist on modern hardware are 
+often proprietary, but this doesn't stop us analysing side channels to figure
+out how these protocols might be implemented."""
+
+date = 2025-04-01
+
+[meta]
+keywords = ["cache", "coherence", "hardware"]
+
+[[author]]
+name = "Oliver Iliffe"
