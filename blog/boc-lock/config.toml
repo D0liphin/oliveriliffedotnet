@@ -1,0 +1,13 @@
+title = "Faster Locks than XCHG on x86"
+
+description = """I describe a lock that is in many regards much faster than an 
+XCHG-based lock for x86 machines. I made this as part of my Master's thesis. I
+also release my frustrations about computer architecture."""
+
+date = 2025-10-16
+
+[meta]
+keywords = ["locks", "xchg", "x86", "architecture"]
+
+[[author]]
+name = "Oliver Iliffe"

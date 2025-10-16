@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Oliver Iliffe's Website</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="DESCRIPTION">
+    <meta name="keywords" content="locks, xchg, x86, architecture">
+    <meta name="author" content="Oliver Iliffe">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+        rel="stylesheet">
+    <!-- MATH
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex/dist/contrib/auto-render.min.js" onload="renderMath()"></script>
+    <script>
+    const renderMath = () => {
+        document.querySelectorAll('.tex-math').forEach(el => {
+            renderMathInElement(el, {
+                delimiters: [
+                    { left: "\\(", right: "\\)", display: false },
+                    { left: "\\[", right: "\\]", display: true }
+                ]
+            });
+        });
+    };
+    </script>  
+    ENDMATH -->
+    <style>
+        :root {
+            --almost-black: rgb(30, 30, 30);
+            --almost-white: rgb(240, 240, 240);
+        }
+
+        :root {
+            --primary-color: var(--almost-white);
+            --secondary-color: var(--almost-black);
+        }
+
+        * {
+            box-sizing: border-box;
+            color: var(--primary-color);
+        }
+
+        .sans-serif {
+            font-family: "Open Sans", sans-serif;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: "Open Sans", sans-serif;
+            font-weight: 800;
+        }
+        
+        p {
+            font-family: "Open Sans", sans-serif;
+        }
+
+        a:hover {
+            color: var(--primary-color);
+        }
+
+        html {
+            margin: 0px;
+        }
+
+        body {
+            margin: 0px;
+            background-color: var(--secondary-color);
+            overflow-x: hidden;
+        }
+
+        .everything-container {
+            padding: 20px;
+        }
+
+        @media (max-width: 500px) {
+            .everything-container {
+                padding: 0px;
+            }
+        }
+
+        .heading-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0px 20px 0px 20px;
+        }
+
+        @media (max-width: 500px) {
+            .heading-container {
+                margin-bottom: 10px;
+            }
+        }
+
+        .img-with-border {
+            border: 5px solid var(--primary-color);
+        }
+
+        .inverse * {
+            color: var(--secondary-color);
+        }
+
+        .inverse * a:hover {
+            color: var(--secondary-color);
+        }
+
+        .content-container {
+            border-radius: 6px;
+            background-color: var(--primary-color);
+            padding: 20px 30px 30px 30px;
+            position: relative;
+        }
+
+        .content-container *>img {
+            max-width: 100%;
+        }
+
+        @media (max-width: 500px) {
+            .content-container {
+                border-radius: 0px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .ferris-the-crab {
+                visibility: hidden;
+            }
+        }
+
+        pre *,
+        code *,
+        code {
+            font-family: "Roboto Mono", monospace;
+            font-size: 14px;
+            line-height: 20px;
+        }
+
+        h1 *,
+        h2 *,
+        h3 *,
+        h4 * {
+            font-size: inherit;
+        }
+
+        pre {
+            overflow-x: auto;
+            background-color: var(--almost-black);
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        pre>code {
+            color: rgb(78, 233, 194) !important;
+        }
+
+        .tex-math {
+            overflow-x: scroll;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="max-width: 800px; margin-left: auto; margin-right: auto;">
+        <div class="everything-container">
+            <div class="heading-container">
+                <div style="display: flex; flex-direction: column;">
+                    <h1>Faster Locks than XCHG on x86</h1>
+                    <span style="position: relative; bottom: 10px; padding-left: 2px;" class="sans-serif">October 16, 2025</span>
+                </div>
+                <a href="/">
+                    <img src="/img/go-back.svg" alt="A navigation arrow to send you back to the site homepage"
+                        style="filter: invert(1); height: 30px;" />
+                </a>
+            </div>
+            <div class="content-container inverse">
+                <h1>Batching Locks</h1><p>I am increasingly frustrated by CPUs not doing what I want them to. I 
+want them to be streaming and I want them to give me deep control over
+their functional units and scheduling and caches. But they're not. The
+job of a CPU optimizer feels like it's counterintuitive. The CPU 
+designers try and make a processor that guesses what you want to do,
+based on the instructions you gave it, and ends up doing something quite
+non-obvious. And then you are trying to guess what the CPU is doing...
+so you're guessing what the CPU is guessing what you're trying to do.
+Hell. I like the GPU philosophy more and I intend to leave the world of
+CPUs behind after I finish my current projects.</p><p>One thing that makes me upset is <code>clflushopt</code>, another is <code>clwb</code>. And a
+third thing that makes me upset is <code>mfence</code>, and for that matter, any
+instruction that functions as an <code>mfence</code> (such as <code>xchg</code>). <code>xchg</code> is
+really slow and I don't want to use it for my locks. It takes like 
+25-50 cycles to finish and serializes with the other instructions so
+nothing can even do anything while it's executing. What that means, if
+you don't know, is if I have this super useful bunch of work:</p><pre lang="rs"><code>asm!(
+    // instruction
+    &quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,
+    &quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,
+    &quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,
+    &quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,
+    &quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,
+    &quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,
+    &quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,
+    &quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,
+    &quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,
+    &quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,
+    &quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,
+    &quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,&quotnop&quot,
+    // that was 100 nops
+    options(nomem, nostack, preserves_flags)
+);
+</code></pre><p>...and I want to put something where it says <code>instruction</code>, I can 
+normally expect that something that takes a while will happen, and while
+it's happening, we can do the useful work after <code>instruction</code> <em>at the 
+same time</em>, because that's the magic of CPUs. Sof if <code>instruction</code> is 
+something like an <code>idiv</code> (which takes 50 cycles ish), we see that the 
+time that block takes increases by 4-5 cycles (which is not 50). If I
+put a flippin <code>xchg</code>, it increases by 25-30 cycles (which is arse).
+And sometimes, you just want to lock something to do like one or two
+operations, that <em>probably won't conflict anyway</em>, so WHY AM I SOMETIMES
+30x-ing my overhead for basically NOTHING. Why am I GETTING THIS 
+PERFORMANCE when there's NOT EVEN ANY CONTENTION. whew.</p><p>The reason for this is because the CPU does this flush of the store 
+buffer, of course. I'll assume you know this already and explain my 
+solution.</p><h2>The Dekker Lock</h2><p>A Dekker lock is a lock that lets you have mutual exclusion between
+two threads with just <code>MOV</code>s. I didn't invent it (first). It works 
+by having two flags <code>a</code> and <code>b</code> and each flag can only be written to
+by one of the two threads. To lock you do something like this</p><pre lang="rs"><code>// thread &aposa&apos is acquiring
+loop:
+    a := 1
+    if b == 1: 
+        a := 0
+    else:
+        break;
+// lock acquired
+</code></pre><p>You can think of <code>a</code> set to <code>1</code> meaning "I want this lock". You can work
+through this yourself to prove the sequentially consistent version 
+works. Using this with x86's memory model (TSO) will yield a pretty 
+correct lock. This is nice because <code>MOV</code>s are not stupid instructions
+that cannot be pipelined properly. </p><p>...But it is a lock that is wrong. Here's why:</p><p><img alt="Ordering diagram showing how both threads can acquire the lock" src="image.png"></p><p>As you can see, both threads can acquire the lock because of TSO being
+annoying.</p><h2>The Fixed Dekker Lock</h2><p>We can fix this by acquiring like 10 locks, then doing the <code>mfence</code>.
+You could also probably fix this by just doing the acquire, then 
+doing 30 cycles worth of work while you wait for the store buffer to 
+drain, then go back to it. But that's not 'semantically correct' and 
+all the formalising people will be mad at you. You can then extend this
+design to allow up to 16 threads.</p><p>Some Points:                                                               </p><ol><li><p> We use str8, ldr128 etc. for when we are actually dealing with the lock 
+word. This is so that we can reason about correctness.                  
+<em> These operations are <em>atomic</em>                                         
+</em> These operations respect TSO                                          
+</p></li><li><p> Otherwise, we use the intrinsics, since the compiler can reason about   
+them for optimizations.                                                 </p></li></ol><pre lang="c"><code>typedef struct {
+        char bytes[16];
+} mb_lock16_t __attribute__((aligned(16)));
+
+#define RELEASED 0
+#define ACQUIRED 0xff
+
+static inline void mb_lock16_init(mb_lock16_t *lock)
+{
+  memset((void *)&amp;lock-&gtbytes, RELEASED, sizeof(mb_lock16_t));
+}
+
+static inline void mb_lock16_will_acquire(mb_lock16_t *lock, size_t id)
+{
+  __m128i lockv = ldr128((__m128i *)lock);
+  if (!_mm_testz_si128(lockv, lockv)) return;
+  str8(&amp;lock-&gtbytes[id], ACQUIRED);
+}
+
+static inline void mb_lock16_fence() { mfence(); }
+
+static inline bool mb_lock16_try_acquire(mb_lock16_t *lock, size_t id)
+{
+  __m128i lockv = ldr128((__m128i *)lock);
+  // treating each byte as a bit 0xff/0x00, we know that the movemask for
+  // an acquired lock is all 0s except 1 for our ID
+  uint16_t movm = (uint16_t)_mm_movemask_epi8(lockv);
+  uint16_t acqm = 1u &lt&lt id;
+  if (movm == acqm) {
+    // we acquired
+    return true;
+  } else if ((movm &amp; acqm) != 0) {
+    // we need to reset our flag
+    str8(&amp;lock-&gtbytes[id], RELEASED);
+  }
+  return false;
+}
+
+static inline void mb_lock16_release(mb_lock16_t *lock, size_t id)
+{
+  str8(&amp;lock-&gtbytes[id], RELEASED);
+}
+</code></pre><p>You'd use this like this:</p><pre lang="c"><code>for (size_t i = 0; i &lt nr_locks; ++i) {
+    mb_lock16_will_acquire(&amp;locks[i], thread_id());
+}
+mb_lock16_fence();
+for (size_t i = 0; i &lt nr_locks; ++i) {
+    while (!mb_lock16_try_acquire(&amp;locks[i], thread_id()));
+    // do some work
+    mb_lock16_release(&amp;locks[i], thread_id());
+}
+</code></pre><h2>"I am Concerned!"</h2><blockquote><p> <strong>Concern</strong>: "Oli, that's only 16 threads max though!". 
+</p></blockquote><p><strong>Comfort</strong>: It's unlikely you have more than 16 threads that you 
+really want to do fine grained locking with because hardware doesn't do
+that and you should really rethink your algorithm.</p><blockquote><p> <strong>Concern</strong>: "Oli, won't that be slower than a regular lock if I don't batch it?"
+</p></blockquote><p><strong>Comfort</strong>: Sometimes, but it's for batching.</p><blockquote><p> <strong>Concern</strong>: "Oli, I use green threads"
+</p></blockquote><p><strong>Comfort</strong>: Lock not design for this</p><blockquote><p> <strong>Concern</strong>: "Won't this cause lots of contention and failed locks"
+</p></blockquote><p><strong>Comfort</strong>: No, you will almost never see someone not acquiring this
+on the first try even if lots of people are snapping their jaws at the 
+lock because M state cache lines exist exclusively and changing them
+is more expensive than finishing a <code>MOV</code>.</p><blockquote><p> <strong>Concern</strong>: "Isn't this indefinite wait?"
+</p></blockquote><p><strong>Comfort</strong>: Yes</p><h2>Graphs </h2><p>Here's a graph showing you lock acquisiting time in ns for my CPU, which
+is a Tigerlake one.</p><p><img alt="a graph showing you lock acquisiting time in ns for my CPU, which
+is a Tigerlake one." src="image-1.png"></p><p>The x axis shows how many locks you acquire at once, the y axis how 
+long each one took you to acquire. Ignore the fact that we're worse 
+than XCHG for less than 4 locks. Don't use it then. The various lines 
+show us what kind of contention scenarios we have. E.g. "2 Hyperthread"
+means that the locks are being snapped at by 2 threads on the same core.</p><h2>Hopes </h2><p>I hope that was interesting and made some sense!
+</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
