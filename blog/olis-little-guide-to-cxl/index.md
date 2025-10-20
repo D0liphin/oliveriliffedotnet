@@ -1,9 +1,5 @@
 # Oli's Little Guide to CXL
 
-> test
-> test
-## breaks
-
 I'm working on a research project about [CXL (Compute Express Link)](https://en.wikipedia.org/wiki/Compute_Express_Link)
 and distributed memory, so I am adding a new little guide about what CXL
 actually is. Hopefully in a way that you can read this in 20 minutes 
