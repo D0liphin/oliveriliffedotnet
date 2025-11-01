@@ -1,0 +1,11 @@
+title = "AI"
+
+description = """My thoughts on AI"""
+
+date = 2025-10-31
+
+[meta]
+keywords = ["ai"]
+
+[[author]]
+name = "Oliver Iliffe"
